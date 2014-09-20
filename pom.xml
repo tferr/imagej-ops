@@ -131,6 +131,7 @@
 	<properties>
 		<!-- NB: JUnit >= 4.11 needed for JUnit-Benchmarks -->
 		<junit.version>4.11</junit.version>
+		<imglib2.version>2.0.0-SNAPSHOT</imglib2.version>
 	</properties>
 
 	<repositories>
