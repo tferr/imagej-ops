@@ -30,23 +30,29 @@
 
 package net.imagej.ops.create;
 
-import net.imagej.ops.Op;
-import net.imagej.ops.Ops;
+import net.imglib2.img.Img;
+import net.imglib2.img.ImgFactory;
 import net.imglib2.type.Type;
 
+import org.scijava.ItemIO;
 import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
 
-@Plugin(type = Op.class, name = Ops.CreateImg.NAME)
-public class CreateImgDefault<V extends Type<V>> extends AbstractCreateImg<V>
-	implements Ops.CreateImg
-{
+/**
+ * Abstract class for creating an image from a factory and a type. Derived
+ * classes will contain logic to determine size and values of the image.
+ * 
+ * @author bnorthan
+ * @param <V>
+ */
+abstract public class AbstractCreateImg<V extends Type<V>> {
+
+	@Parameter(type = ItemIO.OUTPUT)
+	protected Img<V> output;
 
 	@Parameter
-	private long[] dims;
+	protected ImgFactory<V> fac;
 
-	@Override
-	public void run() {
-		output = fac.create(dims, outType.copy());
-	}
+	@Parameter
+	protected V outType;
+
 }
