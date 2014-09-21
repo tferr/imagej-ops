@@ -14,6 +14,7 @@ ops = ```
   {name: identity,    iface: Identity},
   {name: invert,      iface: Invert},
   {name: join,        iface: Join},
+  {name: log,         iface: Log},
   {name: lookup,      iface: Lookup,         aliases: "op"},
   {name: loop,        iface: Loop},
   {name: map,         iface: Map},
