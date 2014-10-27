@@ -15,7 +15,8 @@ ops = ```
   {name: feret, iface: Feret},
   {name: feretresult, iface: FeretResult},
   {name: centerofgravity, iface: CenterOfGravity},
-  {name: convexhull, iface: ConvexHull},
+  {name: convexhullcreator, iface: ConvexHullCreator},
+  {name: polygoncreator, iface:PolygonCreator},
   {name: smallestenclosingrectangle, iface: SmallestEnclosingRectangle}
 ]
 ```
