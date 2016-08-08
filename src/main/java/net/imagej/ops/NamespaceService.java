@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,13 +30,18 @@
 
 package net.imagej.ops;
 
-import org.scijava.plugin.SingletonService;
+import net.imagej.ImageJService;
+
+import org.scijava.plugin.PTService;
 
 /**
- * Interface for services that manage OPS {@link Namespace}s.
+ * Interface for services that manage Ops {@link Namespace}s.
  *
  * @author Curtis Rueden
  */
-public interface NamespaceService extends SingletonService<Namespace> {
-	// NB: Marker interface.
+public interface NamespaceService extends PTService<Namespace>, ImageJService {
+
+	/** Creates a {@link Namespace} with the given op execution environment. */
+	<NS extends Namespace> NS create(Class<NS> pluginClass, OpEnvironment ops);
+
 }

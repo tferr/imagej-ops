@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -40,9 +40,8 @@ import net.imagej.ops.Op;
  * would be marked by implementing the {@code Ops.Eval} interface, and
  * annotating them with:
  * </p>
- * <pre>
- * @Plugin(type = Ops.Eval.class, name = Ops.Eval.NAME)
- * </pre>
+ *
+ * {@code @Plugin(type = Ops.Eval.class)}
  *
 #foreach ($author in $authors)
  * @author $author
@@ -62,14 +61,7 @@ public final class Ops {
 	 * Implementing classes should be annotated with:
 	 * </p>
 	 *
-	 * <pre>
-#if ($op.aliases)
-	 * @Plugin(type = Ops.${opClass}.class, name = Ops.${opClass}.NAME,
-	 *   attrs = { @Attr(name = "aliases", value = Ops.${opClass}.ALIASES) })
-#else
-	 * @Plugin(type = Ops.${opClass}.class, name = Ops.${opClass}.NAME)
-#end
-	 * </pre>
+	 * {@code @Plugin(type = Ops.${opClass}.class)}
 	 */
 	public interface $opClass extends Op {
 		String NAME = "$op.name";
@@ -102,14 +94,7 @@ $alias##
 		 * Implementing classes should be annotated with:
 		 * </p>
 		 *
-		 * <pre>
-#if ($op.aliases)
-		 * @Plugin(type = Ops.${nsClass}.${opClass}.class, name = Ops.${nsClass}.${opClass}.NAME,
-		 *   attrs = { @Attr(name = "aliases", value = Ops.${nsClass}.${opClass}.ALIASES) })
-#else
-		 * @Plugin(type = Ops.${nsClass}.${opClass}.class, name = Ops.${nsClass}.${opClass}.NAME)
-#end
-		 * </pre>
+		 * {@code @Plugin(type = Ops.${nsClass}.${opClass}.class)}
 		 */
 		public interface $opClass extends Op {
 			String NAME = "${ns.name}.$op.name";

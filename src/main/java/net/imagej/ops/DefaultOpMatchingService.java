@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,14 +32,16 @@ package net.imagej.ops;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Iterator;
 import java.util.List;
+import java.util.function.Predicate;
 
 import net.imagej.ops.OpCandidate.StatusCode;
 
 import org.scijava.Context;
 import org.scijava.InstantiableException;
-import org.scijava.command.CommandInfo;
-import org.scijava.command.CommandService;
 import org.scijava.convert.ConvertService;
 import org.scijava.log.LogService;
 import org.scijava.module.Module;
@@ -50,6 +52,8 @@ import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 import org.scijava.service.AbstractService;
 import org.scijava.service.Service;
+import org.scijava.util.ConversionUtils;
+import org.scijava.util.GenericUtils;
 
 /**
  * Default service for finding {@link Op}s which match a request.
@@ -68,9 +72,6 @@ public class DefaultOpMatchingService extends AbstractService implements
 	private ModuleService moduleService;
 
 	@Parameter
-	private CommandService commandService;
-
-	@Parameter
 	private ConvertService convertService;
 
 	@Parameter
@@ -79,85 +80,79 @@ public class DefaultOpMatchingService extends AbstractService implements
 	// -- OpMatchingService methods --
 
 	@Override
-	public List<CommandInfo> getOps() {
-		return commandService.getCommandsOfType(Op.class);
+	public OpCandidate findMatch(final OpEnvironment ops, final OpRef ref) {
+		return findMatch(ops, Collections.singletonList(ref));
 	}
 
 	@Override
-	public <OP extends Op> Module findModule(final OpRef<OP> ref) {
+	public OpCandidate findMatch(final OpEnvironment ops,
+		final List<OpRef> refs)
+	{
 		// find candidates with matching name & type
-		final List<OpCandidate<OP>> candidates = findCandidates(ref);
-		if (candidates.isEmpty()) {
-			throw new IllegalArgumentException("No candidate '" + ref.getLabel() +
-				"' ops");
-		}
+		final List<OpCandidate> candidates = findCandidates(ops, refs);
+		assertCandidates(candidates, refs.get(0));
 
 		// narrow down candidates to the exact matches
-		final List<Module> matches = findMatches(candidates);
+		final List<OpCandidate> matches = filterMatches(candidates);
 
-		if (matches.size() == 1) {
-			// a single match: return it
-			if (log.isDebug()) {
-				log.debug("Selected '" + ref.getLabel() + "' op: " +
-					matches.get(0).getDelegateObject().getClass().getName());
-			}
-			return matches.get(0);
-		}
-
-		final String analysis = OpUtils.matchInfo(candidates, matches);
-		throw new IllegalArgumentException(analysis);
+		return singleMatch(candidates, matches);
 	}
 
 	@Override
-	public <OP extends Op> List<OpCandidate<OP>> findCandidates(
-		final OpRef<OP> ref)
+	public List<OpCandidate> findCandidates(final OpEnvironment ops,
+		final OpRef ref)
 	{
-		final ArrayList<OpCandidate<OP>> candidates =
-			new ArrayList<OpCandidate<OP>>();
-		for (final CommandInfo info : getOps()) {
-			if (isCandidate(info, ref)) {
-				candidates.add(new OpCandidate<OP>(ref, info));
+		return findCandidates(ops, Collections.singletonList(ref));
+	}
+
+	@Override
+	public List<OpCandidate> findCandidates(final OpEnvironment ops,
+		final List<OpRef> refs)
+	{
+		final ArrayList<OpCandidate> candidates = new ArrayList<>();
+		for (final OpInfo info : ops.infos()) {
+			for (final OpRef ref : refs) {
+				if (isCandidate(info, ref)) {
+					candidates.add(new OpCandidate(ops, ref, info));
+				}
 			}
 		}
 		return candidates;
 	}
 
 	@Override
-	public <OP extends Op> List<Module> findMatches(
-		final List<OpCandidate<OP>> candidates)
-	{
-		final ArrayList<Module> matches = new ArrayList<Module>();
+	public List<OpCandidate> filterMatches(final List<OpCandidate> candidates) {
+		final List<OpCandidate> validCandidates = validCandidates(candidates);
 
-		double priority = Double.NaN;
-		for (final OpCandidate<?> candidate : candidates) {
-			final ModuleInfo info = candidate.getInfo();
-			final double p = info.getPriority();
-			if (p != priority && !matches.isEmpty()) {
-				// NB: Lower priority was reached; stop looking for any more matches.
-				break;
-			}
-			priority = p;
+		List<OpCandidate> matches;
 
-			final Module module = match(candidate);
+		matches = filterMatches(validCandidates, (cand) -> typesPerfectMatch(cand));
+		if (!matches.isEmpty()) return matches;
 
-			if (module != null) matches.add(module);
-		}
+		matches = castMatches(validCandidates);
+		if (!matches.isEmpty()) return matches;
 
+		// NB: Not implemented yet
+//		matches = filterMatches(validCandidates, (cand) -> losslessMatch(cand));
+//		if (!matches.isEmpty()) return matches;
+
+		matches = filterMatches(validCandidates, (cand) -> typesMatch(cand));
 		return matches;
 	}
 
 	@Override
-	public <OP extends Op> Module match(final OpCandidate<OP> candidate) {
+	public Module match(final OpCandidate candidate) {
 		if (!valid(candidate)) return null;
+		if (!outputsMatch(candidate)) return null;
 		final Object[] args = padArgs(candidate);
 		return args == null ? null : match(candidate, args);
 	}
 
 	@Override
-	public <OP extends Op> boolean typesMatch(final OpCandidate<OP> candidate) {
+	public boolean typesMatch(final OpCandidate candidate) {
 		if (!valid(candidate)) return false;
 		final Object[] args = padArgs(candidate);
-		return args == null ? false : typesMatch(candidate, args);
+		return args == null ? false : typesMatch(candidate, args) < 0;
 	}
 
 	@Override
@@ -170,9 +165,9 @@ public class DefaultOpMatchingService extends AbstractService implements
 	}
 
 	@Override
-	public <OP extends Op> Object[] padArgs(final OpCandidate<OP> candidate) {
+	public Object[] padArgs(final OpCandidate candidate) {
 		int inputCount = 0, requiredCount = 0;
-		for (final ModuleItem<?> item : candidate.getInfo().inputs()) {
+		for (final ModuleItem<?> item : candidate.cInfo().inputs()) {
 			inputCount++;
 			if (item.isRequired()) requiredCount++;
 		}
@@ -183,14 +178,14 @@ public class DefaultOpMatchingService extends AbstractService implements
 		}
 		if (args.length > inputCount) {
 			// too many arguments
-			candidate.setStatus(StatusCode.TOO_MANY_ARGS,
-				args.length + " > " + inputCount);
+			candidate.setStatus(StatusCode.TOO_MANY_ARGS, args.length + " > " +
+				inputCount);
 			return null;
 		}
 		if (args.length < requiredCount) {
 			// too few arguments
-			candidate.setStatus(StatusCode.TOO_FEW_ARGS,
-				args.length + " < " + requiredCount);
+			candidate.setStatus(StatusCode.TOO_FEW_ARGS, args.length + " < " +
+				requiredCount);
 			return null;
 		}
 
@@ -200,7 +195,7 @@ public class DefaultOpMatchingService extends AbstractService implements
 		final int optionalsToFill = optionalCount - argsToPad;
 		final Object[] paddedArgs = new Object[inputCount];
 		int argIndex = 0, paddedIndex = 0, optionalIndex = 0;
-		for (final ModuleItem<?> item : candidate.getInfo().inputs()) {
+		for (final ModuleItem<?> item : candidate.cInfo().inputs()) {
 			if (!item.isRequired() && optionalIndex++ >= optionalsToFill) {
 				// skip this optional parameter (pad with null)
 				paddedIndex++;
@@ -214,40 +209,305 @@ public class DefaultOpMatchingService extends AbstractService implements
 	// -- Helper methods --
 
 	/** Helper method of {@link #findCandidates}. */
-	private <OP extends Op> boolean isCandidate(final CommandInfo info,
-		final OpRef<OP> ref)
-	{
-		if (!nameMatches(info, ref.getName())) return false;
+	private boolean isCandidate(final OpInfo info, final OpRef ref) {
+		if (!info.nameMatches(ref.getName())) return false;
 
 		// the name matches; now check the class
 		final Class<?> opClass;
 		try {
-			opClass = info.loadClass();
+			opClass = info.cInfo().loadClass();
 		}
 		catch (final InstantiableException exc) {
-			log.error("Invalid op: " + info.getClassName());
+			final String msg = "Invalid op: " + info.cInfo().getClassName();
+			if (log.isDebug()) log.debug(msg, exc);
+			else log.error(msg);
 			return false;
 		}
 
-		return ref.getType() == null || ref.getType().isAssignableFrom(opClass);
+		return ref.typesMatch(opClass);
 	}
 
-	/** Verifies that the given candidate's module is valid. */
-	private <OP extends Op> boolean valid(final OpCandidate<OP> candidate) {
-		if (candidate.getInfo().isValid()) return true;
+	/** Helper method of {@link #findMatch}. */
+	private void assertCandidates(final List<OpCandidate> candidates,
+		final OpRef ref)
+	{
+		if (candidates.isEmpty()) {
+			throw new IllegalArgumentException("No candidate '" + ref.getLabel() +
+				"' ops");
+		}
+	}
+
+	/**
+	 * Gets a list of valid candidates injected with padded arguments.
+	 * <p>
+	 * Helper method of {@link #filterMatches}.
+	 * </p>
+	 * 
+	 * @param candidates list of candidates
+	 * @return a list of valid candidates with arguments injected
+	 */
+	private List<OpCandidate> validCandidates(
+		final List<OpCandidate> candidates)
+	{
+		final ArrayList<OpCandidate> validCandidates = new ArrayList<>();
+		for (final OpCandidate candidate : candidates) {
+			if (!valid(candidate) || !outputsMatch(candidate)) continue;
+			final Object[] args = padArgs(candidate);
+			if (args == null) continue;
+			candidate.setArgs(args);
+			if (missArgs(candidate)) continue;
+			validCandidates.add(candidate);
+		}
+		return validCandidates;
+	}
+
+	/**
+	 * Determines if the candidate arguments match with lossless conversion. Needs
+	 * support from the conversion in the future.
+	 */
+	@SuppressWarnings("unused")
+	private boolean losslessMatch(final OpCandidate candidate) {
+		// NB: Not yet implemented
+		return false;
+	}
+
+	/**
+	 * Filters out candidates that pass the given filter.
+	 * <p>
+	 * Helper method of {@link #filterMatches(List)}.
+	 * </p>
+	 */
+	private List<OpCandidate> filterMatches(final List<OpCandidate> candidates,
+		final Predicate<OpCandidate> filter)
+	{
+		final ArrayList<OpCandidate> matches = new ArrayList<>();
+		double priority = Double.NaN;
+		for (final OpCandidate candidate : candidates) {
+			final ModuleInfo info = candidate.cInfo();
+			final double p = info.getPriority();
+			if (p != priority && !matches.isEmpty()) {
+				// NB: Lower priority was reached; stop looking for any more matches.
+				break;
+			}
+			priority = p;
+
+			if (filter.test(candidate) && moduleConforms(candidate)) matches.add(
+				candidate);
+		}
+		return matches;
+	}
+
+	/**
+	 * Determines if the candidate has some arguments missing.
+	 * <p>
+	 * Helper method of {@link #filterMatches(List)}.
+	 * </p>
+	 */
+	private boolean missArgs(final OpCandidate candidate) {
+		int i = 0;
+		for (final ModuleItem<?> item : candidate.cInfo().inputs()) {
+			if (candidate.getArgs()[i++] == null && item.isRequired()) {
+				candidate.setStatus(StatusCode.REQUIRED_ARG_IS_NULL, null, item);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Determine if the arguments of the candidate perfectly match with the
+	 * reference.
+	 * <p>
+	 * Helper method of {@link #filterMatches(List)}.
+	 * </p>
+	 */
+	private boolean typesPerfectMatch(final OpCandidate candidate) {
+		int i = 0;
+		final Object[] args = candidate.getArgs();
+		for (final ModuleItem<?> item : candidate.cInfo().inputs()) {
+			if (args[i] != null) {
+				final Class<?> typeClass = OpMatchingUtil.getClass(item.getType());
+				final Class<?> argClass = OpMatchingUtil.getClass(args[i]);
+				if (!typeClass.equals(argClass)) return false;
+			}
+			i++;
+		}
+		return true;
+	}
+
+	/**
+	 * Extracts a list of candidates that requires casting to match with the
+	 * reference.
+	 * <p>
+	 * Helper method of {@link #filterMatches(List)}.
+	 * </p>
+	 */
+	private List<OpCandidate> castMatches(final List<OpCandidate> candidates) {
+		final ArrayList<OpCandidate> matches = new ArrayList<>();
+		int minLevels = Integer.MAX_VALUE;
+		double priority = Double.NaN;
+		for (final OpCandidate candidate : candidates) {
+
+			final ModuleInfo info = candidate.cInfo();
+			final double p = info.getPriority();
+			if (p != priority && !matches.isEmpty()) {
+				// NB: Lower priority was reached; stop looking for any more matches.
+				break;
+			}
+			priority = p;
+
+			final int nextLevels = findCastLevels(candidate);
+			if (nextLevels < 0 || nextLevels > minLevels) continue;
+
+			if (!moduleConforms(candidate)) continue;
+
+			if (nextLevels < minLevels) {
+				matches.clear();
+				minLevels = nextLevels;
+			}
+			matches.add(candidate);
+		}
+		return matches;
+	}
+
+	/**
+	 * Find the total levels of casting needed for the candidate to match with the
+	 * reference.
+	 * <p>
+	 * Helper method of {@link #filterMatches(List)}.
+	 * </p>
+	 */
+	private int findCastLevels(final OpCandidate candidate) {
+		int level = 0, i = 0;
+		final Object[] args = candidate.getArgs();
+		for (final ModuleItem<?> item : candidate.cInfo().inputs()) {
+			final Class<?> type = item.getType();
+			if (args[i] != null) {
+				final int currLevel = OpMatchingUtil.findCastLevels(type, OpMatchingUtil
+					.getClass(args[i]));
+				if (currLevel < 0) return -1;
+				level += currLevel;
+			}
+			i++;
+		}
+		return level;
+	}
+
+	/**
+	 * Extracts and returns the single match from the given list of matches,
+	 * executing the linked {@link Module}'s initializer if applicable. If there
+	 * is not exactly one match, an {@link IllegalArgumentException} is thrown
+	 * with an analysis of the problem(s).
+	 * <p>
+	 * Helper method of {@link #findMatch}.
+	 * </p>
+	 * 
+	 * @param candidates The original unfiltered list of candidates, used during
+	 *          the analysis if there was a problem finding exactly one match.
+	 * @param matches The list of matching candidates.
+	 * @return The single matching candidate, with its module initialized.
+	 * @throws IllegalArgumentException If there is not exactly one matching
+	 *           candidate.
+	 */
+	private OpCandidate singleMatch(final List<OpCandidate> candidates,
+		final List<OpCandidate> matches)
+	{
+		if (matches.size() == 1) {
+			// a single match: initialize and return it
+			final Module m = matches.get(0).getModule();
+			if (log.isDebug()) {
+				log.debug("Selected '" + matches.get(0).getRef().getLabel() + "' op: " +
+					m.getDelegateObject().getClass().getName());
+			}
+
+			// initialize the op, if appropriate
+			if (m.getDelegateObject() instanceof Initializable) {
+				((Initializable) m.getDelegateObject()).initialize();
+			}
+
+			return matches.get(0);
+		}
+
+		final String analysis = OpUtils.matchInfo(candidates, matches);
+		throw new IllegalArgumentException(analysis);
+	}
+
+	/**
+	 * Verifies that the given candidate's module is valid.
+	 * <p>
+	 * Helper method of {@link #match(OpCandidate)}.
+	 * </p>
+	 */
+	private boolean valid(final OpCandidate candidate) {
+		if (candidate.cInfo().isValid()) return true;
 		candidate.setStatus(StatusCode.INVALID_MODULE);
 		return false;
 	}
 
+	/**
+	 * Verifies that the given candidate's output types match those of the op.
+	 * <p>
+	 * Helper method of {@link #match(OpCandidate)}.
+	 * </p>
+	 */
+	private boolean outputsMatch(final OpCandidate candidate) {
+		final Collection<Type> outTypes = candidate.getRef().getOutTypes();
+		if (outTypes == null) return true; // no constraints on output types
+
+		final Iterator<ModuleItem<?>> outItems = //
+			candidate.cInfo().outputs().iterator();
+		for (final Type outType : outTypes) {
+			if (!outItems.hasNext()) {
+				candidate.setStatus(StatusCode.TOO_FEW_OUTPUTS);
+				return false;
+			}
+			// FIXME: Use generic assignability test, once it exists.
+			final Class<?> raw = GenericUtils.getClass(outType);
+			if (!ConversionUtils.canCast(outItems.next().getType(), raw)) {
+				candidate.setStatus(StatusCode.OUTPUT_TYPES_DO_NOT_MATCH);
+				return false;
+			}
+		}
+		return true;
+	}
+
+	/**
+	 * Verifies that the given candidate's module conforms.
+	 * <p>
+	 * Helper method of {@link #filterMatches(List)}.
+	 * </p>
+	 */
+	private boolean moduleConforms(final OpCandidate candidate) {
+		// create module and assign the inputs
+		final Module module = createModule(candidate, candidate.getArgs());
+		candidate.setModule(module);
+
+		// make sure the op itself is happy with these arguments
+		final Object op = module.getDelegateObject();
+		if (op instanceof Contingent) {
+			final Contingent c = (Contingent) op;
+			if (!c.conforms()) {
+				candidate.setStatus(StatusCode.DOES_NOT_CONFORM);
+				return false;
+			}
+		}
+
+		// found a match!
+		return true;
+	}
+
 	/** Helper method of {@link #match(OpCandidate)}. */
-	private <OP extends Op> Module match(final OpCandidate<OP> candidate,
-		final Object[] args)
-	{
+	private Module match(final OpCandidate candidate, final Object[] args) {
 		// check that each parameter is compatible with its argument
-		if (!typesMatch(candidate, args)) return null;
+		final int badIndex = typesMatch(candidate, args);
+		if (badIndex >= 0) {
+			final String message = typeClashMessage(candidate, args, badIndex);
+			candidate.setStatus(StatusCode.ARG_TYPES_DO_NOT_MATCH, message);
+			return null;
+		}
 
 		// create module and assign the inputs
-		final Module module = createModule(candidate.getInfo(), args);
+		final Module module = createModule(candidate, args);
 		candidate.setModule(module);
 
 		// make sure the op itself is happy with these arguments
@@ -268,55 +528,55 @@ public class DefaultOpMatchingService extends AbstractService implements
 	 * Checks that each parameter is type-compatible with its corresponding
 	 * argument.
 	 */
-	private <OP extends Op> boolean typesMatch(final OpCandidate<OP> candidate,
-		final Object[] args)
-	{
+	private int typesMatch(final OpCandidate candidate, final Object[] args) {
 		int i = 0;
-		for (final ModuleItem<?> item : candidate.getInfo().inputs()) {
-			final Object arg = args[i++];
-			if (!canAssign(candidate, arg, item)) return false;
+		for (final ModuleItem<?> item : candidate.cInfo().inputs()) {
+			if (!canAssign(candidate, args[i], item)) return i;
+			i++;
 		}
-		return true;
-	}
-
-	/** Helper method of {@link #isCandidate}. */
-	private boolean nameMatches(final ModuleInfo info, final String name) {
-		if (name == null) return true; // not filtering on name
-
-		// check if name matches exactly
-		final String infoName = info.getName();
-		if (name.equals(infoName)) return true;
-
-		// check if name matches w/o namespace (e.g., 'add' matches 'math.add')
-		if (infoName != null) {
-			final int dot = infoName.lastIndexOf(".");
-			if (dot >= 0 && name.equals(infoName.substring(dot + 1))) return true;
-		}
-
-		// check for an alias
-		final String alias = info.get("alias");
-		if (name.equals(alias)) return true;
-
-		// check for a list of aliases
-		final String aliases = info.get("aliases");
-		if (aliases != null) {
-			for (final String a : aliases.split(",")) {
-				if (name.equals(a.trim())) return true;
-			}
-		}
-
-		return false;
+		return -1;
 	}
 
 	/** Helper method of {@link #match(OpCandidate, Object[])}. */
-	private Module createModule(final ModuleInfo info, final Object... args) {
-		final Module module = moduleService.createModule(info);
-		context.inject(module.getDelegateObject());
+	private String typeClashMessage(final OpCandidate candidate,
+		final Object[] args, final int index)
+	{
+		int i = 0;
+		for (final ModuleItem<?> item : candidate.opInfo().cInfo().inputs()) {
+			if (i++ == index) {
+				final Object arg = args[index];
+				final String argType = arg == null ? "null" : arg.getClass().getName();
+				final Type inputType = item.getGenericType();
+				return index + ": cannot coerce " + argType + " -> " + inputType;
+			}
+		}
+		throw new IllegalArgumentException("Invalid index: " + index);
+	}
+
+	/** Helper method of {@link #match(OpCandidate, Object[])}. */
+	private Module createModule(final OpCandidate candidate,
+		final Object... args)
+	{
+		// create the module
+		final Module module = moduleService.createModule(candidate.cInfo());
+
+		// unwrap the created op
+		final Op op = OpUtils.unwrap(module, candidate.getRef());
+
+		// inject the op execution environment
+		op.setEnvironment(candidate.ops());
+
+		// inject the SciJava application context
+		// CTR: TODO: It would be nice if the framework already injected this.
+		// Why does ModuleService.createModule not inject on getDelegateObject?
+		context.inject(op);
+
+		// populate the inputs and return the module
 		return assignInputs(module, args);
 	}
 
 	/** Helper method of {@link #match(OpCandidate, Object[])}. */
-	private boolean canAssign(final OpCandidate<?> candidate, final Object arg,
+	private boolean canAssign(final OpCandidate candidate, final Object arg,
 		final ModuleItem<?> item)
 	{
 		if (arg == null) {
@@ -329,8 +589,8 @@ public class DefaultOpMatchingService extends AbstractService implements
 
 		final Type type = item.getGenericType();
 		if (!canConvert(arg, type)) {
-			candidate.setStatus(StatusCode.CANNOT_CONVERT,
-				arg.getClass().getName() + " => " + type, item);
+			candidate.setStatus(StatusCode.CANNOT_CONVERT, arg.getClass().getName() +
+				" => " + type, item);
 			return false;
 		}
 
@@ -369,7 +629,8 @@ public class DefaultOpMatchingService extends AbstractService implements
 
 	/** Determines whether the argument is a matching class instance. */
 	private boolean isMatchingClass(final Object arg, final Type type) {
-		return arg instanceof Class &&
-			convertService.supports((Class<?>) arg, type);
+		return arg instanceof Class && convertService.supports((Class<?>) arg,
+			type);
 	}
+
 }

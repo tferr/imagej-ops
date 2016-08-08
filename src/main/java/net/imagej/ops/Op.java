@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -40,7 +40,10 @@ import org.scijava.plugin.PluginService;
  * <p>
  * <p>
  * Ops discoverable at runtime must implement this interface and be annotated
- * with @{@link Plugin} with attribute {@link Plugin#type()} = {@link Op}.class.
+ * with @{@link Plugin} with attribute {@link Plugin#type()} = {@link Op}.class
+ * or a subtype thereof (see the interfaces of {@link Ops}). While it is
+ * possible to create an op merely by implementing this interface, it is
+ * encouraged to instead extend {@link AbstractOp}, for convenience.
  * </p>
  * <h2>Naming and matching</h2>
  * <p>
@@ -75,49 +78,13 @@ import org.scijava.plugin.PluginService;
  * <li>Op arguments are fixed: an op may not dynamically alter the number or
  * types of its arguments.</li>
  * <li>Calling the same op twice with the same argument values must result in
- * the same result (for a given set of available ops).</li>
+ * the same result (for a given op execution environment).</li>
  * </ul>
- * <h2>Most common types of ops</h2>
- * <p>
- * Four common patterns for ops are:
- * </p>
- * <table style="border: 1px solid black; border-collapse: collapse">
- * <tr>
- * <th>Name</th>
- * <th>Summary</th>
- * <th>Output type</th>
- * <th>Methods</th>
- * </tr>
- * <tr>
- * <th>{@link FunctionOp}</th>
- * <td>&nbsp;</td>
- * <td>OUTPUT</td>
- * <td>{@code compute(I)}</td>
- * </tr>
- * <tr>
- * <th>{@link ComputerOp}</th>
- * <td>&nbsp;</td>
- * <td>BOTH</td>
- * <td>{@code compute(I, O)}</td>
- * </tr>
- * <tr>
- * <th>{@link HybridOp}</th>
- * <td>&nbsp;</td>
- * <td>BOTH (optional)</td>
- * <td>{@code compute(I, O)} and {@code compute(I)}</td>
- * </tr>
- * <tr>
- * <th>{@link InplaceOp}</th>
- * <td>&nbsp;</td>
- * <td>BOTH</td>
- * <td>{@code compute(A)}</td>
- * </tr>
- * </table>
  * 
  * @author Curtis Rueden
  * @see Plugin
  * @see PluginService
  */
-public interface Op extends Command {
+public interface Op extends Command, Environmental {
 	// NB: Marker interface.
 }

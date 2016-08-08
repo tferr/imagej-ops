@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,11 +31,11 @@
 package net.imagej.ops.commands.convolve;
 
 import net.imagej.ImgPlus;
-import net.imagej.ops.ComputerOp;
+import net.imagej.axis.Axis;
 import net.imagej.ops.Op;
 import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
-import net.imglib2.Axis;
+import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
@@ -75,7 +75,7 @@ public class Convolve<I extends RealType<I>, K extends RealType<K>, O extends Re
 	// TODO: needs to be selected by the user, but is not a plugin -> probably
 	// needs to be wrapped?
 	@Parameter
-	private OutOfBoundsFactory<I, ImgPlus<I>> outOfBounds = new OutOfBoundsMirrorFactory<I, ImgPlus<I>>(
+	private OutOfBoundsFactory<I, ImgPlus<I>> outOfBounds = new OutOfBoundsMirrorFactory<>(
 			Boundary.SINGLE);
 
 	@Parameter
@@ -108,7 +108,7 @@ public class Convolve<I extends RealType<I>, K extends RealType<K>, O extends Re
 				out = (ImgPlus) in.factory().imgFactory(new FloatType())
 						.create(in, new FloatType());
 			} catch (final IncompatibleTypeException e) {
-				throw new RuntimeException(e);
+				throw new IllegalArgumentException(e);
 			}
 		} else {
 			out = (ImgPlus<O>) in.factory().create(in,
@@ -117,11 +117,11 @@ public class Convolve<I extends RealType<I>, K extends RealType<K>, O extends Re
 
 		final Op op = ops.op(Ops.Filter.Convolve.class, out, in, kernel);
 		if (in.numDimensions() > kernel.numDimensions()) {
-			if (op instanceof ComputerOp) {
+			if (op instanceof UnaryComputerOp) {
 				// if the selected convolve op is a function and the kernel dimensions
 				// doesn't match the input image dimensions, than we can still convolve
 				// each slice individually
-				ops.slicewise(out, in, op, axisIndices);
+				ops.run(Ops.Slice.class, out, in, op, axisIndices);
 			} else {
 				throw new IllegalArgumentException(
 						"The input image has more dimensions than the kernel!");

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -36,20 +36,20 @@ import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 
 /**
- * Default (slower) implementation of an {@link MapIterableInplace}.
+ * A {@link MapInplace} over an {@link Iterable}.
  * 
  * @author Curtis Rueden
  * @author Christian Dietz (University of Konstanz)
- * @param <A>
+ * @param <A> element type of inplace arguments
  */
-@Plugin(type = Ops.Map.class, name = Ops.Map.NAME,
-	priority = Priority.LOW_PRIORITY)
-public class MapIterableInplace<A> extends AbstractMapInplace<A, Iterable<A>> {
+@Plugin(type = Ops.Map.class, priority = Priority.LOW_PRIORITY)
+public class MapIterableInplace<A> extends
+	AbstractMapIterableInplace<A, A, Iterable<A>>
+{
 
 	@Override
-	public void compute(final Iterable<A> arg) {
-		for (final A t : arg) {
-			getOp().compute(t, t);
-		}
+	public void mutate(final Iterable<A> arg) {
+		Maps.inplace(arg, getOp());
 	}
+
 }

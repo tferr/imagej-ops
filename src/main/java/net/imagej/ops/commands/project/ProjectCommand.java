@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,7 @@ package net.imagej.ops.commands.project;
 
 import net.imagej.ImgPlus;
 import net.imagej.axis.TypedAxis;
-import net.imagej.ops.AbstractComputerOp;
 import net.imagej.ops.OpService;
-import net.imagej.ops.stats.mean.MeanOp;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 
@@ -67,28 +65,10 @@ public class ProjectCommand<T extends RealType<T>> implements Command {
 	public void run() {
 		if (out == null) {
 			Img<T> img = in.factory().create(in, in.firstElement().createVariable());
-			out = new ImgPlus<T>(img, in);
+			out = new ImgPlus<>(img, in);
 		}
 		int axisIndex = in.dimensionIndex(axis.type());
-		ops.image().project(out, in, method, axisIndex);
-	}
-
-	/* -- Wrapper classes to mark certain operations as projection methods --*/
-
-	private class ProjectMean extends AbstractComputerOp<Iterable<T>, T>
-		implements ProjectMethod<T>
-	{
-
-		private MeanOp<Iterable<T>, T> mean;
-
-		@Override
-		public void compute(final Iterable<T> input, final T output) {
-			if (mean == null) {
-				mean = ops.op(MeanOp.class, output, input);
-			}
-			mean.compute(input, output);
-		}
-
+		ops.transform().project(out, in, method, axisIndex);
 	}
 
 }

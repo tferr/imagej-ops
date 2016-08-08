@@ -5,114 +5,153 @@
 	<parent>
 		<groupId>net.imagej</groupId>
 		<artifactId>pom-imagej</artifactId>
-		<version>9.2.0</version>
+		<version>16.0.0</version>
 		<relativePath />
 	</parent>
 
 	<artifactId>imagej-ops</artifactId>
-	<version>0.15.1-SNAPSHOT</version>
+	<version>0.32.0-SNAPSHOT</version>
 
-	<name>ImageJ Operations</name>
-	<description>ImageJ OPS: a framework for reusable algorithms.</description>
+	<name>ImageJ Ops</name>
+	<description>ImageJ Operations: a framework for reusable algorithms.</description>
 	<inceptionYear>2014</inceptionYear>
 
 	<developers>
 		<developer>
-			<id>dietzc</id>
-			<name>Christian Dietz</name>
-			<email>christian.dietz@uni-konstanz.de</email>
-			<url>http://www.informatik.uni-konstanz.de/berthold/mitglieder/christian-dietz/</url>
-			<organization>University of Konstanz</organization>
-			<organizationUrl>http://www.informatik.uni-konstanz.de/</organizationUrl>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
-		</developer>
-		<developer>
 			<id>ctrueden</id>
 			<name>Curtis Rueden</name>
-			<email>ctrueden@wisc.edu</email>
-			<url>http://loci.wisc.edu/people/curtis-rueden</url>
-			<organization>UW-Madison LOCI</organization>
-			<organizationUrl>http://loci.wisc.edu/</organizationUrl>
+			<url>http://imagej.net/User:Rueden</url>
 			<roles>
-				<role>architect</role>
+				<role>founder</role>
+				<role>lead</role>
 				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
 			</roles>
-			<timezone>-6</timezone>
 		</developer>
 		<developer>
-			<id>dscho</id>
-			<name>Johannes Schindelin</name>
-			<email>johannes.schindelin@gmx.de</email>
-			<url>http://loci.wisc.edu/people/johannes-schindelin</url>
-			<organization>UW-Madison LOCI</organization>
-			<organizationUrl>http://loci.wisc.edu/</organizationUrl>
+			<id>dietzc</id>
+			<name>Christian Dietz</name>
+			<url>http://imagej.net/User:Dietzc</url>
 			<roles>
-				<role>architect</role>
+				<role>founder</role>
+				<role>lead</role>
 				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+				<role>maintainer</role>
 			</roles>
-			<timezone>-6</timezone>
-		</developer>
-		<developer>
-			<id>hornm</id>
-			<name>Martin Horn</name>
-			<email>martin.horn@uni-konstanz.de</email>
-			<url>http://www.informatik.uni-konstanz.de/berthold/mitglieder/martin-horn/</url>
-			<organization>University of Konstanz</organization>
-			<organizationUrl>http://www.informatik.uni-konstanz.de/</organizationUrl>
-			<roles>
-				<role>architect</role>
-				<role>developer</role>
-			</roles>
-			<timezone>+1</timezone>
 		</developer>
 		<developer>
 			<id>bnorthan</id>
 			<name>Brian Northan</name>
-			<email>bnorthan@gmail.com</email>
-			<url>www.linkedin.com/pub/brian-northan/6/860/3a7</url>
+			<url>http://imagej.net/User:Bnorthan</url>
+			<roles>
+				<role>developer</role>
+				<role>debugger</role>
+				<role>reviewer</role>
+				<role>support</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>gab1one</id>
+			<name>Gabriel Einsdorf</name>
+			<url>http://imagej.net/User:Gab1one</url>
 			<roles>
 				<role>developer</role>
 			</roles>
 		</developer>
 		<developer>
-			<id>Squareys</id>
-			<name>Jonathan Hale</name>
-			<email>squareys@googlemail.com</email>
-			<url>http://squareys.tumblr.com/</url>
-			<organization>University of Konstanz</organization>
-			<organizationUrl>http://www.informatik.uni-konstanz.de/</organizationUrl>
+			<id>tibuch</id>
+			<name>Tim-Oliver Buchholz</name>
 			<roles>
 				<role>developer</role>
+				<role>support</role>
 			</roles>
-			<timezone>+1</timezone>
 		</developer>
 		<developer>
-			<id>apal4</id>
-			<name>Aparna Pal</name>
-			<email>apal4@wisc.edu</email>
-			<url>http://loci.wisc.edu/people/aparna-pal</url>
-			<organization>UW-Madison LOCI</organization>
-			<organizationUrl>http://loci.wisc.edu/</organizationUrl>
+			<id>LeonYang5114</id>
+			<name>Leon Yang</name>
+			<url>http://imagej.net/User:Leon</url>
 			<roles>
 				<role>developer</role>
 			</roles>
-			<timezone>-6</timezone>
 		</developer>
 	</developers>
 	<contributors>
 		<contributor>
-			<name>Mark Hiner</name>
-			<email>hiner@wisc.edu</email>
-			<url>http://developer.imagej.net/users/hinerm</url>
-			<organization>UW-Madison LOCI</organization>
-			<organizationUrl>http://loci.wisc.edu/</organizationUrl>
-			<timezone>-6</timezone>
+			<name>Martin Horn</name>
+			<roles><role>founder</role></roles>
+			<properties><id>hornm</id></properties>
 		</contributor>
-		<contributor><name>Michael Zinsmaier</name></contributor>
+		<contributor>
+			<name>Johannes Schindelin</name>
+			<url>http://imagej.net/User:Schindelin</url>
+			<roles><role>founder</role></roles>
+			<properties><id>dscho</id></properties>
+		</contributor>
+		<contributor>
+			<name>Richard Domander</name>
+			<url>http://imagej.net/User:Rdom</url>
+			<properties><id>rimadoma</id></properties>
+		</contributor>
+		<contributor>
+			<name>Jan Eglinger</name>
+			<url>http://imagej.net/User:Eglinger</url>
+			<properties><id>imagejan</id></properties>
+		</contributor>
+		<contributor>
+			<name>Andreas Graumann</name>
+			<properties><id>angrauma</id></properties>
+		</contributor>
+		<contributor>
+			<name>Jonathan Hale</name>
+			<properties><id>Squareys</id></properties>
+		</contributor>
+		<contributor>
+			<name>Kyle Harrington</name>
+			<url>http://imagej.net/User:Kharrington</url>
+			<properties><id>kephale</id></properties>
+		</contributor>
+		<contributor>
+			<name>Eike Heinz</name>
+			<properties><id>EikeHeinz</id></properties>
+		</contributor>
+		<contributor>
+			<name>Stefan Helfrich</name>
+			<url>http://imagej.net/User:Stelfrich</url>
+			<properties><id>stelfrich</id></properties>
+		</contributor>
+		<contributor>
+			<name>Mark Hiner</name>
+			<url>http://imagej.net/User:Hinerm</url>
+			<properties><id>hinerm</id></properties>
+		</contributor>
+		<contributor>
+			<name>Aparna Pal</name>
+			<url>http://imagej.net/User:Apal4</url>
+			<properties><id>apal4</id></properties>
+		</contributor>
+		<contributor>
+			<name>Simon Schmid</name>
+			<properties><id>SimonSchmid</id></properties>
+		</contributor>
+		<contributor>
+			<name>Daniel Seebacher</name>
+			<properties><id>seebacherd</id></properties>
+		</contributor>
+		<contributor>
+			<name>Alison Walter</name>
+			<url>http://imagej.net/User:Awalter2</url>
+			<properties><id>awalter17</id></properties>
+		</contributor>
+		<contributor>
+			<name>Michael Zinsmaier</name>
+			<properties><id>MichaelZinsmaier</id></properties>
+		</contributor>
 	</contributors>
 
 	<scm>
@@ -127,11 +166,12 @@
 	</issueManagement>
 	<ciManagement>
 		<system>Jenkins</system>
-		<url>http://jenkins.imagej.net/job/ImageJ-OPS/</url>
+		<url>http://jenkins.imagej.net/job/ImageJ-Ops/</url>
 	</ciManagement>
 
 	<properties>
 		<main-class>net.imagej.ops.Main</main-class>
+		<scijava.jvm.version>1.8</scijava.jvm.version>
 	</properties>
 
 	<repositories>
@@ -175,6 +215,16 @@
 			<groupId>org.scijava</groupId>
 			<artifactId>scijava-expression-parser</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>scripting-javascript</artifactId>
+		</dependency>
+
+		<!-- Third party dependencies -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-math3</artifactId>
+		</dependency>
 
 		<!-- Test scope dependencies -->
 		<dependency>
@@ -188,8 +238,8 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
-			<groupId>net.imglib2</groupId>
-			<artifactId>imglib2-ij</artifactId>
+			<groupId>io.scif</groupId>
+			<artifactId>scifio</artifactId>
 			<scope>test</scope>
 		</dependency>
 		<dependency>
@@ -236,6 +286,14 @@
 			</plugins>
 		</pluginManagement>
 		<plugins>
+			<!--  Workaround for a bug in maven-compiler-plugin.
+			See https://issues.apache.org/jira/browse/MCOMPILER-209 -->
+			<plugin>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<useIncrementalCompilation>false</useIncrementalCompilation>
+				</configuration>
+			</plugin>
 			<plugin>
 				<groupId>org.codehaus.mojo</groupId>
 				<artifactId>groovy-maven-plugin</artifactId>

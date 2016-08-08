@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,12 +31,9 @@
 package net.imagej.ops.create.nativeType;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.Output;
-import net.imglib2.type.NativeType;
+import net.imagej.ops.special.function.AbstractNullaryFunctionOp;
 import net.imglib2.type.numeric.real.DoubleType;
 
-import org.scijava.ItemIO;
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -46,49 +43,14 @@ import org.scijava.plugin.Plugin;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  * @author Curtis Rueden
  */
-@Plugin(type = Ops.Create.NativeType.class, name = Ops.Create.NativeType.NAME)
-public class DefaultCreateNativeType<T extends NativeType<T>> implements
-	Ops.Create.NativeType, Output<T>
+@Plugin(type = Ops.Create.NativeType.class)
+public class DefaultCreateNativeType extends
+	AbstractNullaryFunctionOp<DoubleType> implements Ops.Create.NativeType
 {
 
-	@Parameter(type = ItemIO.OUTPUT)
-	private T output;
-
-	@Parameter(required = false)
-	private Class<T> type;
-
 	@Override
-	public void run() {
-		if (type != null) output = createTypeFromClass();
-		else output = createTypeFromScratch();
-	}
-
-	@Override
-	public T getOutput() {
-		return output;
-	}
-
-	// -- Helper methods --
-
-	private T createTypeFromClass() {
-		try {
-			return type.newInstance();
-		}
-		catch (final InstantiationException exc) {
-			throw new IllegalArgumentException(exc);
-		}
-		catch (final IllegalAccessException exc) {
-			throw new IllegalStateException(exc);
-		}
-	}
-
-	private T createTypeFromScratch() {
-		// NB: No type given; we can only guess.
-		// HACK: For Java 6 compiler.
-		final Object o = new DoubleType();
-		@SuppressWarnings("unchecked")
-		final T t = (T) o;
-		return t;
+	public DoubleType compute0() {
+		return new DoubleType();
 	}
 
 }

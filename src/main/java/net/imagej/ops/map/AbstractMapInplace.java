@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,32 +30,36 @@
 
 package net.imagej.ops.map;
 
-import net.imagej.ops.AbstractInplaceOp;
-import net.imagej.ops.InplaceOp;
+import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 
 import org.scijava.plugin.Parameter;
 
 /**
- * Abstract implementation of an {@link MapIterableInplace}
+ * Abstract base class for {@link MapInplace} implementations.
  * 
- * @author Christian Dietz (University of Konstanz)
- * @param <A> type of values to be mapped
- * @param <I> {@link Iterable} of <A>s
+ * @author Curtis Rueden
+ * @param <EI> element input type
+ * @param <EO> element output type
+ * @param <PA> producer of arguments
  */
-public abstract class AbstractMapInplace<A, I extends Iterable<A>> extends
-	AbstractInplaceOp<I> implements MapOp<A, A, InplaceOp<A>>
+public abstract class AbstractMapInplace<EI, EO extends EI, PA> extends
+	AbstractUnaryInplaceOp<PA> implements
+	MapInplace<EI, EO, UnaryInplaceOp<EI, EO>>
 {
 
 	@Parameter
-	private InplaceOp<A> op;
+	private UnaryInplaceOp<EI, EO> op;
+
+	// -- MapOp methods --
 
 	@Override
-	public InplaceOp<A> getOp() {
+	public UnaryInplaceOp<EI, EO> getOp() {
 		return op;
 	}
 
 	@Override
-	public void setOp(final InplaceOp<A> op) {
+	public void setOp(final UnaryInplaceOp<EI, EO> op) {
 		this.op = op;
 	}
 

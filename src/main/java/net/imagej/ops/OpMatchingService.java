@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,7 +34,6 @@ import java.util.List;
 
 import net.imagej.ImageJService;
 
-import org.scijava.command.CommandInfo;
 import org.scijava.module.Module;
 import org.scijava.module.ModuleInfo;
 
@@ -45,36 +44,61 @@ import org.scijava.module.ModuleInfo;
  */
 public interface OpMatchingService extends ImageJService {
 
-	/** Gets the list of all available {@link Op} implementations. */
-	public List<CommandInfo> getOps();
-
 	/**
 	 * Finds and initializes the best module matching the given op name and/or
-	 * type + arguments.
+	 * type + arguments. An {@link OpCandidate} containing the matching module
+	 * will be returned.
 	 * 
+	 * @param ops The pool from which candidate ops should be drawn.
 	 * @param ref The op reference describing the op to match.
-	 * @return A {@link Module} wrapping the best {@link Op}, with populated
-	 *         inputs, ready to run.
+	 * @return An {@link OpCandidate} containing the module which wraps the best
+	 *         {@link Op}, with populated inputs, ready to run.
 	 * @throws IllegalArgumentException if there is no match, or if there is more
 	 *           than one match at the same priority.
 	 */
-	public <OP extends Op> Module findModule(OpRef<OP> ref);
+	OpCandidate findMatch(OpEnvironment ops, OpRef ref);
+
+	/**
+	 * Finds and initializes the best module matching any of the given op name
+	 * and/or type + arguments. An {@link OpCandidate} containing the matching
+	 * module will be returned.
+	 * 
+	 * @param ops The pool from which candidate ops should be drawn.
+	 * @param refs The op references describing the op to match.
+	 * @return An {@link OpCandidate} containing the module which wraps the best
+	 *         {@link Op}, with populated inputs, ready to run.
+	 * @throws IllegalArgumentException if there is no match, or if there is more
+	 *           than one match at the same priority.
+	 */
+	OpCandidate findMatch(OpEnvironment ops, List<OpRef> refs);
 
 	/**
 	 * Builds a list of candidate ops which might match the given op reference.
 	 * 
+	 * @param ops The pool from which candidate ops should be drawn.
 	 * @param ref The op reference describing the op to match.
 	 * @return The list of candidate operations.
 	 */
-	<OP extends Op> List<OpCandidate<OP>> findCandidates(OpRef<OP> ref);
+	List<OpCandidate> findCandidates(OpEnvironment ops, OpRef ref);
+
+	/**
+	 * Builds a list of candidate ops which might match one of the given op
+	 * references.
+	 * 
+	 * @param ops The pool from which candidate ops should be drawn.
+	 * @param refs The op references describing the op to match.
+	 * @return The list of candidate operations.
+	 */
+	List<OpCandidate> findCandidates(OpEnvironment ops, List<OpRef> refs);
 
 	/**
 	 * Filters a list of ops to those matching the given arguments.
 	 * 
 	 * @param candidates The list of op candidates to scan for matches.
-	 * @return The list of matching ops as {@link Module} instances.
+	 * @return The list of matching op candidates, with associated {@link Module}
+	 *         instances attached.
 	 */
-	<OP extends Op> List<Module> findMatches(List<OpCandidate<OP>> candidates);
+	List<OpCandidate> filterMatches(List<OpCandidate> candidates);
 
 	/**
 	 * Attempts to match the given arguments to the {@link Op} described by the
@@ -83,16 +107,16 @@ public interface OpMatchingService extends ImageJService {
 	 * @return A populated {@link Module} instance for the matching {@link Op}, or
 	 *         null if the arguments do not match the {@link Op}.
 	 */
-	<OP extends Op> Module match(OpCandidate<OP> candidate);
+	Module match(OpCandidate candidate);
 
 	/**
 	 * Checks that each parameter is type-compatible with its corresponding
 	 * argument.
 	 */
-	<OP extends Op> boolean typesMatch(OpCandidate<OP> candidate);
+	boolean typesMatch(OpCandidate candidate);
 
 	/** Checks the number of args, padding optional args with null as needed. */
-	<OP extends Op> Object[] padArgs(OpCandidate<OP> candidate);
+	Object[] padArgs(OpCandidate candidate);
 
 	/** Assigns arguments into the given module's inputs. */
 	Module assignInputs(Module module, Object... args);

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -63,11 +63,11 @@ public class ReadmeExampleTest {
 		// extract the example script
 		final File readme = new File("README.md");
 		final String contents = new String(FileUtils.readFile(readme), "UTF-8");
-		final String telltale = "```python\n";
+		final String telltale = String.format("```python%n");
 		final int begin = contents.indexOf(telltale) + telltale.length();
 		assertTrue(begin > telltale.length());
 		assertTrue(contents.indexOf(telltale, begin) < 0);
-		final int end = contents.indexOf("```\n", begin);
+		final int end = contents.indexOf(String.format("```%n"), begin);
 		assertTrue(end > 0);
 		final String snippet = contents.substring(begin, end);
 		assertTrue(snippet.startsWith("# @ImageJ ij"));
@@ -91,8 +91,7 @@ public class ReadmeExampleTest {
 
 	@Plugin(type = Service.class)
 	public static class Mock extends AbstractService {
-		protected final Map<String, Img<DoubleType>> images =
-				new HashMap<String, Img<DoubleType>>();
+		protected final Map<String, Img<DoubleType>> images = new HashMap<>();
 
 		public OpService op() {
 			return getContext().getService(OpService.class);

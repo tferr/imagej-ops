@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,33 +30,60 @@
 
 package net.imagej.ops.loop;
 
-import net.imagej.ops.ComputerOp;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- * Default implementation of a {@link AbstractLoopInplace}
+ * Default implementation of a {@link LoopInplace}.
  * 
  * @author Christian Dietz (University of Konstanz)
+ * @author Curtis Rueden
  */
-@Plugin(type = Ops.Loop.class, name = Ops.Loop.NAME)
-public class DefaultLoopInplace<I> extends AbstractLoopInplace<I> {
+@Plugin(type = Ops.Loop.class)
+public class DefaultLoopInplace<A> extends AbstractUnaryInplaceOp<A> implements
+	LoopInplace<A, A>
+{
+
+	@Parameter
+	private UnaryInplaceOp<A, A> op;
+
+	@Parameter
+	private int n;
+
+	// -- LoopOp methods --
 
 	@Override
-	public void compute(final I arg) {
-		final int n = getLoopCount();
-		final ComputerOp<I, I> func = getOp();
-		for (int i = 0; i < n; i++) {
-			func.compute(arg, arg);
-		}
+	public UnaryInplaceOp<A, A> getOp() {
+		return op;
 	}
 
 	@Override
-	public DefaultLoopInplace<I> getIndependentInstance() {
-		final DefaultLoopInplace<I> looper = new DefaultLoopInplace<I>();
+	public void setOp(final UnaryInplaceOp<A, A> op) {
+		this.op = op;
+	}
+
+	@Override
+	public int getLoopCount() {
+		return n;
+	}
+
+	@Override
+	public void setLoopCount(final int n) {
+		this.n = n;
+	}
+
+	// -- Threadable methods --
+
+	@Override
+	public DefaultLoopInplace<A> getIndependentInstance() {
+		final DefaultLoopInplace<A> looper = new DefaultLoopInplace<>();
 		looper.setOp(getOp().getIndependentInstance());
 		looper.setLoopCount(getLoopCount());
 		return looper;
 	}
+
 }

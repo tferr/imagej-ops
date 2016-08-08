@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -117,8 +117,8 @@ public class ChunkerBenchmarkTest extends AbstractOpBenchmark {
 		if (size > 1024) {
 			assumeTrue(expensiveTestsEnabled);
 		}
-		in = generateByteTestImg(true, size, size);
-		out = generateByteTestImg(false, size, size);
+		in = generateByteArrayTestImg(true, size, size);
+		out = generateByteArrayTestImg(false, size, size);
 	}
 
 	private void generateByteArrays(int size) {

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 package net.imagej.ops.identity;
 
 import static org.junit.Assert.assertSame;
+
 import net.imagej.ops.AbstractOpTest;
 
 import org.junit.Test;
@@ -45,15 +46,15 @@ public class IdentityTest extends AbstractOpTest {
 	@Test
 	public void testIdentity() {
 		final Byte b = 35;
-		final Object ib = ops.identity(b);
+		final Object ib = ops.run(DefaultIdentity.class, b);
 		assertSame(b, ib);
 
 		final int i = 23;
-		final Object ii = ops.identity(i);
+		final Object ii = ops.run(DefaultIdentity.class, i);
 		assertSame(i, ii);
 
 		final String s = "hello";
-		final Object is = ops.identity(s);
+		final Object is = ops.run(DefaultIdentity.class, s);
 		assertSame(s, is);
 	}
 

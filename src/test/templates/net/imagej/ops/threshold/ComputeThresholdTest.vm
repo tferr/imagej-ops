@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison and University of Konstanz.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -40,11 +40,12 @@ import org.junit.Test;
  */
 public class ComputeThresholdTest extends AbstractThresholdTest {
 #foreach ($method in $methods)
+#set ($className = "net.imagej.ops.threshold.${method.name}.Compute${method.iface}Threshold") 
 
-	/** Tests {@link net.imagej.ops.threshold.${method.name}.Compute${method.iface}Threshold}. */
+	/** Tests {@link $className}. */
 	@Test
 	public void test${method.iface}() {
-		final Object actual = ops.threshold().${method.name}(histogram());
+		final Object actual = ops.run(${className}.class, histogram());
 		assertThreshold($method.expected, actual);
 	}
 #end

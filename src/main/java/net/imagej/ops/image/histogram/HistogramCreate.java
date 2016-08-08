@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,46 +30,49 @@
 
 package net.imagej.ops.image.histogram;
 
-import java.util.List;
-
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
+import net.imagej.ops.special.function.Functions;
+import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.histogram.Real1dBinMapper;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.util.Pair;
 
-import org.scijava.ItemIO;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  * @author Martin Horn (University of Konstanz)
+ * @author Christian Dietz (University of Konstanz)
  */
-@Plugin(type = Ops.Image.Histogram.class, name = Ops.Image.Histogram.NAME)
-public class HistogramCreate<T extends RealType<T>> implements
-	Ops.Image.Histogram
-{
-
-	@Parameter(type = ItemIO.OUTPUT)
-	private Histogram1d<T> out;
-
-	@Parameter
-	private Iterable<T> in;
+@Plugin(type = Ops.Image.Histogram.class)
+public class HistogramCreate<T extends RealType<T>> extends
+		AbstractUnaryFunctionOp<Iterable<T>, Histogram1d<T>> implements
+		Ops.Image.Histogram {
 
 	@Parameter(required = false)
 	private int numBins = 256;
 
-	@Parameter
-	private OpService ops;
+	private UnaryFunctionOp<Iterable<T>, Pair<T, T>> minMaxFunc;
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void initialize() {
+		minMaxFunc = (UnaryFunctionOp) Functions.unary(ops(), Ops.Stats.MinMax.class, Pair.class,
+				in() != null ? in() : Iterable.class);
+	}
 
 	@Override
-	public void run() {
-		final List<T> res = ops.stats().minMax(in);
+	public Histogram1d<T> compute1(final Iterable<T> input) {
+		final Pair<T, T> res = minMaxFunc.compute1(input);
 
-		out = new Histogram1d<T>(new Real1dBinMapper<T>(res.get(0)
-				.getRealDouble(), res.get(1).getRealDouble(), numBins, false));
+		final Histogram1d<T> histogram1d = new Histogram1d<>(
+				new Real1dBinMapper<T>(res.getA().getRealDouble(), res.getB()
+						.getRealDouble(), numBins, false));
 
-		out.countData(in);
+		histogram1d.countData(input);
 
+		return histogram1d;
 	}
 }

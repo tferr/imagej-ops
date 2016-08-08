@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,34 +30,33 @@
 
 package net.imagej.ops.image.ascii;
 
-import java.util.List;
-
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
+import net.imagej.ops.special.function.Functions;
+import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
+import net.imglib2.util.Pair;
 
-import org.scijava.ItemIO;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  * Generates an ASCII version of an image.
- * <p>Only the first two dimensions of the image are considered.</p>
+ * <p>
+ * Only the first two dimensions of the image are considered.
+ * </p>
  * 
  * @author Curtis Rueden
  */
-@Plugin(type = Ops.Image.ASCII.class, name = Ops.Image.ASCII.NAME)
-public class DefaultASCII<T extends RealType<T>> implements Ops.Image.ASCII {
+@Plugin(type = Ops.Image.ASCII.class)
+public class DefaultASCII<T extends RealType<T>> extends
+	AbstractUnaryFunctionOp<IterableInterval<T>, String> implements
+	Ops.Image.ASCII
+{
 
 	private static final String CHARS = " .,-+o*O#";
-
-	@Parameter
-	private OpService ops;
-
-	@Parameter
-	private IterableInterval<T> image;
 
 	@Parameter(required = false)
 	private T min;
@@ -65,17 +64,23 @@ public class DefaultASCII<T extends RealType<T>> implements Ops.Image.ASCII {
 	@Parameter(required = false)
 	private T max;
 
-	@Parameter(type = ItemIO.OUTPUT)
-	private String ascii;
+	private UnaryFunctionOp<IterableInterval<T>, Pair<T, T>> minMaxFunc;
+
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	@Override
+	public void initialize() {
+		minMaxFunc = (UnaryFunctionOp) Functions.unary(ops(),
+			Ops.Stats.MinMax.class, Pair.class, in());
+	}
 
 	@Override
-	public void run() {
+	public String compute1(final IterableInterval<T> input) {
 		if (min == null || max == null) {
-			final List<T> minMax = ops.stats().minMax(image);
-			if (min == null) min = minMax.get(0);
-			if (max == null) max = minMax.get(1);
+			final Pair<T, T> minMax = minMaxFunc.compute1(input);
+			if (min == null) min = minMax.getA();
+			if (max == null) max = minMax.getB();
 		}
-		ascii = ascii(image, min, max);
+		return ascii(input, min, max);
 	}
 
 	// -- Utility methods --

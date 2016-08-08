@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,8 +32,8 @@ package net.imagej.ops.filter.addNoise;
 
 import java.util.Random;
 
-import net.imagej.ops.AbstractComputerOp;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.plugin.Parameter;
@@ -43,9 +43,9 @@ import org.scijava.plugin.Plugin;
  * Sets the real component of an output real number to the addition of the real
  * component of an input real number with an amount of Gaussian noise.
  */
-@Plugin(type = Ops.Filter.AddNoise.class, name = Ops.Filter.AddNoise.NAME)
+@Plugin(type = Ops.Filter.AddNoise.class)
 public class AddNoiseRealType<I extends RealType<I>, O extends RealType<O>>
-	extends AbstractComputerOp<I, O> implements Ops.Filter.AddNoise
+	extends AbstractUnaryComputerOp<I, O> implements Ops.Filter.AddNoise
 {
 
 	@Parameter
@@ -57,11 +57,25 @@ public class AddNoiseRealType<I extends RealType<I>, O extends RealType<O>>
 	@Parameter
 	private double rangeStdDev;
 
-	@Parameter
+	@Parameter(required = false)
+	private long seed = 0xabcdef1234567890L;
+	
 	private Random rng;
 
+	// -- UnaryComputerOp methods --
+
 	@Override
-	public void compute(final I input, final O output) {
+	public void compute1(final I input, final O output) {
+		if (rng == null) rng = new Random(seed);
+		addNoise(input, output, rangeMin, rangeMax, rangeStdDev, rng);
+	}
+
+	// -- Static utility methods --
+
+	public static <I extends RealType<I>, O extends RealType<O>> void addNoise(
+		final I input, final O output, final double rangeMin, final double rangeMax,
+		final double rangeStdDev, final Random rng)
+	{
 		int i = 0;
 		do {
 			final double newVal =

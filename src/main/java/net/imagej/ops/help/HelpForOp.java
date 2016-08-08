@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -33,9 +33,9 @@ package net.imagej.ops.help;
 import java.util.Collections;
 
 import net.imagej.ops.Op;
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
 
+import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -44,19 +44,16 @@ import org.scijava.plugin.Plugin;
  *
  * @author Curtis Rueden
  */
-@Plugin(type = Ops.Help.class, name = Ops.Help.NAME,
+@Plugin(type = Ops.Help.class, priority = Priority.HIGH_PRIORITY,
 	description = "Gets documentation for the given op.")
 public class HelpForOp extends AbstractHelp {
-
-	@Parameter
-	private OpService ops;
 
 	@Parameter
 	private Op op;
 
 	@Override
 	public void run() {
-		help(Collections.singleton(ops.info(op)));
+		help(Collections.singleton(ops().info(op)));
 	}
 
 }

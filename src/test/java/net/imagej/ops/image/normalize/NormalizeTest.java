@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,12 @@ package net.imagej.ops.image.normalize;
 
 import static org.junit.Assert.assertEquals;
 
-import java.util.List;
-
 import net.imagej.ops.AbstractOpTest;
+import net.imglib2.Cursor;
+import net.imglib2.IterableInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
+import net.imglib2.util.Pair;
 
 import org.junit.Test;
 
@@ -48,16 +49,26 @@ public class NormalizeTest extends AbstractOpTest {
 	@Test
 	public void testNormalize() {
 
-		Img<ByteType> in = generateByteTestImg(true, 5, 5);
+		Img<ByteType> in = generateByteArrayTestImg(true, 5, 5);
 		Img<ByteType> out = in.factory().create(in, new ByteType());
 
-		ops.image().normalize(out, in);
+		ops.run(NormalizeIIComputer.class, out, in);
 
-		List<ByteType> minMax1 = ops.stats().minMax(in);
-		List<ByteType> minMax2 = ops.stats().minMax(out);
+		final Pair<ByteType, ByteType> minMax2 = ops.stats().minMax(out);
 
-		assertEquals(minMax2.get(0).get(), Byte.MIN_VALUE);
-		assertEquals(minMax2.get(1).get(), Byte.MAX_VALUE);
+		assertEquals(minMax2.getA().get(), Byte.MIN_VALUE);
+		assertEquals(minMax2.getB().get(), Byte.MAX_VALUE);
 
+		final IterableInterval<ByteType> lazyOut = ops.image().normalize(in);
+		final IterableInterval<ByteType> notLazyOut = ops.image().normalize(in,
+			null, null, null, null, false);
+
+		final Cursor<ByteType> outCursor = out.cursor();
+		final Cursor<ByteType> lazyCursor = lazyOut.cursor();
+		final Cursor<ByteType> notLazyCursor = notLazyOut.cursor();
+		while (outCursor.hasNext()) {
+			assertEquals(outCursor.next().get(), lazyCursor.next().get());
+			assertEquals(outCursor.get().get(), notLazyCursor.next().get());
+		}
 	}
 }

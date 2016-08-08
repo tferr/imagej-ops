@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,246 +31,165 @@
 package net.imagej.ops.map;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
-import net.imagej.ops.AbstractComputerOp;
-import net.imagej.ops.AbstractInplaceOp;
+
 import net.imagej.ops.AbstractOpTest;
 import net.imagej.ops.Op;
+import net.imagej.ops.Ops;
+import net.imagej.ops.special.computer.Computers;
+import net.imagej.ops.special.inplace.BinaryInplaceOp;
+import net.imagej.ops.special.inplace.Inplaces;
 import net.imglib2.Cursor;
-import net.imglib2.IterableInterval;
-import net.imglib2.RandomAccess;
-import net.imglib2.RandomAccessible;
-import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
 
-import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
 
 /**
+ * Tests for {@link MapOp}s that are not covered in the auto generated tests.
+ * 
+ * @author Leon Yang
  * @author Christian Dietz (University of Konstanz)
  */
 public class MapTest extends AbstractOpTest {
 
-	private Img<ByteType> in;
-	private Img<ByteType> out;
-	private Img<ByteType> outDiffDims;
+	@Rule
+	public ExpectedException thrown = ExpectedException.none();
 
-	@Before
-	public void initImg() {
-		in = generateByteTestImg(true, 10, 10);
-		out = generateByteTestImg(false, 10, 10);
-		outDiffDims = generateByteTestImg(false, 10, 10, 15);
+	private Op sub;
+
+	@Test
+	public void testIterable() {
+		final Img<ByteType> in = generateByteArrayTestImg(true, 10, 10);
+
+		Op nullary = Computers.nullary(ops, Ops.Math.Zero.class, ByteType.class);
+		ops.run(MapNullaryIterable.class, in, nullary);
+
+		for (ByteType ps : in)
+			assertEquals(ps.get(), 0);
 	}
 
 	@Test
-	public void testMapIterableIntervalToIterableInterval() {
-		final Op functional =
-			ops.op(MapIterableIntervalToIterableInterval.class, out, in,
-				new AddOneFunctional());
-		functional.run();
+	public void testII() {
+		final Img<ByteType> in = generateByteArrayTestImg(true, 10, 10);
 
-		final Cursor<ByteType> cursor1 = in.cursor();
-		final Cursor<ByteType> cursor2 = out.cursor();
+		Op nullary = Computers.nullary(ops, Ops.Math.Zero.class, ByteType.class);
+		ops.run(MapNullaryII.class, in, nullary);
 
-		while (cursor1.hasNext()) {
-			cursor1.fwd();
-			cursor2.fwd();
-			assertEquals(cursor1.get().get() + 1, cursor2.get().get());
-		}
+		for (ByteType ps : in)
+			assertEquals(ps.get(), 0);
 	}
 
 	@Test
-	public void testMapIterableIntervalToIterableIntervalDiffDims() {
+	public void testIIAndIIInplace() {
+		final Img<ByteType> first = generateByteArrayTestImg(true, 10, 10);
+		final Img<ByteType> firstCopy = first.copy();
+		final Img<ByteType> second = generateByteArrayTestImg(false, 10, 10);
+		for (ByteType px : second)
+			px.set((byte) 1);
+		final Img<ByteType> secondCopy = second.copy();
+		final Img<ByteType> secondDiffDims = generateByteArrayTestImg(false, 10, 10,
+			2);
 
-		boolean fails = false;
-		try {
-			ops.run(MapIterableIntervalToIterableInterval.class, outDiffDims, in,
-				new AddOneFunctional());
-		}
-		catch (final IllegalArgumentException e) {
-			fails = true;
-		}
-		assertTrue(fails);
+		sub = Inplaces.binary(ops, Ops.Math.Subtract.class, ByteType.class);
+		final BinaryInplaceOp<? super Img<ByteType>, Img<ByteType>> map = Inplaces
+			.binary(ops, MapIIAndIIInplaceParallel.class, firstCopy, second, sub);
+		map.run(firstCopy, second, firstCopy);
+		map.run(first, secondCopy, secondCopy);
+
+		assertImgSubEquals(first, second, firstCopy);
+		assertImgSubEquals(first, second, secondCopy);
+
+		// Expect exception when in2 has different dimensions
+		thrown.expect(IllegalArgumentException.class);
+		ops.op(MapIIAndIIInplace.class, first, secondDiffDims, sub);
 	}
 
 	@Test
-	public void testMapRAIToIterableInterval() {
+	public void testIIAndIIInplaceParallel() {
+		final Img<ByteType> first = generateByteArrayTestImg(true, 10, 10);
+		final Img<ByteType> firstCopy = first.copy();
+		final Img<ByteType> second = generateByteArrayTestImg(false, 10, 10);
+		for (ByteType px : second)
+			px.set((byte) 1);
+		final Img<ByteType> secondCopy = second.copy();
+		final Img<ByteType> secondDiffDims = generateByteArrayTestImg(false, 10, 10,
+			2);
 
-		final Op functional =
-			ops.op(MapRAIToIterableInterval.class, out, in, new AddOneFunctional());
-		functional.run();
+		sub = Inplaces.binary(ops, Ops.Math.Subtract.class, ByteType.class);
+		final BinaryInplaceOp<? super Img<ByteType>, Img<ByteType>> map = Inplaces
+			.binary(ops, MapIIAndIIInplaceParallel.class, firstCopy, second, sub);
+		map.run(firstCopy, second, firstCopy);
+		map.run(first, secondCopy, secondCopy);
 
-		final Cursor<ByteType> cursor1 = in.cursor();
-		final Cursor<ByteType> cursor2 = out.cursor();
+		assertImgSubEquals(first, second, firstCopy);
+		assertImgSubEquals(first, second, secondCopy);
 
-		while (cursor1.hasNext()) {
-			cursor1.fwd();
-			cursor2.fwd();
-			assertEquals(cursor1.get().get() + 1, cursor2.get().get());
-		}
+		// Expect exception when in2 has different dimensions
+		thrown.expect(IllegalArgumentException.class);
+		ops.op(MapIIAndIIInplace.class, first, secondDiffDims, sub);
 	}
 
 	@Test
-	public void testMapRAIToIterableIntervalDiffDims() {
-		boolean fails = false;
-		try {
-			ops.op(MapRAIToIterableInterval.class, outDiffDims, in,
-				new AddOneFunctional());
-		}
-		catch (final IllegalArgumentException e) {
-			fails = true;
-		}
-		assertTrue(fails);
+	public void testIIInplaceParallal() {
+		final Img<ByteType> arg = generateByteArrayTestImg(true, 10, 10);
+		final Img<ByteType> argCopy = arg.copy();
+
+		sub = Inplaces.unary(ops, Ops.Math.Subtract.class, ByteType.class,
+			new ByteType((byte) 1));
+		ops.run(MapIIInplaceParallel.class, argCopy, sub);
+
+		assertImgSubOneEquals(arg, argCopy);
 	}
 
 	@Test
-	public void testMapIterableIntervalToRAI() {
+	public void testIterableInplace() {
+		final Img<ByteType> arg = generateByteArrayTestImg(true, 10, 10);
+		final Img<ByteType> argCopy = arg.copy();
 
-		final Op functional =
-			ops.op(MapIterableIntervalToRAI.class, out, in, new AddOneFunctional());
-		functional.run();
+		sub = Inplaces.unary(ops, Ops.Math.Subtract.class, ByteType.class,
+			new ByteType((byte) 1));
+		ops.run(MapIterableInplace.class, argCopy, sub);
 
-		final Cursor<ByteType> cursor1 = in.cursor();
-		final Cursor<ByteType> cursor2 = out.cursor();
-
-		while (cursor1.hasNext()) {
-			cursor1.fwd();
-			cursor2.fwd();
-			assertEquals(cursor1.get().get() + 1, cursor2.get().get());
-		}
+		assertImgSubOneEquals(arg, argCopy);
 	}
 
 	@Test
-	public void testMapIterableIntervalToRAIDiffDims() {
-		boolean fails = false;
-		try {
-			ops.op(MapIterableIntervalToRAI.class, outDiffDims, in,
-				new AddOneFunctional());
-		}
-		catch (final IllegalArgumentException e) {
-			fails = true;
-		}
-		assertTrue(fails);
+	public void testIterableToIterable() {
+		final Img<ByteType> in = generateByteArrayTestImg(true, 10, 10);
+		final Img<ByteType> out = generateByteArrayTestImg(false, 10, 10);
+
+		sub = Computers.unary(ops, Ops.Math.Subtract.class, ByteType.class,
+			new ByteType((byte) 1));
+		ops.run(MapIterableToIterable.class, out, in, sub);
+
+		assertImgSubOneEquals(in, out);
 	}
 
-	@Test
-	public void testMapIterableInplace() {
+	// -- helper methods --
 
-		final Cursor<ByteType> cursor1 = in.copy().cursor();
-		final Cursor<ByteType> cursor2 = in.cursor();
-
-		final Op functional =
-			ops.op(MapIterableInplace.class, in, new AddOneInplace());
-		functional.run();
-
-		while (cursor1.hasNext()) {
-			cursor1.fwd();
-			cursor2.fwd();
-			assertEquals(cursor1.get().get() + 1, cursor2.get().get());
-		}
-	}
-
-	@Test
-	public void testMapIterableIntervalToView() {
-
-		final Op functional =
-			ops.op(MapIterableIntervalToView.class, in, new AddOneFunctional(),
-				new ByteType());
-		functional.run();
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		final IterableInterval<ByteType> o =
-			(IterableInterval<ByteType>) ((MapIterableIntervalToView) functional)
-				.getOutput();
-
-		final RandomAccess<ByteType> inputRA = in.randomAccess();
-		final Cursor<ByteType> outCursor = o.localizingCursor();
-
-		while (outCursor.hasNext()) {
-			outCursor.fwd();
-			inputRA.setPosition(outCursor);
-			assertEquals(inputRA.get().get() + 1, outCursor.get().get());
-		}
-	}
-
-	@Test
-	public void testMapIterableToIterable() {
-
-		final Op functional =
-			ops.op(MapIterableToIterable.class, out, in, new AddOneFunctional());
-		functional.run();
-
-		final Cursor<ByteType> cursor1 = in.cursor();
-		final Cursor<ByteType> cursor2 = out.cursor();
-
-		while (cursor1.hasNext()) {
-			cursor1.fwd();
-			cursor2.fwd();
-			assertEquals(cursor1.get().get() + 1, cursor2.get().get());
-		}
-	}
-
-	@Test
-	public void testMapConvertRAIToRAI() {
-
-		final Op functional =
-			ops.op(MapConvertRAIToRAI.class, in, new AddOneFunctional(),
-				new ByteType());
-		functional.run();
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		final RandomAccessibleInterval<ByteType> output =
-			(RandomAccessibleInterval<ByteType>) ((MapConvertRAIToRAI) functional)
-				.getOutput();
-
-		final Cursor<ByteType> inputC = in.cursor();
-		final RandomAccess<ByteType> outputRA = output.randomAccess();
-
-		while (inputC.hasNext()) {
-			inputC.fwd();
-			outputRA.setPosition(inputC);
-			assertEquals(inputC.get().get() + 1, outputRA.get().get());
-		}
-	}
-
-	@Test
-	public void testMapConvertRandomAccessToRandomAccess() {
-
-		final Op functional =
-			ops.op(MapConvertRandomAccessToRandomAccess.class, in,
-				new AddOneFunctional(), new ByteType());
-		functional.run();
-		@SuppressWarnings({ "unchecked", "rawtypes" })
-		final RandomAccessible<ByteType> output =
-			(RandomAccessible<ByteType>) ((MapConvertRandomAccessToRandomAccess) functional)
-				.getOutput();
-
-		final Cursor<ByteType> inputC = in.cursor();
-		final RandomAccess<ByteType> outputRA = output.randomAccess();
-
-		while (inputC.hasNext()) {
-			inputC.fwd();
-			outputRA.setPosition(inputC);
-			assertEquals(inputC.get().get() + 1, outputRA.get().get());
-		}
-	}
-
-	// -- Helper classes --
-	private static class AddOneInplace extends AbstractInplaceOp<ByteType> {
-
-		@Override
-		public void compute(final ByteType arg) {
-			arg.inc();
-		}
-	}
-
-	private static class AddOneFunctional extends
-		AbstractComputerOp<ByteType, ByteType>
+	private static void assertImgSubEquals(Img<ByteType> in1, Img<ByteType> in2,
+		Img<ByteType> out)
 	{
+		final Cursor<ByteType> in1Cursor = in1.cursor();
+		final Cursor<ByteType> in2Cursor = in2.cursor();
+		final Cursor<ByteType> outCursor = out.cursor();
 
-		@Override
-		public void compute(final ByteType input, final ByteType output) {
-			output.set(input);
-			output.inc();
+		while (in1Cursor.hasNext()) {
+			assertEquals((byte) (in1Cursor.next().get() - in2Cursor.next().get()),
+				outCursor.next().get());
+		}
+	}
+
+	private static void assertImgSubOneEquals(Img<ByteType> in,
+		Img<ByteType> out)
+	{
+		final Cursor<ByteType> in1Cursor = in.cursor();
+		final Cursor<ByteType> outCursor = out.cursor();
+
+		while (in1Cursor.hasNext()) {
+			assertEquals((byte) (in1Cursor.next().get() - 1), outCursor.next().get());
 		}
 	}
 

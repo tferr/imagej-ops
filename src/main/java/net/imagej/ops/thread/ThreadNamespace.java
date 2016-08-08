@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -48,16 +48,10 @@ public class ThreadNamespace extends AbstractNamespace {
 	// -- Thread namespace ops --
 
 	/** Executes the "chunker" operation on the given arguments. */
-	@OpMethod(op = net.imagej.ops.Ops.Thread.Chunker.class)
-	public Object chunker(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Thread.Chunker.class, args);
-	}
-
-	/** Executes the "chunker" operation on the given arguments. */
 	@OpMethod(ops = { net.imagej.ops.thread.chunker.DefaultChunker.class,
 		net.imagej.ops.thread.chunker.ChunkerInterleaved.class })
 	public void chunker(final Chunk chunkable, final long numberOfElements) {
-		ops().run(net.imagej.ops.thread.chunker.DefaultChunker.class, chunkable,
+		ops().run(net.imagej.ops.Ops.Thread.Chunker.class, chunkable,
 			numberOfElements);
 	}
 

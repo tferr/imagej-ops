@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,23 +30,23 @@
 
 package net.imagej.ops.bufferfactories;
 
-import net.imagej.ops.BufferFactory;
+import net.imagej.ops.special.UnaryOutputFactory;
 import net.imglib2.img.Img;
 import net.imglib2.type.Type;
 
 /**
- * {@link BufferFactory} used to create an empty output {@link Img} of same type
+ * {@link UnaryOutputFactory} used to create an empty output {@link Img} of same type
  * and dimensionality as the input {@link Img}.
  * 
  * @author Christian Dietz (University of Konstanz)
- * @param <L>
+ * @param <T>
  */
 public class ImgImgSameTypeFactory<T extends Type<T>> implements
-	BufferFactory<Img<T>, Img<T>>
+	UnaryOutputFactory<Img<T>, Img<T>>
 {
 
 	@Override
-	public Img<T> createBuffer(final Img<T> input) {
+	public Img<T> createOutput(final Img<T> input) {
 		return input.factory().create(input, input.firstElement().createVariable());
 	}
 }

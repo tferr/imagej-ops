@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -37,8 +37,8 @@ import javax.script.ScriptContext;
 import javax.script.ScriptEngine;
 import javax.script.ScriptException;
 
-import net.imagej.ops.AbstractHybridOp;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.img.array.ArrayImgs;
@@ -59,14 +59,14 @@ import org.scijava.script.ScriptService;
  * </p>
  * <p>
  * Note that this op is rather slow; it is intended mainly for demonstration
- * purposes, and to easily generate small images for testing OPS workflows.
+ * purposes, and to easily generate small images for testing Ops workflows.
  * </p>
  * 
  * @author Curtis Rueden
  */
-@Plugin(type = Ops.Image.Equation.class, name = Ops.Image.Equation.NAME)
+@Plugin(type = Ops.Image.Equation.class)
 public class DefaultEquation<T extends RealType<T>> extends
-	AbstractHybridOp<String, IterableInterval<T>> implements EquationOp<T>
+	AbstractUnaryHybridCF<String, IterableInterval<T>> implements EquationOp<T>
 {
 
 	@Parameter
@@ -75,21 +75,10 @@ public class DefaultEquation<T extends RealType<T>> extends
 	@Parameter
 	private LogService log;
 
-	// -- HybridOp methods --
+	// -- UnaryComputerOp methods --
 
 	@Override
-	public IterableInterval<T> createOutput(final String input) {
-		// produce a 256x256 float64 array-backed image by default
-		@SuppressWarnings({ "rawtypes", "unchecked" })
-		final IterableInterval<T> newImage =
-			(IterableInterval) ArrayImgs.doubles(256, 256);
-		return newImage;
-	}
-
-	// -- ComputerOp methods --
-
-	@Override
-	public void compute(final String input,
+	public void compute1(final String input,
 		final IterableInterval<T> output)
 	{
 		final String equation = input + ";";
@@ -138,6 +127,17 @@ public class DefaultEquation<T extends RealType<T>> extends
 		catch (final ScriptException exc) {
 			log.error(exc);
 		}
+	}
+
+	// -- UnaryOutputFactory methods --
+
+	@Override
+	public IterableInterval<T> createOutput(final String input) {
+		// produce a 256x256 float64 array-backed image by default
+		@SuppressWarnings({ "rawtypes", "unchecked" })
+		final IterableInterval<T> newImage =
+			(IterableInterval) ArrayImgs.doubles(256, 256);
+		return newImage;
 	}
 
 }

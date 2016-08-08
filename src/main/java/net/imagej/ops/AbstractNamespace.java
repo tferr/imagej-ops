@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,6 @@
 package net.imagej.ops;
 
 import org.scijava.AbstractContextual;
-import org.scijava.plugin.Parameter;
 
 /**
  * Abstract base class for {@link Namespace} implementations.
@@ -42,21 +41,19 @@ public abstract class AbstractNamespace extends AbstractContextual implements
 	Namespace
 {
 
-	@Parameter
-	private OpService ops;
+	/** The namespace's op execution environment. */
+	private OpEnvironment ops;
 
-	// -- Namespace methods --
+	// -- Environmental methods --
 
 	@Override
-	public OpService ops() {
+	public OpEnvironment ops() {
 		return ops;
 	}
 
-	// -- Named methods --
-
 	@Override
-	public void setName(final String name) {
-		throw new UnsupportedOperationException();
+	public void setEnvironment(final OpEnvironment ops) {
+		this.ops = ops;
 	}
 
 }

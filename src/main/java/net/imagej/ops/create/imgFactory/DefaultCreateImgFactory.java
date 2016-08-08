@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,8 @@
 
 package net.imagej.ops.create.imgFactory;
 
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
-import net.imagej.ops.Output;
+import net.imagej.ops.special.function.AbstractNullaryFunctionOp;
 import net.imglib2.Dimensions;
 import net.imglib2.img.ImgFactory;
 import net.imglib2.img.array.ArrayImgFactory;
@@ -40,7 +39,6 @@ import net.imglib2.img.cell.CellImgFactory;
 import net.imglib2.type.NativeType;
 import net.imglib2.util.Intervals;
 
-import org.scijava.ItemIO;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -51,37 +49,18 @@ import org.scijava.plugin.Plugin;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  * @param <T>
  */
-@Plugin(type = Ops.Create.ImgFactory.class, name = Ops.Create.ImgFactory.NAME)
-public class DefaultCreateImgFactory<T extends NativeType<T>> implements
-	Ops.Create.ImgFactory, Output<ImgFactory<T>>
+@Plugin(type = Ops.Create.ImgFactory.class)
+public class DefaultCreateImgFactory<T extends NativeType<T>> extends
+	AbstractNullaryFunctionOp<ImgFactory<T>> implements Ops.Create.ImgFactory
 {
-
-	@Parameter(type = ItemIO.OUTPUT)
-	private ImgFactory<T> output;
-
-	@Parameter
-	private OpService ops;
 
 	@Parameter(required = false)
 	private Dimensions dims;
 
-	@Parameter(required = false)
-	private T outType;
-
 	@Override
-	public void run() {
-		if (outType == null) {
-			outType = ops.create().<T> nativeType();
-		}
-
-		output =
-			(dims == null || Intervals.numElements(dims) <= Integer.MAX_VALUE)
-				? new ArrayImgFactory<T>() : new CellImgFactory<T>();
-	}
-
-	@Override
-	public ImgFactory<T> getOutput() {
-		return output;
+	public ImgFactory<T> compute0() {
+		return (dims == null || Intervals.numElements(dims) <= Integer.MAX_VALUE)
+			? new ArrayImgFactory<>() : new CellImgFactory<>();
 	}
 
 }

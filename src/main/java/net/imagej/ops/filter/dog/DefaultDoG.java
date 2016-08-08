@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,11 +30,10 @@
 
 package net.imagej.ops.filter.dog;
 
-import net.imagej.ops.AbstractHybridOp;
-import net.imagej.ops.Contingent;
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
-import net.imglib2.Cursor;
+import net.imagej.ops.special.computer.UnaryComputerOp;
+import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.RandomAccessible;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
@@ -42,38 +41,37 @@ import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
 import net.imglib2.outofbounds.OutOfBoundsMirrorFactory.Boundary;
 import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.NumericType;
-import net.imglib2.util.Util;
 import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
-import org.scijava.thread.ThreadService;
 
 /**
- * Default Difference of Gaussians (DoG) implementation.
- * 
+ * Low-level difference of Gaussians (DoG) implementation which leans on other
+ * ops to do the work.
+ *
  * @author Christian Dietz (University of Konstanz)
+ * @author Curtis Rueden
  * @param <T>
  */
-@Plugin(type = Ops.Filter.DoG.class, name = Ops.Filter.DoG.NAME)
-public class DefaultDoG<T extends NumericType<T> & NativeType<T>>
-	extends
-	AbstractHybridOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>>
-	implements Ops.Filter.DoG, Contingent
+@Plugin(type = Ops.Filter.DoG.class)
+public class DefaultDoG<T extends NumericType<T> & NativeType<T>> extends
+	AbstractUnaryHybridCF<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>>
+	implements Ops.Filter.DoG
 {
 
 	@Parameter
-	private ThreadService ts;
+	private UnaryComputerOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> gauss1;
 
 	@Parameter
-	private OpService ops;
+	private UnaryComputerOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> gauss2;
 
 	@Parameter
-	private double[] sigmas1;
+	private UnaryFunctionOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> outputCreator;
 
 	@Parameter
-	private double[] sigmas2;
+	private UnaryFunctionOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> tmpCreator;
 
 	@Parameter(required = false)
 	private OutOfBoundsFactory<T, RandomAccessibleInterval<T>> fac;
@@ -82,54 +80,33 @@ public class DefaultDoG<T extends NumericType<T> & NativeType<T>>
 	public RandomAccessibleInterval<T> createOutput(
 		final RandomAccessibleInterval<T> input)
 	{
-		// HACK: Make Java 6 javac compiler happy.
-		return (RandomAccessibleInterval<T>) ops.create().<T> img(input);
+		return outputCreator.compute1(input);
 	}
 
 	@Override
-	public void compute(final RandomAccessibleInterval<T> input,
+	public void initialize() {
+		if (fac == null) {
+			fac = new OutOfBoundsMirrorFactory<>(
+				Boundary.SINGLE);
+		}
+	}
+
+	@Override
+	public void compute1(final RandomAccessibleInterval<T> input,
 		final RandomAccessibleInterval<T> output)
 	{
-
-		if (fac == null) {
-			fac =
-				new OutOfBoundsMirrorFactory<T, RandomAccessibleInterval<T>>(
-					Boundary.SINGLE);
-		}
-
 		// input may potentially be translated
 		final long[] translation = new long[input.numDimensions()];
 		input.min(translation);
 
-		final IntervalView<T> tmpInterval =
-			Views.interval(Views.translate((RandomAccessible<T>) ops.create().img(
-				input, Util.getTypeFromInterval(input)), translation), output);
+		final IntervalView<T> tmpInterval = Views.interval(Views.translate(
+			(RandomAccessible<T>) tmpCreator.compute1(input), translation), output);
 
-		// TODO: How can I enforce that a certain gauss implementation is used
-		// here? I don't want to pass the Gauss class in the DoG, I rather
-		// would love to have something that allows me to enforce
-		// that certain Ops are used, even if they have lower priority. This is a
-		// common use-case if you want to let the user
-		// select in a GUI if (for example) he wants to use CUDA or CPU
-		// see issue https://github.com/imagej/imagej-ops/issues/154)
+		gauss1.compute1(input, tmpInterval);
+		gauss2.compute1(input, output);
 
-		ops.filter().gauss(tmpInterval, input, sigmas1);
-		ops.filter().gauss(output, input, sigmas2);
-
-		// TODO: Use SubtractOp as soon as available (see issue
-		// https://github.com/imagej/imagej-ops/issues/161).
-		final Cursor<T> tmpCursor = Views.flatIterable(tmpInterval).cursor();
-		final Cursor<T> outputCursor = Views.flatIterable(output).cursor();
-
-		while (outputCursor.hasNext()) {
-			outputCursor.next().sub(tmpCursor.next());
-		}
-
+		// TODO: Match the Subtract Op in initialize() once we have BinaryOp
+		ops().run(Ops.Math.Subtract.class, output, output, tmpInterval);
 	}
 
-	@Override
-	public boolean conforms() {
-		return sigmas1.length == sigmas2.length &&
-			sigmas1.length == getInput().numDimensions();
-	}
 }

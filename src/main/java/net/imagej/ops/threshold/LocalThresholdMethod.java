@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,21 +30,18 @@
 
 package net.imagej.ops.threshold;
 
-import net.imagej.ops.AbstractComputerOp;
-import net.imagej.ops.threshold.LocalThresholdMethod.Pair;
+import net.imagej.ops.map.neighborhood.AbstractCenterAwareComputerOp;
+import net.imagej.ops.threshold.apply.LocalThreshold;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 
 /**
- * @author Martin Horn (University of Konstanz)
+ * {@link AbstractCenterAwareComputerOp} for use in {@link LocalThreshold}s.
+ * 
+ * @author Jonathan Hale (University of Konstanz)
  */
 public abstract class LocalThresholdMethod<T extends RealType<T>> extends
-	AbstractComputerOp<Pair<T>, BitType>
-{
-
-	public static class Pair<T extends RealType<T>> {
-
-		public Iterable<T> neighborhood;
-		public T pixel;
-	}
+	AbstractCenterAwareComputerOp<T, BitType>
+{	
+	// NB: marker interface
 }

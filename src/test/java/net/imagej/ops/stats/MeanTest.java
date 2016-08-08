@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,8 +31,8 @@
 package net.imagej.ops.stats;
 
 import static org.junit.Assert.assertEquals;
+
 import net.imagej.ops.AbstractOpTest;
-import net.imagej.ops.stats.mean.MeanOp;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -41,7 +41,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 import org.junit.Test;
 
 /**
- * Tests {@link MeanOp}.
+ * Tests {@link net.imagej.ops.Ops.Stats.Mean}.
  * 
  * @author Curtis Rueden
  */
@@ -49,9 +49,9 @@ public class MeanTest extends AbstractOpTest {
 
 	@Test
 	public void testMean() {
-		final Img<ByteType> image = generateByteTestImg(true, 40, 50);
+		final Img<ByteType> image = generateByteArrayTestImg(true, 40, 50);
 		final DoubleType mean = new DoubleType();
-		ops.stats().mean(mean, image);
+		ops.run(IterableMean.class, mean, image);
 
 		assertEquals(1.0 / 15.625, mean.get(), 0.0);
 
@@ -63,7 +63,7 @@ public class MeanTest extends AbstractOpTest {
 			c.get().setReal(100.0);
 		}
 
-		ops.stats().mean(mean, image);
+		ops.run(IterableMean.class, mean, image);
 
 		// the mean should be 100
 		assertEquals(100.0, mean.get(), 0.0);

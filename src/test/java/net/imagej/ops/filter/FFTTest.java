@@ -1,8 +1,7 @@
-/*
- * #%L
+/* #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,16 +30,21 @@
 package net.imagej.ops.filter;
 
 import static org.junit.Assert.assertEquals;
-import net.imagej.ops.benchmark.AbstractOpBenchmark;
+
+import net.imagej.ops.AbstractOpTest;
+import net.imagej.ops.filter.fft.FFTMethodsOpF;
+import net.imagej.ops.filter.fftSize.ComputeFFTSize;
+import net.imagej.ops.filter.ifft.IFFTMethodsOpC;
+import net.imagej.ops.filter.pad.PadShiftKernel;
+import net.imagej.ops.filter.pad.PadShiftKernelFFTMethods;
 import net.imglib2.Cursor;
-import net.imglib2.Dimensions;
 import net.imglib2.FinalDimensions;
 import net.imglib2.IterableInterval;
 import net.imglib2.Point;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.region.hypersphere.HyperSphere;
 import net.imglib2.img.Img;
-import net.imglib2.img.array.ArrayImgFactory;
+import net.imglib2.type.numeric.complex.ComplexDoubleType;
 import net.imglib2.type.numeric.complex.ComplexFloatType;
 import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.view.Views;
@@ -52,7 +56,10 @@ import org.junit.Test;
  * 
  * @author Brian Northan
  */
-public class FFTTest extends AbstractOpBenchmark {
+public class FFTTest extends AbstractOpTest {
+
+	private final boolean expensiveTestsEnabled = "enabled".equals(System
+		.getProperty("imagej.ops.expensive.tests"));
 
 	/**
 	 * test that a forward transform followed by an inverse transform gives us
@@ -60,20 +67,23 @@ public class FFTTest extends AbstractOpBenchmark {
 	 */
 	@Test
 	public void testFFT3DOp() {
-		for (int i = 115; i < 120; i++) {
+		final int min = expensiveTestsEnabled ? 115 : 9;
+		final int max = expensiveTestsEnabled ? 120 : 11;
+		for (int i = min; i < max; i++) {
 
-			Dimensions dimensions = new FinalDimensions(new long[] { i, i, i });
+			final long[] dimensions = new long[] { i, i, i };
 
 			// create an input with a small sphere at the center
-			Img<FloatType> in = new ArrayImgFactory<FloatType>().create(
-					dimensions, new FloatType());
+			final Img<FloatType> in = generateFloatArrayTestImg(false, dimensions);
 			placeSphereInCenter(in);
 
-			Img<FloatType> inverse = new ArrayImgFactory<FloatType>().create(
-					dimensions, new FloatType());
+			final Img<FloatType> inverse = generateFloatArrayTestImg(false,
+				dimensions);
 
-			Img<ComplexFloatType> out = (Img<ComplexFloatType>) ops.filter().fft(in);
-			ops.filter().ifft(inverse, out);
+			@SuppressWarnings("unchecked")
+			final Img<ComplexFloatType> out = (Img<ComplexFloatType>) ops.run(
+				FFTMethodsOpF.class, in);
+			ops.run(IFFTMethodsOpC.class, inverse, out);
 
 			assertImagesEqual(in, inverse, .00005f);
 		}
@@ -86,80 +96,83 @@ public class FFTTest extends AbstractOpBenchmark {
 	@Test
 	public void testFastFFT3DOp() {
 
-		for (int i = 115; i < 135; i++) {
+		final int min = expensiveTestsEnabled ? 120 : 9;
+		final int max = expensiveTestsEnabled ? 130 : 11;
+		final int size = expensiveTestsEnabled ? 129 : 10;
+		for (int i = min; i < max; i++) {
 
 			// define the original dimensions
-			long[] originalDimensions = new long[] { i, 129, 129 };
+			final long[] originalDimensions = new long[] { i, size, size };
 
 			// arrays for the fast dimensions
-			long[] fastDimensions = new long[3];
-			long[] fftDimensions = new long[3];
+			final long[] fastDimensions = new long[3];
+			final long[] fftDimensions = new long[3];
 
 			// compute the dimensions that will result in the fastest FFT time
-			ops.filter().fftSize(originalDimensions, fastDimensions, fftDimensions,
-				true, true);
+			ops.run(ComputeFFTSize.class, originalDimensions, fastDimensions,
+				fftDimensions, true, true);
 
 			// create an input with a small sphere at the center
-			Img<FloatType> inOriginal =
-				(Img<FloatType>) ops.create().img(new FloatType(),
-					new ArrayImgFactory<FloatType>(), originalDimensions);
+			final Img<FloatType> inOriginal = generateFloatArrayTestImg(false,
+				originalDimensions);
 			placeSphereInCenter(inOriginal);
 
 			// create a similar input using the fast size
-			Img<FloatType> inFast =
-				(Img<FloatType>) ops.create().img(new FloatType(),
-					new ArrayImgFactory<FloatType>(), fastDimensions);
+			final Img<FloatType> inFast = generateFloatArrayTestImg(false,
+				fastDimensions);
 			placeSphereInCenter(inFast);
 
 			// call FFT passing false for "fast" (in order to pass the optional
 			// parameter we have to pass null for the
 			// output parameter).
-			Img<ComplexFloatType> fft1 =
-				(Img<ComplexFloatType>) ops.filter().fft(null, inOriginal, null, false);
+			@SuppressWarnings("unchecked")
+			final RandomAccessibleInterval<ComplexFloatType> fft1 =
+				(RandomAccessibleInterval<ComplexFloatType>) ops.run(
+					FFTMethodsOpF.class, inOriginal, null, false);
 
-			// call FFT passing true for "fast" (in order to pass the optional
-			// parameter we have to pass null for the
-			// output parameter). The FFT op will pad the input to the fast
+			// call FFT passing true for "fast" The FFT op will pad the input to the
+			// fast
 			// size.
-			Img<ComplexFloatType> fft2 =
-				(Img<ComplexFloatType>) ops.filter().fft(null, inOriginal, null, true);
+			@SuppressWarnings("unchecked")
+			final RandomAccessibleInterval<ComplexFloatType> fft2 =
+				(RandomAccessibleInterval<ComplexFloatType>) ops.run(
+					FFTMethodsOpF.class, inOriginal, null, true);
 
 			// call fft using the img that was created with the fast size
-			Img<ComplexFloatType> fft3 =
-				(Img<ComplexFloatType>) ops.filter().fft(inFast);
+			@SuppressWarnings("unchecked")
+			final RandomAccessibleInterval<ComplexFloatType> fft3 =
+				(RandomAccessibleInterval<ComplexFloatType>) ops.run(
+					FFTMethodsOpF.class, inFast);
 
 			// create an image to be used for the inverse, using the original
 			// size
-			Img<FloatType> inverseOriginalSmall =
-				(Img<FloatType>) ops.create().img(new FloatType(),
-					new ArrayImgFactory<FloatType>(), originalDimensions);
+			final Img<FloatType> inverseOriginalSmall = generateFloatArrayTestImg(
+				false, originalDimensions);
 
 			// create an inverse image to be used for the inverse, using the
 			// original
 			// size
-			Img<FloatType> inverseOriginalFast =
-				(Img<FloatType>) ops.create().img(new FloatType(),
-					new ArrayImgFactory<FloatType>(), originalDimensions);
+			final Img<FloatType> inverseOriginalFast = generateFloatArrayTestImg(
+				false, originalDimensions);
 
 			// create an inverse image to be used for the inverse, using the
 			// fast size
-			Img<FloatType> inverseFast =
-				(Img<FloatType>) ops.create().img(new FloatType(),
-					new ArrayImgFactory<FloatType>(), fastDimensions);
+			final Img<FloatType> inverseFast = generateFloatArrayTestImg(false,
+				fastDimensions);
 
 			// invert the "small" FFT
-			ops.filter().ifft(inverseOriginalSmall, fft1);
+			ops.run(IFFTMethodsOpC.class, inverseOriginalSmall, fft1);
 
 			// invert the "fast" FFT. The inverse will should be the original
 			// size.
-			ops.filter().ifft(inverseOriginalFast, fft2);
+			ops.run(IFFTMethodsOpC.class, inverseOriginalFast, fft2);
 
 			// invert the "fast" FFT that was acheived by explicitly using an
 			// image
 			// that had "fast" dimensions. The inverse will be the fast size
 			// this
 			// time.
-			ops.filter().ifft(inverseFast, fft3);
+			ops.run(IFFTMethodsOpC.class, inverseFast, fft3);
 
 			// assert that the inverse images are equal to the original
 			assertImagesEqual(inverseOriginalSmall, inOriginal, .0001f);
@@ -168,20 +181,42 @@ public class FFTTest extends AbstractOpBenchmark {
 		}
 	}
 
+	@Test
+	@SuppressWarnings("unchecked")
+	public void testPadShiftKernel() {
+		long[] dims = new long[] { 1024, 1024 };
+		Img<ComplexDoubleType> test = ops.create().img(new FinalDimensions(dims),
+			new ComplexDoubleType());
+
+		RandomAccessibleInterval<ComplexDoubleType> shift =
+			(RandomAccessibleInterval<ComplexDoubleType>) ops.run(
+				PadShiftKernel.class, test, new FinalDimensions(dims));
+
+		RandomAccessibleInterval<ComplexDoubleType> shift2 =
+			(RandomAccessibleInterval<ComplexDoubleType>) ops.run(
+				PadShiftKernelFFTMethods.class, test, new FinalDimensions(dims));
+
+		// assert there was no additional padding done by PadShiftKernel
+		assertEquals(1024, shift.dimension(0));
+		// assert that PadShiftKernelFFTMethods padded to the FFTMethods fast size
+		assertEquals(1120, shift2.dimension(0));
+
+	}
+
 	/**
 	 * utility that places a sphere in the center of the image
 	 * 
 	 * @param img
 	 */
-	private void placeSphereInCenter(Img<FloatType> img) {
+	private void placeSphereInCenter(final Img<FloatType> img) {
 
 		final Point center = new Point(img.numDimensions());
 
 		for (int d = 0; d < img.numDimensions(); d++)
 			center.setPosition(img.dimension(d) / 2, d);
 
-		HyperSphere<FloatType> hyperSphere = new HyperSphere<FloatType>(img,
-				center, 2);
+		final HyperSphere<FloatType> hyperSphere = new HyperSphere<>(img, center,
+			2);
 
 		for (final FloatType value : hyperSphere) {
 			value.setReal(1);
@@ -195,70 +230,57 @@ public class FFTTest extends AbstractOpBenchmark {
 	 * @param img2
 	 * @param delta
 	 */
-	protected void assertImagesEqual(Img<FloatType> img1, Img<FloatType> img2,
-			float delta) {
-		Cursor<FloatType> c1 = img1.cursor();
-		Cursor<FloatType> c2 = img2.cursor();
+	protected void assertImagesEqual(final Img<FloatType> img1,
+		final Img<FloatType> img2, final float delta)
+	{
+		final Cursor<FloatType> c1 = img1.cursor();
+		final Cursor<FloatType> c2 = img2.cursor();
 
-		int i = 0;
 		while (c1.hasNext()) {
-
 			c1.fwd();
 			c2.fwd();
 
-			i++;
-
 			// assert that the inverse = the input within the error delta
-			assertEquals(c1.get().getRealFloat(), c2.get().getRealFloat(),
-					delta);
+			assertEquals(c1.get().getRealFloat(), c2.get().getRealFloat(), delta);
 		}
 
 	}
 
 	// a utility to assert that two rais are equal
-	protected void assertRAIsEqual(RandomAccessibleInterval<FloatType> rai1,
-			RandomAccessibleInterval<FloatType> rai2, float delta) {
-		IterableInterval<FloatType> rai1Iterator = Views.iterable(rai1);
-		IterableInterval<FloatType> rai2Iterator = Views.iterable(rai2);
+	protected void assertRAIsEqual(final RandomAccessibleInterval<FloatType> rai1,
+		final RandomAccessibleInterval<FloatType> rai2, final float delta)
+	{
+		final IterableInterval<FloatType> rai1Iterator = Views.iterable(rai1);
+		final IterableInterval<FloatType> rai2Iterator = Views.iterable(rai2);
 
-		Cursor<FloatType> c1 = rai1Iterator.cursor();
-		Cursor<FloatType> c2 = rai2Iterator.cursor();
+		final Cursor<FloatType> c1 = rai1Iterator.cursor();
+		final Cursor<FloatType> c2 = rai2Iterator.cursor();
 
-		int i = 0;
 		while (c1.hasNext()) {
-
 			c1.fwd();
 			c2.fwd();
 
-			i++;
-
 			// assert that the inverse = the input within the error delta
-			assertEquals(c1.get().getRealFloat(), c2.get().getRealFloat(),
-					delta);
+			assertEquals(c1.get().getRealFloat(), c2.get().getRealFloat(), delta);
 		}
-
 	}
 
 	// a utility to assert that two images are equal
-	protected void assertComplexImagesEqual(Img<ComplexFloatType> img1,
-			Img<ComplexFloatType> img2, float delta) {
-		Cursor<ComplexFloatType> c1 = img1.cursor();
-		Cursor<ComplexFloatType> c2 = img2.cursor();
+	protected void assertComplexImagesEqual(final Img<ComplexFloatType> img1,
+		final Img<ComplexFloatType> img2, final float delta)
+	{
+		final Cursor<ComplexFloatType> c1 = img1.cursor();
+		final Cursor<ComplexFloatType> c2 = img2.cursor();
 
-		int i = 0;
 		while (c1.hasNext()) {
-
 			c1.fwd();
 			c2.fwd();
 
-			i++;
-
 			// assert that the inverse = the input within the error delta
-			assertEquals(c1.get().getRealFloat(), c2.get().getRealFloat(),
-					delta);
+			assertEquals(c1.get().getRealFloat(), c2.get().getRealFloat(), delta);
 			// assert that the inverse = the input within the error delta
-			assertEquals(c1.get().getImaginaryFloat(), c2.get()
-					.getImaginaryFloat(), delta);
+			assertEquals(c1.get().getImaginaryFloat(), c2.get().getImaginaryFloat(),
+				delta);
 		}
 
 	}

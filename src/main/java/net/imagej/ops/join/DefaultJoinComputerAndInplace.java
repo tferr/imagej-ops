@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,38 +30,64 @@
 
 package net.imagej.ops.join;
 
-import net.imagej.ops.ComputerOp;
-import net.imagej.ops.InplaceOp;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.UnaryComputerOp;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- * Joins a {@link ComputerOp} with an {@link InplaceOp}.
+ * Joins a {@link UnaryComputerOp} with an {@link UnaryInplaceOp}.
  * 
  * @author Christian Dietz (University of Konstanz)
  */
-@Plugin(type = Ops.Join.class, name = Ops.Join.NAME)
+@Plugin(type = Ops.Join.class)
 public class DefaultJoinComputerAndInplace<A, B> extends
-	AbstractJoinComputerAndComputer<A, B, B, ComputerOp<A, B>, InplaceOp<B>>
+	AbstractUnaryComputerOp<A, B> implements JoinComputerAndInplace<A, B, B>
 {
 
+	@Parameter
+	private UnaryComputerOp<A, B> first;
+
+	@Parameter
+	private UnaryInplaceOp<B, B> second;
+
+	// -- Join2Ops methods --
+
 	@Override
-	public void compute(final A input, final B output) {
-		getFirst().compute(input, output);
-		getSecond().compute(output);
+	public UnaryComputerOp<A, B> getFirst() {
+		return first;
 	}
+
+	@Override
+	public void setFirst(final UnaryComputerOp<A, B> first) {
+		this.first = first;
+	}
+
+	@Override
+	public UnaryInplaceOp<B, B> getSecond() {
+		return second;
+	}
+
+	@Override
+	public void setSecond(final UnaryInplaceOp<B, B> second) {
+		this.second = second;
+	}
+
+	// -- Threadable methods --
 
 	@Override
 	public DefaultJoinComputerAndInplace<A, B> getIndependentInstance() {
 
 		final DefaultJoinComputerAndInplace<A, B> joiner =
-			new DefaultJoinComputerAndInplace<A, B>();
+			new DefaultJoinComputerAndInplace<>();
 
 		joiner.setFirst(getFirst().getIndependentInstance());
 		joiner.setSecond(getSecond().getIndependentInstance());
-		joiner.setBufferFactory(getBufferFactory());
 
 		return joiner;
 	}
+
 }

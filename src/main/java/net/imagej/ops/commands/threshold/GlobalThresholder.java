@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,11 @@
 package net.imagej.ops.commands.threshold;
 
 import net.imagej.ImgPlus;
+import net.imagej.axis.Axis;
+import net.imagej.ops.AbstractOp;
 import net.imagej.ops.Op;
-import net.imagej.ops.OpService;
+import net.imagej.ops.Ops;
 import net.imagej.ops.threshold.ComputeThreshold;
-import net.imglib2.Axis;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 
@@ -50,13 +51,10 @@ import org.scijava.plugin.Plugin;
  * @author Martin Horn (University of Konstanz)
  */
 @Plugin(type = Command.class, menuPath = "Image > Threshold > Apply Threshold")
-public class GlobalThresholder<T extends RealType<T>> implements Op {
+public class GlobalThresholder<T extends RealType<T>> extends AbstractOp {
 
     @Parameter
     private ComputeThreshold<ImgPlus<T>,T> method;
-
-    @Parameter
-    private OpService ops;
 
     // should not be Dataset, DisplayService, ...
     @Parameter
@@ -71,10 +69,10 @@ public class GlobalThresholder<T extends RealType<T>> implements Op {
 
     @Override
     public void run() {
-        Op threshold = ops.op("threshold", out, in, method);
+        Op threshold = ops().op("threshold", out, in, method);
 
         // TODO actually map axes to int array
-        ops.slicewise(out, in, threshold, new int[]{0, 1});
+        ops().run(Ops.Slice.class, out, in, threshold, new int[]{0, 1});
     }
     
     // TODO call otsu: out = ops.run(GlobalThresholder.class, ops.ops(Otsu...),in).

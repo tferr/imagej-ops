@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,12 @@ package net.imagej.ops.threshold.minimum;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.threshold.AbstractComputeThresholdHistogram;
-import net.imagej.ops.threshold.ThresholdUtils;
+import net.imagej.ops.threshold.Thresholds;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;
+import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -44,14 +45,14 @@ import org.scijava.plugin.Plugin;
 // plugin found in Fiji (version 1.14).
 
 /**
- * Implements a minimum threshold method by Prewitt & Mendelsohn.
+ * Implements a minimum threshold method by Prewitt &amp; Mendelsohn.
  * 
  * @author Barry DeZonia
  * @author Gabriel Landini
  */
-@Plugin(type = Ops.Threshold.Minimum.class, name = Ops.Threshold.Minimum.NAME)
+@Plugin(type = Ops.Threshold.Minimum.class, priority = Priority.HIGH_PRIORITY)
 public class ComputeMinimumThreshold<T extends RealType<T>> extends
-		AbstractComputeThresholdHistogram<T> {
+		AbstractComputeThresholdHistogram<T> implements Ops.Threshold.Minimum {
 
 	@Parameter(type = ItemIO.OUTPUT)
 	private String errMsg;
@@ -88,9 +89,9 @@ public class ComputeMinimumThreshold<T extends RealType<T>> extends
 			if (histogram[i] > 0)
 				max = i;
 		}
-		double[] tHisto = iHisto;
+		double[] tHisto = new double[iHisto.length] ;
 
-		while (!ThresholdUtils.bimodalTest(iHisto)) {
+		while (!Thresholds.bimodalTest(iHisto)) {
 			// smooth with a 3 point running mean filter
 			for (int i = 1; i < histogram.length - 1; i++)
 				tHisto[i] = (iHisto[i - 1] + iHisto[i] + iHisto[i + 1]) / 3;
@@ -98,7 +99,7 @@ public class ComputeMinimumThreshold<T extends RealType<T>> extends
 			tHisto[0] = (iHisto[0] + iHisto[1]) / 3;
 			// 0 outside
 			tHisto[histogram.length - 1] = (iHisto[histogram.length - 2] + iHisto[histogram.length - 1]) / 3;
-			iHisto = tHisto;
+			System.arraycopy(tHisto, 0, iHisto, 0, iHisto.length) ;
 			iter++;
 			if (iter > 10000) {
 				errMsg = "Minimum Threshold not found after 10000 iterations.";
@@ -111,7 +112,7 @@ public class ComputeMinimumThreshold<T extends RealType<T>> extends
 		double[] y = iHisto;
 		for (int k = 1; k < max; k++) {
 			// IJ.log(" "+i+"  "+iHisto[i]);
-			if (y[k - 1] > y[k] & y[k + 1] >= y[k])
+			if (y[k - 1] > y[k] && y[k + 1] >= y[k])
 				return k;
 		}
 		return -1;

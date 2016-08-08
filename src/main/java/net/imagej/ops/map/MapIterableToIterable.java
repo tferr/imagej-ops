@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -38,23 +38,25 @@ import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 
 /**
- * {@link MapOp} from {@link Iterable} to {@link Iterable}.
+ * {@link MapUnaryComputer} from {@link Iterable} input to {@link Iterable} output.
  * 
  * @author Martin Horn (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
+ * @param <EI> element type of inputs
+ * @param <EO> element type of outputs
  */
-@Plugin(type = Ops.Map.class, name = Ops.Map.NAME, priority = Priority.LOW_PRIORITY - 1)
-public class MapIterableToIterable<A, B> extends
-	AbstractMapComputer<A, B, Iterable<A>, Iterable<B>>
+@Plugin(type = Ops.Map.class, priority = Priority.LOW_PRIORITY - 1)
+public class MapIterableToIterable<EI, EO> extends
+	AbstractMapComputer<EI, EO, Iterable<EI>, Iterable<EO>>
 {
 
 	@Override
-	public void compute(final Iterable<A> input, final Iterable<B> output) {
-		final Iterator<A> inCursor = input.iterator();
-		final Iterator<B> outCursor = output.iterator();
+	public void compute1(final Iterable<EI> input, final Iterable<EO> output) {
+		final Iterator<EI> inCursor = input.iterator();
+		final Iterator<EO> outCursor = output.iterator();
 
 		while (inCursor.hasNext()) {
-			getOp().compute(inCursor.next(), outCursor.next());
+			getOp().compute1(inCursor.next(), outCursor.next());
 		}
 	}
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,24 +32,22 @@ package net.imagej.ops;
 
 import static org.junit.Assert.assertTrue;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 
-import org.scijava.command.CommandInfo;
 import org.scijava.command.CommandService;
-import org.scijava.module.ModuleInfo;
 import org.scijava.module.ModuleItem;
 import org.scijava.plugin.Parameter;
 import org.scijava.util.ClassUtils;
 import org.scijava.util.ConversionUtils;
 import org.scijava.util.GenericUtils;
-import org.scijava.util.MiscUtils;
 
 /**
  * Base class for unit testing of namespaces. In particular, this class has
@@ -73,11 +71,13 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	public void assertComplete(final String namespace,
 		final Class<?> namespaceClass)
 	{
+		boolean success = true; // whether the test will succeed
 		for (final String op : ops.ops()) {
-			final String ns = getNamespace(op);
-			if (!MiscUtils.equal(namespace, ns)) continue;
-			assertComplete(namespaceClass, op);
+			final String ns = OpUtils.getNamespace(op);
+			if (!Objects.equals(namespace, ns)) continue;
+			if (!checkComplete(namespaceClass, op)) success = false;
 		}
+		assertTrue("Coverage mismatch", success);
 	}
 
 	/**
@@ -91,7 +91,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	 * </p>
 	 * <p>
 	 * This method provides a general-purpose verification test which extensions
-	 * to OPS can also use to verify their own cache of type-safe methods provided
+	 * to Ops can also use to verify their own cache of type-safe methods provided
 	 * by their own service(s).
 	 * </p>
 	 * <p>
@@ -114,41 +114,42 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	 * @see GlobalNamespaceTest Usage examples for global namespace ops.
 	 * @see net.imagej.ops.math.MathNamespaceTest Usage examples for math ops.
 	 */
-	public void assertComplete(final Class<?> namespaceClass, final String qName)
+	public boolean checkComplete(final Class<?> namespaceClass,
+		final String qName)
 	{
-		final String namespace = getNamespace(qName);
-		final String opName = stripNamespace(qName);
+		final String namespace = OpUtils.getNamespace(qName);
+		final String opName = OpUtils.stripNamespace(qName);
 
 		// obtain the list of built-in methods
 		final List<Method> allMethods =
 			ClassUtils.getAnnotatedMethods(namespaceClass, OpMethod.class);
 
 		// obtain the list of ops
-		final List<CommandInfo> allOps = matcher.getOps();
+		final Collection<OpInfo> allOps = ops.infos();
 
 		// filter methods and ops to only those with the given name
 		final List<Method> methods;
-		final List<CommandInfo> opList;
+		final Collection<OpInfo> opList;
 		if (opName == null) {
 			methods = allMethods;
 			opList = allOps;
 		}
 		else {
 			// filter the methods
-			methods = new ArrayList<Method>();
+			methods = new ArrayList<>();
 			for (final Method method : allMethods) {
 				if (opName.equals(method.getName())) methods.add(method);
 			}
 
 			// filter the ops
-			opList = new ArrayList<CommandInfo>();
-			for (final CommandInfo op : allOps) {
+			opList = new ArrayList<>();
+			for (final OpInfo op : allOps) {
 				if (qName.equals(op.getName())) opList.add(op);
 			}
 		}
 
 		// cross-check them!
-		assertComplete(namespace, methods, opList);
+		return checkComplete(namespace, methods, opList);
 	}
 
 	/**
@@ -169,12 +170,13 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	 * @param methods List of methods.
 	 * @param infos List of ops.
 	 */
-	public void assertComplete(final String namespace,
-		final List<Method> methods, final List<? extends ModuleInfo> infos)
+	public boolean checkComplete(final String namespace,
+		final Collection<Method> methods,
+		final Collection<? extends OpInfo> infos)
 	{
 		final OpCoverSet coverSet = new OpCoverSet();
 
-		boolean success = true; // whether the test will succeed
+		boolean success = true;
 		for (final Method method : methods) {
 			final String name = method.getName();
 			final String qName = namespace == null ? name : namespace + "." + name;
@@ -182,21 +184,16 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 			if (!checkVarArgs(method)) success = false;
 
 			for (final Class<? extends Op> opType : opTypes(method)) {
-				if (opType.isInterface()) {
-					if (!checkOpIface(method, qName, opType)) success = false;
-				}
-				else {
-					if (!checkOpImpl(method, qName, opType, coverSet)) success = false;
-				}
+				if (!checkOpImpl(method, qName, opType, coverSet)) success = false;
 			}
 		}
 
 		// verify that all ops have been completely covered
 		final StringBuilder missingMessage = new StringBuilder("Missing methods:");
 		int missingCount = 0;
-		for (final ModuleInfo info : infos) {
+		for (final OpInfo info : infos) {
 			int requiredCount = 0, inputCount = 0;
-			for (final ModuleItem<?> input : info.inputs()) {
+			for (final ModuleItem<?> input : info.cInfo().inputs()) {
 				if (input.isRequired()) requiredCount++;
 				inputCount++;
 			}
@@ -214,7 +211,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 			success = false;
 		}
 
-		assertTrue("Coverage mismatch", success);
+		return success;
 	}
 
 	// -- Helper methods --
@@ -241,7 +238,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	 * the {@link OpMethod} annotation.
 	 */
 	private Set<Class<? extends Op>> opTypes(final Method method) {
-		final Set<Class<? extends Op>> opSet = new HashSet<Class<? extends Op>>();
+		final Set<Class<? extends Op>> opSet = new HashSet<>();
 		final OpMethod ann = method.getAnnotation(OpMethod.class);
 		if (ann != null) {
 			final Class<? extends Op>[] opTypes = ann.ops();
@@ -251,48 +248,6 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 			}
 		}
 		return opSet;
-	}
-
-	/**
-	 * Checks whether the given op interface matches the specified method,
-	 * particularly with respect to the interface's {@code NAME} constant.
-	 * @param method The method to which the {@link Op} should be compared.
-	 * @param qName The fully qualified (with namespace) name of the op.
-	 * @param opType The {@link Op} to which the method should be compared.
-	 * @return true iff the method and {@link Op} match up.
-	 */
-	private boolean checkOpIface(final Method method, final String qName,
-		final Class<? extends Op> opType)
-	{
-		try {
-			final Field nameField = opType.getField("NAME");
-			if (nameField.getType() != String.class) {
-				error("Non-String NAME field", opType, method);
-				return false;
-			}
-			final String nameFieldValue = (String) nameField.get(null);
-			if (!qName.equals(nameFieldValue)) {
-				error("NAME field mismatch", opType, method);
-				return false;
-			}
-		}
-		catch (final NoSuchFieldException exc) {
-			error("No NAME field", opType, method);
-			return false;
-		}
-		catch (final IllegalAccessException exc) {
-			error("Inaccessible NAME field", opType, method);
-			return false;
-		}
-
-		final Object[] argTypes = method.getParameterTypes();
-		// verify that the method argument is "Object..." as expected
-		if (argTypes.length != 1 || argTypes[0] != Object[].class) {
-			error("Expected single Object... argument", opType, method);
-			return false;
-		}
-
-		return true;
 	}
 
 	/**
@@ -313,9 +268,9 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		// Then we can pass Types here instead of Class instances.
 		// final Object[] argTypes = method.getGenericParameterTypes();
 		final Object[] argTypes = method.getParameterTypes();
-		final OpRef<Op> ref = new OpRef<Op>(qName, null, argTypes);
-		final CommandInfo info = commandService.getCommand(opType);
-		final OpCandidate<Op> candidate = new OpCandidate<Op>(ref, info);
+		final OpRef ref = OpRef.create(qName, argTypes);
+		final OpInfo info = ops.info(opType);
+		final OpCandidate candidate = new OpCandidate(ops, ref, info);
 
 		// check input types
 		if (!inputTypesMatch(candidate)) {
@@ -336,14 +291,14 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		return true;
 	}
 
-	private boolean inputTypesMatch(final OpCandidate<Op> candidate) {
+	private boolean inputTypesMatch(final OpCandidate candidate) {
 		// check for assignment compatibility, including generics
 		if (!matcher.typesMatch(candidate)) return false;
 
 		// also check that raw types exactly match
 		final Object[] paddedArgs = matcher.padArgs(candidate);
 		int i = 0;
-		for (final ModuleItem<?> input : candidate.getInfo().inputs()) {
+		for (final ModuleItem<?> input : candidate.cInfo().inputs()) {
 			final Object arg = paddedArgs[i++];
 			if (!typeMatches(arg, input.getType())) return false;
 		}
@@ -360,10 +315,10 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	}
 
 	private boolean outputTypesMatch(final Type returnType,
-		final OpCandidate<Op> candidate)
+		final OpCandidate candidate)
 	{
-		final List<Type> outTypes = new ArrayList<Type>();
-		for (final ModuleItem<?> output : candidate.getInfo().outputs()) {
+		final List<Type> outTypes = new ArrayList<>();
+		for (final ModuleItem<?> output : candidate.cInfo().outputs()) {
 			outTypes.add(output.getGenericType());
 		}
 		if (outTypes.size() == 0) return returnType == void.class;
@@ -407,15 +362,14 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		System.err.println("[ERROR] " + message);
 	}
 
-	private String methodString(final ModuleInfo info, final int optionalsToFill)
-	{
+	private String methodString(final OpInfo info, final int optionalsToFill) {
 		final StringBuilder sb = new StringBuilder();
 
 		// outputs
 		int outputCount = 0;
 		String returnType = "void";
 		String castPrefix = "";
-		for (final ModuleItem<?> output : info.outputs()) {
+		for (final ModuleItem<?> output : info.cInfo().outputs()) {
 			if (++outputCount == 1) {
 				returnType = typeString(output);
 				castPrefix = "(" + castTypeString(output) + ") ";
@@ -428,10 +382,10 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		}
 
 		final String className =
-			info.getDelegateClassName().replaceAll("\\$", ".") + ".class";
+			info.cInfo().getDelegateClassName().replaceAll("\\$", ".") + ".class";
 		sb.append("\t@OpMethod(op = " + className + ")\n");
 
-		final String methodName = stripNamespace(info.getName());
+		final String methodName = info.getSimpleName();
 		sb.append("\tpublic " + returnType + " " + methodName + "(");
 
 		// inputs
@@ -439,7 +393,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		int optionalIndex = 0;
 		final StringBuilder args = new StringBuilder();
 		args.append(className);
-		for (final ModuleItem<?> input : info.inputs()) {
+		for (final ModuleItem<?> input : info.cInfo().inputs()) {
 			if (!input.isRequired()) {
 				// leave off unspecified optional arguments
 				if (++optionalIndex > optionalsToFill) continue;
@@ -470,17 +424,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		return ConversionUtils.getNonprimitiveType(item.getType()).getSimpleName();
 	}
 
-	private String getNamespace(final String qName) {
-		if (qName == null) return null;
-		final int dot = qName.lastIndexOf(".");
-		return dot < 0 ? null : qName.substring(0, dot);
-	}
-
-	private String stripNamespace(final String qName) {
-		if (qName == null) return null;
-		final int dot = qName.lastIndexOf(".");
-		return dot < 0 ? qName : qName.substring(dot + 1);
-	}
+	// -- Helper classes --
 
 	/** A data structure which maps each key to a set of values. */
 	private static class MultiMap<K, V> extends HashMap<K, Set<V>> {
@@ -488,7 +432,7 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 		public void add(final K key, final V value) {
 			Set<V> set = get(key);
 			if (set == null) {
-				set = new HashSet<V>();
+				set = new HashSet<>();
 				put(key, set);
 			}
 			set.add(value);
@@ -501,10 +445,10 @@ public abstract class AbstractNamespaceTest extends AbstractOpTest {
 	}
 
 	/**
-	 * Maps an op implementation (i.e., {@link ModuleInfo}) to a list of integers.
+	 * Maps an op implementation (i.e., {@link OpInfo}) to a list of integers.
 	 * Each integer represents a different number of arguments to the op.
 	 */
-	public static class OpCoverSet extends MultiMap<ModuleInfo, Integer> {
+	public static class OpCoverSet extends MultiMap<OpInfo, Integer> {
 		// NB: No implementation needed.
 	}
 

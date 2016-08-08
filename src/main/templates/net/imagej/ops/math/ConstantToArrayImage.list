@@ -1,0 +1,27 @@
+# Generated binary arithmetic ops with ArrayImages.
+
+[ConstantToArrayImage.java]
+
+types = ```
+[
+	[name: "Byte",         array: "Byte",     primitive: "byte"],
+	[name: "Int",          array: "Int",      primitive: "int"],
+	[name: "Long",         array: "Long",     primitive: "long"],
+	[name: "Short",        array: "Short",    primitive: "short"],
+	[name: "Float",        array: "Float",    primitive: "float"],
+	[name: "Double",       array: "Double",   primitive: "double"],
+	[name: "UnsignedByte", array: "Byte",     primitive: "byte"],
+	[name: "UnsignedInt",  array: "Int",      primitive: "int"],
+	[name: "UnsignedLong", array: "Long",     primitive: "long"],
+	[name: "UnsignedShort",array: "Short",    primitive: "short"]
+]
+```
+
+ops = ```
+[
+	[name: "Add",      operator: "+"],
+	[name: "Subtract", operator: "-"], 
+	[name: "Multiply", operator: "*"], 
+	[name: "Divide",   operator: "/"]
+]
+```

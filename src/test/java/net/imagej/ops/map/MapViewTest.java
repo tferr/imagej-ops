@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,9 +31,10 @@
 package net.imagej.ops.map;
 
 import static org.junit.Assert.assertEquals;
+
 import net.imagej.ops.AbstractOpTest;
 import net.imagej.ops.Op;
-import net.imagej.ops.math.add.AddConstantToNumericType;
+import net.imagej.ops.math.NumericTypeBinaryMath;
 import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.RandomAccessible;
@@ -55,9 +56,9 @@ public class MapViewTest extends AbstractOpTest {
 	@Before
 	public void init() {
 		final long[] dims = new long[] { 10, 10 };
-		in = generateByteTestImg(false, dims);
+		in = generateByteArrayTestImg(false, dims);
 		op =
-			ops.op(AddConstantToNumericType.class, null, NumericType.class,
+			ops.op(NumericTypeBinaryMath.Add.class, null, NumericType.class,
 				new ByteType((byte) 10));
 	}
 
@@ -65,7 +66,7 @@ public class MapViewTest extends AbstractOpTest {
 	public void testRandomAccessibleView() {
 		@SuppressWarnings("unchecked")
 		final RandomAccessible<ByteType> res =
-			(RandomAccessible<ByteType>) ops.run(MapConvertRandomAccessToRandomAccess.class, in, op,
+			(RandomAccessible<ByteType>) ops.run(MapViewRandomAccessToRandomAccess.class, in, op,
 				new ByteType());
 
 		final Cursor<ByteType> iterable =
@@ -80,7 +81,7 @@ public class MapViewTest extends AbstractOpTest {
 	public void testRandomAccessibleIntervalView() {
 		@SuppressWarnings("unchecked")
 		final RandomAccessibleInterval<ByteType> res =
-			(RandomAccessibleInterval<ByteType>) ops.run(MapConvertRAIToRAI.class, in, op,
+			(RandomAccessibleInterval<ByteType>) ops.run(MapViewRAIToRAI.class, in, op,
 				new ByteType());
 
 		final Cursor<ByteType> iterable = Views.iterable(res).cursor();
@@ -94,7 +95,7 @@ public class MapViewTest extends AbstractOpTest {
 	public void testIterableIntervalView() {
 		@SuppressWarnings("unchecked")
 		final IterableInterval<ByteType> res =
-			(IterableInterval<ByteType>) ops.run(MapIterableIntervalToView.class, in, op,
+			(IterableInterval<ByteType>) ops.run(MapViewIIToII.class, in, op,
 				new ByteType());
 
 		final Cursor<ByteType> iterable = res.cursor();

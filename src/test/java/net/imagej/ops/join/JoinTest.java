@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,13 +35,17 @@ import static org.junit.Assert.assertEquals;
 import java.util.ArrayList;
 import java.util.List;
 
-import net.imagej.ops.AbstractComputerOp;
-import net.imagej.ops.AbstractInplaceOp;
 import net.imagej.ops.AbstractOpTest;
-import net.imagej.ops.BufferFactory;
-import net.imagej.ops.ComputerOp;
 import net.imagej.ops.Op;
+import net.imagej.ops.bufferfactories.ImgImgSameTypeFactory;
 import net.imagej.ops.map.MapOp;
+import net.imagej.ops.special.UnaryOutputFactory;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.Computers;
+import net.imagej.ops.special.computer.UnaryComputerOp;
+import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
+import net.imagej.ops.special.inplace.Inplaces;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -53,23 +57,22 @@ public class JoinTest extends AbstractOpTest {
 
 	private Img<ByteType> in;
 	private Img<ByteType> out;
-	private Op inplaceOp;
-	private Op functionalOp;
+	private UnaryInplaceOp<? super Img<ByteType>, Img<ByteType>> inplaceOp;
+	private UnaryComputerOp<Img<ByteType>, Img<ByteType>> computerOp;
 
 	@Before
 	public void init() {
 		final long[] dims = new long[] { 10, 10 };
-		in = generateByteTestImg(false, dims);
-		out = generateByteTestImg(false, dims);
-		inplaceOp = ops.op(MapOp.class, Img.class, new AddOneInplace());
-		functionalOp =
-			ops.op(MapOp.class, Img.class, Img.class, new AddOneFunctional());
+		in = generateByteArrayTestImg(false, dims);
+		out = generateByteArrayTestImg(false, dims);
+		inplaceOp = Inplaces.unary(ops, MapOp.class, out, new AddOneInplace());
+		computerOp = Computers.unary(ops, MapOp.class, out, in,
+			new AddOneComputer());
 	}
 
 	@Test
-	public void testInplaceJoin() {
-		final Op op =
-			ops.op(DefaultJoinInplaceAndInplace.class, in, inplaceOp, inplaceOp);
+	public void testJoin2Inplaces() {
+		final Op op = ops.op(DefaultJoin2Inplaces.class, in, inplaceOp, inplaceOp);
 		op.run();
 
 		// test
@@ -81,9 +84,9 @@ public class JoinTest extends AbstractOpTest {
 	}
 
 	@Test
-	public void testFunctionInplaceJoin() {
+	public void testJoinComputerAndInplace() {
 		final Op op =
-			ops.op(DefaultJoinComputerAndInplace.class, out, in, functionalOp,
+			ops.op(DefaultJoinComputerAndInplace.class, out, in, computerOp,
 				inplaceOp);
 		op.run();
 
@@ -96,10 +99,10 @@ public class JoinTest extends AbstractOpTest {
 	}
 
 	@Test
-	public void testInplaceFunctionJoin() {
+	public void testJoinInplaceAndComputer() {
 		final Op op =
 			ops.op(DefaultJoinInplaceAndComputer.class, out, in, inplaceOp,
-				functionalOp);
+				computerOp);
 		op.run();
 
 		// test
@@ -111,19 +114,12 @@ public class JoinTest extends AbstractOpTest {
 	}
 
 	@Test
-	public void testFunctionAndFunctionJoin() {
+	public void testJoin2Computers() {
+		final UnaryOutputFactory<Img<ByteType>, Img<ByteType>> outputFactory =
+			new ImgImgSameTypeFactory<>();
 
-		final BufferFactory<Img<ByteType>, Img<ByteType>> bufferFactory =
-			new BufferFactory<Img<ByteType>, Img<ByteType>>() {
-
-				@Override
-				public Img<ByteType> createBuffer(final Img<ByteType> input) {
-					return input.factory().create(input,
-						input.firstElement().createVariable());
-				}
-			};
-
-		ops.join(out, in, functionalOp, functionalOp, bufferFactory);
+		ops.run(DefaultJoin2Computers.class, out, in, computerOp, computerOp,
+			outputFactory);
 
 		// test
 		final Cursor<ByteType> c = out.cursor();
@@ -134,26 +130,18 @@ public class JoinTest extends AbstractOpTest {
 	}
 
 	@Test
-	public void testJoinFunctions() {
-
-		final List<ComputerOp<Img<ByteType>, Img<ByteType>>> functions =
-			new ArrayList<ComputerOp<Img<ByteType>, Img<ByteType>>>();
+	public void testJoinNComputers() {
+		final List<UnaryComputerOp<Img<ByteType>, Img<ByteType>>> computers =
+			new ArrayList<>();
 
 		for (int i = 0; i < 5; i++) {
-			functions.add(new AddOneFunctionalImg());
+			computers.add(new AddOneComputerImg());
 		}
 
-		final BufferFactory<Img<ByteType>, Img<ByteType>> bufferFactory =
-			new BufferFactory<Img<ByteType>, Img<ByteType>>() {
+		final UnaryOutputFactory<Img<ByteType>, Img<ByteType>> outputFactory =
+			new ImgImgSameTypeFactory<>();
 
-				@Override
-				public Img<ByteType> createBuffer(final Img<ByteType> input) {
-					return input.factory().create(input,
-						input.firstElement().createVariable());
-				}
-			};
-
-		ops.join(out, in, functions, bufferFactory);
+		ops.run(DefaultJoinNComputers.class, out, in, computers, outputFactory);
 
 		// test
 		final Cursor<ByteType> c = out.cursor();
@@ -163,33 +151,34 @@ public class JoinTest extends AbstractOpTest {
 		}
 	}
 
-	// Helper classes
-	class AddOneInplace extends AbstractInplaceOp<ByteType> {
+	// -- Helper classes --
+
+	private class AddOneInplace extends AbstractUnaryInplaceOp<ByteType> {
 
 		@Override
-		public void compute(final ByteType arg) {
+		public void mutate(final ByteType arg) {
 			arg.inc();
 		}
 	}
 
-	class AddOneFunctional extends AbstractComputerOp<ByteType, ByteType> {
+	private class AddOneComputer extends AbstractUnaryComputerOp<ByteType, ByteType> {
 
 		@Override
-		public void compute(final ByteType input, final ByteType output) {
+		public void compute1(final ByteType input, final ByteType output) {
 			output.set(input);
 			output.inc();
 		}
 	}
 
-	class AddOneFunctionalImg extends
-		AbstractComputerOp<Img<ByteType>, Img<ByteType>>
+	private class AddOneComputerImg extends
+		AbstractUnaryComputerOp<Img<ByteType>, Img<ByteType>>
 	{
 
 		@Override
-		public void compute(final Img<ByteType> input,
+		public void compute1(final Img<ByteType> input,
 			final Img<ByteType> output)
 		{
-			ops.run(MapOp.class, output, input, new AddOneFunctional());
+			ops.run(MapOp.class, output, input, new AddOneComputer());
 		}
 	}
 

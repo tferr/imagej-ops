@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,9 @@
 
 package net.imagej.ops.threshold.apply;
 
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
 import net.imagej.ops.threshold.AbstractApplyThresholdImg;
+import net.imglib2.IterableInterval;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.RealType;
 
@@ -44,19 +44,16 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Curtis Rueden
  */
-@Plugin(type = Ops.Threshold.Apply.class, name = Ops.Threshold.Apply.NAME)
+@Plugin(type = Ops.Threshold.Apply.class)
 public class ApplyManualThreshold<T extends RealType<T>> extends
-	AbstractApplyThresholdImg<T, Img<T>>
+	AbstractApplyThresholdImg<T>
 {
-
-	@Parameter
-	private OpService ops;
 
 	@Parameter
 	private T threshold;
 
 	@Override
-	public T getThreshold(final Img<T> input) {
+	public T getThreshold(final IterableInterval<T> input) {
 		return threshold;
 	}
 

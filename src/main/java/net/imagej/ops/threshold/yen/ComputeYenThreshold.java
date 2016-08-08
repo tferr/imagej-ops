@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,20 +34,22 @@ import net.imagej.ops.threshold.AbstractComputeThresholdHistogram;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
+import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 
 // NB - this plugin adapted from Gabriel Landini's code of his AutoThreshold
 // plugin found in Fiji (version 1.14).
 
 /**
- * Implements Yen's threshold method (Yen, Chang, & Chang, and Sezgin & Sankur).
+ * Implements Yen's threshold method (Yen, Chang, {@literal &} Chang, and Sezgin
+ * {@literal &} Sankur).
  * 
  * @author Barry DeZonia
  * @author Gabriel Landini
  */
-@Plugin(type = Ops.Threshold.Yen.class, name = Ops.Threshold.Yen.NAME)
+@Plugin(type = Ops.Threshold.Yen.class, priority = Priority.HIGH_PRIORITY)
 public class ComputeYenThreshold<T extends RealType<T>> extends
-		AbstractComputeThresholdHistogram<T> {
+		AbstractComputeThresholdHistogram<T> implements Ops.Threshold.Yen {
 
 	@Override
 	public long computeBin(final Histogram1d<T> hist) {
@@ -101,7 +103,7 @@ public class ComputeYenThreshold<T extends RealType<T>> extends
 
 		/* Find the threshold that maximizes the criterion */
 		threshold = -1;
-		max_crit = Double.MIN_VALUE;
+		max_crit = Double.NEGATIVE_INFINITY;
 		for (it = 0; it < histogram.length; it++) {
 			crit = -1.0
 					* ((P1_sq[it] * P2_sq[it]) > 0.0 ? Math.log(P1_sq[it]

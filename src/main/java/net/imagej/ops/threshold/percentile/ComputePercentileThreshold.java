@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,6 +34,7 @@ import net.imagej.ops.threshold.AbstractComputeThresholdHistogram;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
+import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 
 // NB - this plugin adapted from Gabriel Landini's code of his AutoThreshold
@@ -45,9 +46,9 @@ import org.scijava.plugin.Plugin;
  * @author Barry DeZonia
  * @author Gabriel Landini
  */
-@Plugin(type = Ops.Threshold.Percentile.class, name = Ops.Threshold.Percentile.NAME)
+@Plugin(type = Ops.Threshold.Percentile.class, priority = Priority.HIGH_PRIORITY)
 public class ComputePercentileThreshold<T extends RealType<T>> extends
-		AbstractComputeThresholdHistogram<T> {
+		AbstractComputeThresholdHistogram<T> implements Ops.Threshold.Percentile {
 
 	@Override
 	public long computeBin(final Histogram1d<T> hist) {

@@ -1,8 +1,8 @@
 /*
- * #%L,
+ * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -45,7 +45,7 @@ import org.junit.Test;
 /**
  * Tests Difference of Gaussians (DoG) implementations.
  * 
- * @author Christian Dietz, University of Konstanz
+ * @author Christian Dietz (University of Konstanz)
  */
 public class DoGTest extends AbstractOpTest {
 
@@ -56,11 +56,11 @@ public class DoGTest extends AbstractOpTest {
 		final double[] sigmas2 = new double[] { 2, 2 };
 		final long[] dims = new long[] { 10, 10 };
 
-		final Img<ByteType> in = generateByteTestImg(true, dims);
-		final Img<ByteType> out1 = generateByteTestImg(false, dims);
-		final Img<ByteType> out2 = generateByteTestImg(false, dims);
+		final Img<ByteType> in = generateByteArrayTestImg(true, dims);
+		final Img<ByteType> out1 = generateByteArrayTestImg(false, dims);
+		final Img<ByteType> out2 = generateByteArrayTestImg(false, dims);
 
-		ops.filter().dog(out1, in, sigmas1, sigmas2);
+		ops.run(DoGVaryingSigmas.class, out1, in, sigmas1, sigmas2);
 
 		// test against native imglib2 implementation
 		DifferenceOfGaussian.DoG(sigmas1, sigmas2, Views.extendMirrorSingle(in),
@@ -77,8 +77,10 @@ public class DoGTest extends AbstractOpTest {
 
 	@Test
 	public void dogRAISingleSigmasTest() {
+		@SuppressWarnings("unchecked")
 		final RandomAccessibleInterval<ByteType> res =
-			ops.filter().dog(generateByteTestImg(true, new long[] { 10, 10 }), 1, 2);
+			(RandomAccessibleInterval<ByteType>) ops.run(DoGSingleSigmas.class,
+				generateByteArrayTestImg(true, new long[] { 10, 10 }), 1, 2);
 
 		org.junit.Assert.assertNotNull(res);
 	}

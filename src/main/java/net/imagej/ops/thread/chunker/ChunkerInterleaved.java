@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -48,8 +48,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Michael Zinsmaier (University of Konstanz)
  */
-@Plugin(type = Ops.Thread.Chunker.class, name = Ops.Thread.Chunker.NAME,
-	priority = Priority.VERY_LOW_PRIORITY)
+@Plugin(type = Ops.Thread.Chunker.class, priority = Priority.VERY_LOW_PRIORITY)
 public class ChunkerInterleaved extends AbstractChunker {
 
 	@Parameter
@@ -64,7 +63,7 @@ public class ChunkerInterleaved extends AbstractChunker {
 		final int numStepsFloor = (int) (numberOfElements / numThreads);
 		final int remainder = (int) numberOfElements - (numStepsFloor * numThreads);
 
-		final ArrayList<Future<?>> futures = new ArrayList<Future<?>>(numThreads);
+		final ArrayList<Future<?>> futures = new ArrayList<>(numThreads);
 
 		for (int i = 0; i < numThreads; i++) {
 			final int j = i;

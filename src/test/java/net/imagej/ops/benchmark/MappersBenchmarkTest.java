@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,12 +35,12 @@ import com.carrotsearch.junitbenchmarks.BenchmarkRule;
 
 import net.imagej.ops.Op;
 import net.imagej.ops.Ops;
+import net.imagej.ops.map.MapIIInplaceParallel;
 import net.imagej.ops.map.MapIterableInplace;
-import net.imagej.ops.map.MapIterableIntervalToIterableInterval;
-import net.imagej.ops.map.MapIterableIntervalToRAI;
-import net.imagej.ops.map.MapIterableToIterableParallel;
-import net.imagej.ops.map.MapIterableToRAIParallel;
-import net.imagej.ops.map.MapParallel;
+import net.imagej.ops.map.MapUnaryComputers.IIToII;
+import net.imagej.ops.map.MapUnaryComputers.IIToIIParallel;
+import net.imagej.ops.map.MapUnaryComputers.IIToRAI;
+import net.imagej.ops.map.MapUnaryComputers.IIToRAIParallel;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.NumericType;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -52,8 +52,10 @@ import org.junit.rules.TestRule;
 
 /**
  * Benchmarking various implementations of mappers. Benchmarked since now:
- * {@link MapIterableIntervalToRAI}, {@link MapIterableIntervalToIterableInterval},
- * {@link MapIterableToRAIParallel}, {@link MapIterableToIterableParallel}
+ * {@link IIToRAI},
+ * {@link IIToII},
+ * {@link IIToRAIParallel},
+ * {@link IIToIIParallel}
  * 
  * @author Christian Dietz (University of Konstanz)
  */
@@ -71,41 +73,46 @@ public class MappersBenchmarkTest extends AbstractOpBenchmark {
 
 	@Before
 	public void initImg() {
-		in = generateByteTestImg(true, 1000, 1000);
-		out = generateByteTestImg(false, 1000, 1000);
+		in = generateByteArrayTestImg(true, 1000, 1000);
+		out = generateByteArrayTestImg(false, 1000, 1000);
 
-		addConstant = ops.op(Ops.Math.Add.class, null, NumericType.class, new ByteType((byte) 5));
-		addConstantInplace = ops.op(AddConstantInplace.class, NumericType.class, new ByteType((byte) 5));
+		addConstant =
+			ops.op(Ops.Math.Add.class, null, NumericType.class,
+				new ByteType((byte) 5));
+		addConstantInplace =
+			ops.op(AddConstantInplace.class, NumericType.class,
+				new ByteType((byte) 5));
 	}
 
 	@Test
 	public void pixelWiseTestMapper() {
-		ops.run(new MapIterableIntervalToRAI<ByteType, ByteType>(), out, in, addConstant);
+		ops.run(IIToRAI.class, out, in, addConstant);
 	}
 
 	@Test
 	public void pixelWiseTestMapperII() {
-		ops.run(new MapIterableIntervalToIterableInterval<ByteType, ByteType>(), out, in, addConstant);
+		ops.run(IIToII.class, out, in, addConstant);
 	}
 
 	@Test
 	public void pixelWiseTestThreadedMapper() {
-		ops.run(new MapIterableToRAIParallel<ByteType, ByteType>(), out, in, addConstant);
+		ops.run(IIToRAIParallel.class, out, in, addConstant);
 	}
 
 	@Test
 	public void pixelWiseTestThreadedMapperII() {
-		ops.run(new MapIterableToIterableParallel<ByteType, ByteType>(),
-			out, in, addConstant, out);
+		ops.run(IIToIIParallel.class, out, in,
+			addConstant);
 	}
 
 	@Test
 	public void pixelWiseTestMapperInplace() {
-		ops.run(new MapIterableInplace<ByteType>(), in, addConstantInplace);
+		ops.run(MapIterableInplace.class, in, addConstantInplace);
 	}
 
 	@Test
 	public void pixelWiseTestThreadedMapperInplace() {
-		ops.run(new MapParallel<ByteType>(), in.copy(), addConstantInplace);
+		ops.run(MapIIInplaceParallel.class, in.copy(),
+			addConstantInplace);
 	}
 }

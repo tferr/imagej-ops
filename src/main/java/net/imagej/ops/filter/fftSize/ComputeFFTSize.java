@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,43 +30,65 @@
 
 package net.imagej.ops.filter.fftSize;
 
+import net.imagej.ops.AbstractOp;
 import net.imagej.ops.Ops;
-import net.imglib2.FinalDimensions;
+import net.imglib2.Dimensions;
 import net.imglib2.algorithm.fft2.FFTMethods;
 
+import org.scijava.ItemIO;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- * Op to calculate JTransform FFT sizes.
+ * Op that calculates FFT sizes.
  * 
  * @author Brian Northan
  */
-@Plugin(type = Ops.Filter.FFTSize.class, name = Ops.Filter.FFTSize.NAME)
-public class ComputeFFTSize extends AbstractFFTSize {
+@Plugin(type = Ops.Filter.FFTSize.class)
+public class ComputeFFTSize extends AbstractOp implements Ops.Filter.FFTSize {
+
+	@Parameter
+	private Dimensions inputDimensions;
+
+	@Parameter(type = ItemIO.BOTH)
+	private long[] paddedSize;
+
+	@Parameter(type = ItemIO.BOTH)
+	private long[] fftSize;
+
+	@Parameter
+	private boolean forward;
+
+	@Parameter
+	private boolean fast;
 
 	@Override
 	public void run() {
-		FinalDimensions dim = new FinalDimensions(inputSize);
 
 		if (fast && forward) {
 
-			FFTMethods.dimensionsRealToComplexFast(dim, paddedSize, fftSize);
+			FFTMethods.dimensionsRealToComplexFast(inputDimensions, paddedSize,
+				fftSize);
 
 		}
 		else if (!fast && forward) {
-			FFTMethods.dimensionsRealToComplexSmall(dim, paddedSize, fftSize);
+			FFTMethods.dimensionsRealToComplexSmall(inputDimensions, paddedSize,
+				fftSize);
 
 		}
 		if (fast && !forward) {
 
-			FFTMethods.dimensionsComplexToRealFast(dim, paddedSize, fftSize);
+			FFTMethods.dimensionsComplexToRealFast(inputDimensions, paddedSize,
+				fftSize);
 
 		}
 		else if (!fast && !forward) {
 
-			FFTMethods.dimensionsComplexToRealSmall(dim, paddedSize, fftSize);
+			FFTMethods.dimensionsComplexToRealSmall(inputDimensions, paddedSize,
+				fftSize);
 
 		}
+
 	}
 
 }

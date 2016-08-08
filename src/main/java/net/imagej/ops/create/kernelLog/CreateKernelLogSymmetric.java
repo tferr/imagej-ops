@@ -1,8 +1,11 @@
+
+package net.imagej.ops.create.kernelLog;
+
 /*
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -28,45 +31,52 @@
  * #L%
  */
 
-package net.imagej.ops.create.kernelLog;
+import java.util.Arrays;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.create.AbstractCreateSymmetricKernel;
-import net.imglib2.type.NativeType;
+import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
+import net.imagej.ops.special.function.Functions;
+import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.ComplexType;
 
-import org.scijava.Priority;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- * Convenience op for generating a symmetric LOG kernel
- * 
+ * Creates a Gaussian Kernel
+ *
+ * @author Christian Dietz (University of Konstanz)
  * @author Brian Northan
  * @param <T>
  */
-@Plugin(type = Ops.Create.KernelLog.class, name = Ops.Create.KernelLog.NAME,
-	priority = Priority.HIGH_PRIORITY)
-public class CreateKernelLogSymmetric<T extends ComplexType<T> & NativeType<T>>
-	extends AbstractCreateSymmetricKernel<T> implements Ops.Create.KernelLog
+@Plugin(type = Ops.Create.KernelLog.class)
+public class CreateKernelLogSymmetric<T extends ComplexType<T>> extends
+	AbstractUnaryFunctionOp<Double, RandomAccessibleInterval<T>> implements
+	Ops.Create.KernelLog
 {
 
+	@Parameter
+	private int numDims;
+
+	@Parameter
+	private T type;
+
+	private UnaryFunctionOp<double[], RandomAccessibleInterval<T>> kernelOp;
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void run() {
-
-		double[] sigmas = new double[numDimensions];
-
-		for (int d = 0; d < numDimensions; d++) {
-			sigmas[d] = sigma;
-		}
-
-		if (calibration == null) {
-			calibration = new double[numDimensions];
-
-			for (int i = 0; i < numDimensions; i++) {
-				calibration[i] = 1.0;
-			}
-		}
-
-		output = ops.create().kernelLog(outType, fac, sigmas, calibration);
+	public void initialize() {
+		kernelOp = (UnaryFunctionOp) Functions.unary(ops(),
+			Ops.Create.KernelLog.class, RandomAccessibleInterval.class,
+			double[].class, type);
 	}
+
+	@Override
+	public RandomAccessibleInterval<T> compute1(final Double input) {
+		final double[] sigmas = new double[numDims];
+		Arrays.fill(sigmas, input);
+		return kernelOp.compute1(sigmas);
+	}
+
 }

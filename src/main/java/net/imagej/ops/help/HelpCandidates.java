@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,9 +32,11 @@ package net.imagej.ops.help;
 
 import net.imagej.ops.Op;
 import net.imagej.ops.OpMatchingService;
-import net.imagej.ops.OpRef;
+import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.SpecialOp;
 
+import org.scijava.log.LogService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -43,12 +45,18 @@ import org.scijava.plugin.Plugin;
  *
  * @author Curtis Rueden
  */
-@Plugin(type = Ops.Help.class, name = Ops.Help.NAME,
+@Plugin(type = Ops.Help.class,
 	description = "Gets documentation for ops of the given name and/or type.")
 public class HelpCandidates extends AbstractHelp {
 
 	@Parameter
+	private OpService ops;
+
+	@Parameter
 	private OpMatchingService matcher;
+
+	@Parameter(required = false)
+	private LogService log;
 
 	@Parameter(required = false)
 	private String name;
@@ -56,9 +64,16 @@ public class HelpCandidates extends AbstractHelp {
 	@Parameter(required = false)
 	private Class<? extends Op> opType;
 
+	@Parameter(required = false)
+	private Integer arity;
+
+	@Parameter(required = false)
+	private SpecialOp.Flavor flavor;
+
 	@Override
 	public void run() {
-		help(matcher.findCandidates(new OpRef<Op>(name, opType)));
+		final int a = arity == null ? -1 : arity;
+		help(SpecialOp.candidates(ops, name, opType, a, flavor));
 	}
 
 }

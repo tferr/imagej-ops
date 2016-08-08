@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 package net.imagej.ops.thread.chunker;
 
 import java.util.ArrayList;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import net.imagej.ops.Ops;
@@ -47,7 +48,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Christian Dietz (University of Konstanz)
  */
-@Plugin(type = Ops.Thread.Chunker.class, name = Ops.Thread.Chunker.NAME)
+@Plugin(type = Ops.Thread.Chunker.class)
 public class DefaultChunker extends AbstractChunker {
 
 	private final int STEP_SIZE = 1;
@@ -65,7 +66,7 @@ public class DefaultChunker extends AbstractChunker {
 		
 		final int numChunks = (int) (numberOfElements / numSteps);
 
-		final ArrayList<Future<?>> futures = new ArrayList<Future<?>>(numChunks);
+		final ArrayList<Future<?>> futures = new ArrayList<>(numChunks);
 
 		for (int i = 0; i < numChunks - 1; i++) {
 			final int j = i;
@@ -96,10 +97,11 @@ public class DefaultChunker extends AbstractChunker {
 				}
 				future.get();
 			}
-			catch (final Exception e) {
-				logService.error(e);
-				cancel(e.getMessage());
-				break;
+			catch (final InterruptedException exc) {
+				throw new RuntimeException(exc);
+			}
+			catch (final ExecutionException exc) {
+				throw new RuntimeException(exc);
 			}
 		}
 	}

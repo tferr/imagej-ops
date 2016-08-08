@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,14 +30,25 @@
 
 package net.imagej.ops.loop;
 
-import net.imagej.ops.InplaceOp;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 
 /**
- * Loops over an injected {@link InplaceOp}. A {@link LoopInplace} applies
- * an {@link InplaceOp} n-times to an input. Note: input will be modified!
+ * Loops over an injected {@link UnaryInplaceOp}. A {@link LoopInplace} applies
+ * an {@link UnaryInplaceOp} n-times to an input. Note: input will be modified!
  * 
  * @author Christian Dietz (University of Konstanz)
  */
-public interface LoopInplace<I> extends InplaceOp<I>, LoopOp<I> {
-	// NB: Marker interface
+public interface LoopInplace<I, O extends I> extends UnaryInplaceOp<I, O>, LoopOp<UnaryInplaceOp<I, O>> {
+
+	// -- UnaryInplaceOp methods --
+
+	@Override
+	default void mutate(final O arg) {
+		final int n = getLoopCount();
+		final UnaryInplaceOp<I, O> op = getOp();
+		for (int i = 0; i < n; i++) {
+			op.mutate(arg);
+		}
+	}
+
 }

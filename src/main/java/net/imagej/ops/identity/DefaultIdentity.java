@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,11 +39,13 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Curtis Rueden
  */
-@Plugin(type = Ops.Identity.class, name = Ops.Identity.NAME)
-public class DefaultIdentity<A> extends AbstractIdentity<A> {
+@Plugin(type = Ops.Identity.class)
+public class DefaultIdentity<A> extends AbstractIdentity<A> implements
+	Ops.Identity
+{
 
 	@Override
-	public void compute(final A input) {
+	public void mutate(final A input) {
 		// NB: No implementation needed.
 	}
 

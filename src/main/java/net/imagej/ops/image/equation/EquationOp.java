@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,8 +30,8 @@
 
 package net.imagej.ops.image.equation;
 
-import net.imagej.ops.ComputerOp;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.IterableInterval;
 
 /**
@@ -40,7 +40,7 @@ import net.imglib2.IterableInterval;
  * 
  * @author Curtis Rueden
  */
-public interface EquationOp<T> extends Ops.Image.Equation, ComputerOp<String,
+public interface EquationOp<T> extends Ops.Image.Equation, UnaryComputerOp<String,
 	IterableInterval<T>>
 {
 	// NB: Marker interface.

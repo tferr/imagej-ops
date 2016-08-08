@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,20 +35,21 @@ import net.imagej.ops.threshold.AbstractComputeThresholdHistogram;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
+import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 
 //NB - this plugin adapted from Gabriel Landini's code of his AutoThreshold
 //plugin found in Fiji (version 1.14).
 
 /**
- * Implements Huang's threshold method by Huang & Wang.
+ * Implements Huang's threshold method by Huang {@literal &} Wang.
  * 
  * @author Barry DeZonia
  * @author Gabriel Landini
  */
-@Plugin(type = Ops.Threshold.Huang.class, name = Ops.Threshold.Huang.NAME)
+@Plugin(type = Ops.Threshold.Huang.class, priority = Priority.HIGH_PRIORITY)
 public class ComputeHuangThreshold<T extends RealType<T>> extends
-		AbstractComputeThresholdHistogram<T> {
+		AbstractComputeThresholdHistogram<T> implements Ops.Threshold.Huang {
 
 	@Override
 	public long computeBin(final Histogram1d<T> hist) {
@@ -80,9 +81,8 @@ public class ComputeHuangThreshold<T extends RealType<T>> extends
 			W[i] = W[i - 1] + i * histogram[i];
 		}
 
-		// precalculate the summands of the entropy given the absolute
-		// difference x
-		// - mu (integral)
+		// precalculate the summands of the entropy given the absolute difference
+		// x - mu (integral)
 		double C = last - first;
 		double[] Smu = new double[last + 1 - first];
 		for (int i = 1; i < Smu.length; i++) {
@@ -92,7 +92,7 @@ public class ComputeHuangThreshold<T extends RealType<T>> extends
 
 		// calculate the threshold
 		int bestThreshold = 0;
-		double bestEntropy = Double.MAX_VALUE;
+		double bestEntropy = Double.POSITIVE_INFINITY;
 		for (int threshold = first; threshold <= last; threshold++) {
 			double entropy = 0;
 			int mu = (int) Math.round(W[threshold] / S[threshold]);

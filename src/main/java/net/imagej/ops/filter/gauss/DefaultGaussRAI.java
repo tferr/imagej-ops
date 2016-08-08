@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,9 +30,8 @@
 
 package net.imagej.ops.filter.gauss;
 
-import net.imagej.ops.AbstractHybridOp;
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.RandomAccessible;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.algorithm.gauss3.Gauss3;
@@ -41,9 +40,9 @@ import net.imglib2.exception.IncompatibleTypeException;
 import net.imglib2.outofbounds.OutOfBoundsFactory;
 import net.imglib2.outofbounds.OutOfBoundsMirrorFactory;
 import net.imglib2.outofbounds.OutOfBoundsMirrorFactory.Boundary;
+import net.imglib2.type.NativeType;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.FloatType;
-import net.imglib2.util.Util;
 import net.imglib2.view.Views;
 
 import org.scijava.plugin.Parameter;
@@ -53,20 +52,15 @@ import org.scijava.thread.ThreadService;
 /**
  * Gaussian filter, wrapping {@link Gauss3} of imglib2-algorithms.
  * 
- * @author Christian Dietz, University of Konstanz
- * @param <T> type of input
- * @param <V> type of output
+ * @author Christian Dietz (University of Konstanz)
+ * @param <T> type of input and output
  */
 @SuppressWarnings({ "unchecked", "rawtypes" })
-@Plugin(type = Ops.Filter.Gauss.class, name = Ops.Filter.Gauss.NAME)
-public class DefaultGaussRAI<T extends RealType<T>, V extends RealType<V>>
-	extends
-	AbstractHybridOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<V>>
+@Plugin(type = Ops.Filter.Gauss.class, priority = 1.0)
+public class DefaultGaussRAI<T extends RealType<T> & NativeType<T>> extends
+	AbstractUnaryHybridCF<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>>
 	implements Ops.Filter.Gauss
 {
-
-	@Parameter
-	private OpService ops;
 
 	@Parameter
 	private ThreadService threads;
@@ -78,12 +72,12 @@ public class DefaultGaussRAI<T extends RealType<T>, V extends RealType<V>>
 	private OutOfBoundsFactory<T, RandomAccessibleInterval<T>> outOfBounds;
 
 	@Override
-	public void compute(final RandomAccessibleInterval<T> input,
-		final RandomAccessibleInterval<V> output)
+	public void compute1(final RandomAccessibleInterval<T> input,
+		final RandomAccessibleInterval<T> output)
 	{
 
 		if (outOfBounds == null) outOfBounds =
-			new OutOfBoundsMirrorFactory<T, RandomAccessibleInterval<T>>(
+			new OutOfBoundsMirrorFactory<>(
 				Boundary.SINGLE);
 
 		final RandomAccessible<FloatType> eIn =
@@ -99,11 +93,10 @@ public class DefaultGaussRAI<T extends RealType<T>, V extends RealType<V>>
 	}
 
 	@Override
-	public RandomAccessibleInterval<V> createOutput(
+	public RandomAccessibleInterval<T> createOutput(
 		final RandomAccessibleInterval<T> input)
 	{
-		return (RandomAccessibleInterval<V>) ops.create().img(input,
-			Util.getTypeFromInterval(input));
+		return ops().create().img(input);
 	}
 
 }

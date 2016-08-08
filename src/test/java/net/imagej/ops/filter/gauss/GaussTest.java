@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -53,14 +53,14 @@ public class GaussTest extends AbstractOpTest {
 	@Test
 	public void gaussRegressionTest() {
 
-		final Img<ByteType> in = generateByteTestImg(true, new long[] { 10, 10 });
+		final Img<ByteType> in = generateByteArrayTestImg(true, new long[] { 10, 10 });
 		final Img<ByteType> out1 =
 			ops.create().img(in, Util.getTypeFromInterval(in));
 		final double sigma = 5;
 		final Img<ByteType> out2 =
 			ops.create().img(in, Util.getTypeFromInterval(in));
 
-		ops.filter().gauss(out1, in, sigma);
+		ops.run(GaussRAISingleSigma.class, out1, in, sigma);
 		try {
 			Gauss3.gauss(sigma, Views.extendMirrorSingle(in), out2);
 		}

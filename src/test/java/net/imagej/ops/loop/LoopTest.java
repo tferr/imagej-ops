@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,12 +30,15 @@
 
 package net.imagej.ops.loop;
 
-import net.imagej.ops.AbstractComputerOp;
-import net.imagej.ops.AbstractInplaceOp;
 import net.imagej.ops.AbstractOpTest;
-import net.imagej.ops.Op;
 import net.imagej.ops.bufferfactories.ImgImgSameTypeFactory;
 import net.imagej.ops.map.MapOp;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.Computers;
+import net.imagej.ops.special.computer.UnaryComputerOp;
+import net.imagej.ops.special.inplace.AbstractUnaryInplaceOp;
+import net.imagej.ops.special.inplace.Inplaces;
+import net.imagej.ops.special.inplace.UnaryInplaceOp;
 import net.imglib2.Cursor;
 import net.imglib2.img.Img;
 import net.imglib2.type.numeric.integer.ByteType;
@@ -54,22 +57,22 @@ public class LoopTest extends AbstractOpTest {
 	private Img<ByteType> out;
 
 	private int numIterations;
-	private Op functionalOp;
-	private Op inplaceOp;
+	private UnaryComputerOp<Img<ByteType>, Img<ByteType>> computerOp;
+	private UnaryInplaceOp<? super Img<ByteType>, Img<ByteType>> inplaceOp;
 
 	@Before
 	public void init() {
 		final long[] dims = new long[] { 10, 10 };
-		in = generateByteTestImg(false, dims);
-		out = generateByteTestImg(false, dims);
+		in = generateByteArrayTestImg(false, dims);
+		out = generateByteArrayTestImg(false, dims);
 		numIterations = 10;
-		functionalOp = ops.op(MapOp.class, out, in, new AddOneFunctional());
-		inplaceOp = ops.op(MapOp.class, in, new AddOneInplace());
+		computerOp = Computers.unary(ops, MapOp.class, out, in, new AddOneFunctional());
+		inplaceOp = Inplaces.unary(ops, MapOp.class, in, new AddOneInplace());
 	}
 
 	@Test
 	public void testInplace() {
-		ops.loop(in, inplaceOp, numIterations);
+		ops.run(DefaultLoopInplace.class, in, inplaceOp, numIterations);
 
 		// test
 		final Cursor<ByteType> c = in.cursor();
@@ -81,7 +84,8 @@ public class LoopTest extends AbstractOpTest {
 
 	@Test
 	public void testFunctionalEven() {
-		ops.loop(out, in, functionalOp, new ImgImgSameTypeFactory<ByteType>(), numIterations);
+		ops.run(DefaultLoopComputer.class, out, in, computerOp,
+			new ImgImgSameTypeFactory<ByteType>(), numIterations);
 
 		// test
 		final Cursor<ByteType> c = out.cursor();
@@ -93,8 +97,8 @@ public class LoopTest extends AbstractOpTest {
 
 	@Test
 	public void testFunctionalOdd() {
-		ops.loop(out, in, functionalOp, new ImgImgSameTypeFactory<ByteType>(),
-			numIterations - 1);
+		ops.run(DefaultLoopComputer.class, out, in, computerOp,
+			new ImgImgSameTypeFactory<ByteType>(), numIterations - 1);
 
 		// test
 		final Cursor<ByteType> c = out.cursor();
@@ -105,18 +109,18 @@ public class LoopTest extends AbstractOpTest {
 	}
 
 	// Helper classes
-	class AddOneInplace extends AbstractInplaceOp<ByteType> {
+	class AddOneInplace extends AbstractUnaryInplaceOp<ByteType> {
 
 		@Override
-		public void compute(final ByteType arg) {
+		public void mutate(final ByteType arg) {
 			arg.inc();
 		}
 	}
 
-	class AddOneFunctional extends AbstractComputerOp<ByteType, ByteType> {
+	class AddOneFunctional extends AbstractUnaryComputerOp<ByteType, ByteType> {
 
 		@Override
-		public void compute(final ByteType input, final ByteType output) {
+		public void compute1(final ByteType input, final ByteType output) {
 			output.set(input);
 			output.inc();
 		}

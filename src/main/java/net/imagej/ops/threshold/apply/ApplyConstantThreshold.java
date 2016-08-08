@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,44 +30,48 @@
 
 package net.imagej.ops.threshold.apply;
 
-import net.imagej.ops.AbstractComputerOp;
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.computer.AbstractBinaryComputerOp;
+import net.imagej.ops.special.computer.BinaryComputerOp;
+import net.imagej.ops.special.computer.Computers;
+import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.Priority;
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
  * Applies the given threshold value to every element along the given
  * {@link Iterable} input.
- * 
+ *
  * @author Martin Horn (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
  */
-@Plugin(type = Ops.Threshold.Apply.class, name = Ops.Threshold.Apply.NAME,
-	priority = Priority.HIGH_PRIORITY)
+@Plugin(type = Ops.Threshold.Apply.class, priority = Priority.HIGH_PRIORITY)
 public class ApplyConstantThreshold<T extends RealType<T>> extends
-	AbstractComputerOp<Iterable<T>, Iterable<BitType>> implements
+	AbstractBinaryComputerOp<Iterable<T>, T, Iterable<BitType>> implements
 	Ops.Threshold.Apply
 {
 
-	@Parameter
-	private T threshold;
+	private BinaryComputerOp<T, T, BitType> applyThreshold;
+	private UnaryComputerOp<Iterable<T>, Iterable<BitType>> mapper;
 
-	@Parameter
-	private OpService ops;
+	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+	public void initialize() {
+		applyThreshold = Computers.binary(ops(), ApplyThresholdComparable.class,
+			BitType.class, in2(), in2());
+		mapper = (UnaryComputerOp) Computers.unary(ops(), Ops.Map.class, out() == null
+			? Iterable.class : out(), in1(), applyThreshold);
+	}
 
 	@Override
-	public void compute(final Iterable<T> input, final Iterable<BitType> output) {
-		final Object applyThreshold =
-			ops.op(ApplyThresholdComparable.class, BitType.class, threshold
-				.getClass(), threshold);
-
-		// TODO: Use ops.map(...) once multithreading of BitTypes is fixed.
-		ops.map(output, input, applyThreshold);
+	public void compute2(final Iterable<T> input1, final T input2,
+		final Iterable<BitType> output)
+	{
+		applyThreshold.setInput2(input2);
+		mapper.compute1(input1, output);
 	}
 
 }

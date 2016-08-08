@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ public class ApplyManualThresholdTest extends AbstractThresholdTest {
 	public void testApplyThreshold() throws IncompatibleTypeException {
 		final Img<BitType> out = bitmap();
 		final UnsignedShortType threshold = new UnsignedShortType(30000);
-		ops.threshold().apply(out, in, threshold);
+		ops.run(ApplyManualThreshold.class, out, in, threshold);
 		assertCount(out, 54);
 	}
 

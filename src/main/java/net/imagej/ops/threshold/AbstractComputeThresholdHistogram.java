@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,7 @@
 
 package net.imagej.ops.threshold;
 
-import net.imagej.ops.AbstractHybridOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
@@ -40,23 +40,25 @@ import net.imglib2.type.numeric.RealType;
  * @author Curtis Rueden
  */
 public abstract class AbstractComputeThresholdHistogram<T extends RealType<T>>
-	extends AbstractHybridOp<Histogram1d<T>, T> implements
+	extends AbstractUnaryHybridCF<Histogram1d<T>, T> implements
 	ComputeThresholdHistogram<T>
 {
 
-	@Override
-	public T createOutput(final Histogram1d<T> input) {
-		return input.firstDataValue().createVariable();
-	}
-
-	// -- ComputerOp methods --
+	// -- UnaryComputerOp methods --
 
 	@Override
-	public void compute(final Histogram1d<T> input, final T output) {
+	public void compute1(final Histogram1d<T> input, final T output) {
 		final long binPos = computeBin(input);
 
 		// convert bin number to corresponding gray level
 		input.getCenterValue(binPos, output);
+	}
+
+	// -- UnaryOutputFactory methods --
+
+	@Override
+	public T createOutput(final Histogram1d<T> input) {
+		return input.firstDataValue().createVariable();
 	}
 
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,11 +32,12 @@ package net.imagej.ops.threshold.intermodes;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.threshold.AbstractComputeThresholdHistogram;
-import net.imagej.ops.threshold.ThresholdUtils;
+import net.imagej.ops.threshold.Thresholds;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;
+import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -44,14 +45,14 @@ import org.scijava.plugin.Plugin;
 // plugin found in Fiji (version 1.14).
 
 /**
- * Implements an intermodes threshold method by Prewitt & Mendelsohn.
+ * Implements an intermodes threshold method by Prewitt {@literal &} Mendelsohn.
  * 
  * @author Barry DeZonia
  * @author Gabriel Landini
  */
-@Plugin(type = Ops.Threshold.Intermodes.class, name = Ops.Threshold.Intermodes.NAME)
+@Plugin(type = Ops.Threshold.Intermodes.class, priority = Priority.HIGH_PRIORITY)
 public class ComputeIntermodesThreshold<T extends RealType<T>> extends
-		AbstractComputeThresholdHistogram<T> {
+		AbstractComputeThresholdHistogram<T> implements Ops.Threshold.Intermodes {
 
 	@Parameter(type = ItemIO.OUTPUT)
 	private String errMsg = null;
@@ -84,7 +85,7 @@ public class ComputeIntermodesThreshold<T extends RealType<T>> extends
 		for (int i = 0; i < histogram.length; i++)
 			iHisto[i] = histogram[i];
 
-		while (!ThresholdUtils.bimodalTest(iHisto)) {
+		while (!Thresholds.bimodalTest(iHisto)) {
 			// smooth with a 3 point running mean filter
 			double previous = 0, current = 0, next = iHisto[0];
 			for (int i = 0; i < histogram.length - 1; i++) {

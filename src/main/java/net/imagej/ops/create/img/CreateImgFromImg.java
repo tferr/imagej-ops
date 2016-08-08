@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,16 +30,13 @@
 
 package net.imagej.ops.create.img;
 
-import net.imagej.ops.AbstractFunctionOp;
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imglib2.img.Img;
 import net.imglib2.img.ImgFactory;
-import net.imglib2.type.NativeType;
 import net.imglib2.type.Type;
 
 import org.scijava.Priority;
-import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -47,21 +44,17 @@ import org.scijava.plugin.Plugin;
  * {@link Type} and {@link ImgFactory}.
  *
  * @author Christian Dietz (University of Konstanz)
+ * @author Curtis Rueden
  * @param <T>
  */
-@Plugin(type = Ops.Create.Img.class, name = Ops.Create.Img.NAME,
-	priority = Priority.HIGH_PRIORITY)
-public class CreateImgFromImg<T extends NativeType<T>> extends
-	AbstractFunctionOp<Img<T>, Img<T>> implements Ops.Create.Img
+@Plugin(type = Ops.Create.Img.class, priority = Priority.VERY_HIGH_PRIORITY)
+public class CreateImgFromImg<T extends Type<T>> extends
+	AbstractUnaryFunctionOp<Img<T>, Img<T>> implements Ops.Create.Img
 {
 
-	@Parameter
-	private OpService ops;
-
 	@Override
-	public Img<T> compute(final Img<T> input) {
-		return ops.create().img(getInput(),
-			getInput().firstElement().createVariable(), getInput().factory());
+	public Img<T> compute1(final Img<T> input) {
+		return Imgs.create(input.factory(), input, input.firstElement());
 	}
 
 }

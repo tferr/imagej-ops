@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -51,11 +51,6 @@ import org.scijava.plugin.Plugin;
 @Plugin(type = Namespace.class)
 public class LabelingNamespace extends AbstractNamespace {
 
-	@OpMethod(op = net.imagej.ops.Ops.Labeling.CCA.class)
-	public Object cca(final Object... args) {
-		return ops().run(net.imagej.ops.Ops.Labeling.CCA.class, args);
-	}
-
 	@OpMethod(op = net.imagej.ops.labeling.cca.DefaultCCA.class)
 	public <T extends IntegerType<T>, L, I extends IntegerType<I>>
 		ImgLabeling<L, I> cca(final ImgLabeling<L, I> out,
@@ -65,7 +60,7 @@ public class LabelingNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, I> result =
 			(ImgLabeling<L, I>) ops().run(
-				net.imagej.ops.labeling.cca.DefaultCCA.class, out, in, element,
+				net.imagej.ops.Ops.Labeling.CCA.class, out, in, element,
 				labelGenerator);
 		return result;
 	}
@@ -78,7 +73,7 @@ public class LabelingNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, I> result =
 			(ImgLabeling<L, I>) ops().run(
-				net.imagej.ops.labeling.cca.DefaultCCA.class, out, in, element);
+				net.imagej.ops.Ops.Labeling.CCA.class, out, in, element);
 		return result;
 	}
 
@@ -90,7 +85,7 @@ public class LabelingNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final ImgLabeling<L, I> result =
 			(ImgLabeling<L, I>) ops().run(
-				net.imagej.ops.labeling.cca.DefaultCCA.class, in, element);
+				net.imagej.ops.Ops.Labeling.CCA.class, in, element);
 		return result;
 	}
 

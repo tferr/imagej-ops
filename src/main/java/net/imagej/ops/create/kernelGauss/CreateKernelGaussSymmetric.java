@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,44 +30,52 @@
 
 package net.imagej.ops.create.kernelGauss;
 
+import java.util.Arrays;
+
 import net.imagej.ops.Ops;
-import net.imagej.ops.create.AbstractCreateSymmetricKernel;
-import net.imglib2.img.Img;
+import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
+import net.imagej.ops.special.function.Functions;
+import net.imagej.ops.special.function.UnaryFunctionOp;
+import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.numeric.ComplexType;
 
-import org.scijava.Priority;
+import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
 /**
- * Convenience op for generating a symmetric Gaussian kernel
- * 
+ * Creates a symmetric Gaussian kernel.
+ *
+ * @author Christian Dietz (University of Konstanz)
  * @author Brian Northan
- * @param <T>
+ * @param <T> type of kernel image to create
  */
-@Plugin(type = Ops.Create.KernelGauss.class, name = Ops.Create.KernelGauss.NAME,
-	priority = Priority.HIGH_PRIORITY)
+@Plugin(type = Ops.Create.KernelGauss.class)
 public class CreateKernelGaussSymmetric<T extends ComplexType<T>> extends
-	AbstractCreateSymmetricKernel<T> implements Ops.Create.KernelGauss
+	AbstractUnaryFunctionOp<Double, RandomAccessibleInterval<T>> implements
+	Ops.Create.KernelGauss
 {
 
+	@Parameter
+	private int numDims;
+
+	@Parameter
+	private T type;
+
+	private UnaryFunctionOp<double[], RandomAccessibleInterval<T>> kernelOp;
+
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Override
-	public void run() {
-
-		double[] sigmas = new double[numDimensions];
-
-		for (int d = 0; d < numDimensions; d++) {
-			sigmas[d] = sigma;
-		}
-
-		if (calibration == null) {
-			calibration = new double[numDimensions];
-
-			for (int i = 0; i < numDimensions; i++) {
-				calibration[i] = 1.0;
-			}
-		}
-
-		output =
-			(Img<T>) ops.create().kernelGauss(outType, fac, sigmas, calibration);
+	public void initialize() {
+		kernelOp = (UnaryFunctionOp) Functions.unary(ops(),
+			Ops.Create.KernelGauss.class, RandomAccessibleInterval.class,
+			double[].class, type);
 	}
+
+	@Override
+	public RandomAccessibleInterval<T> compute1(final Double input) {
+		final double[] sigmas = new double[numDims];
+		Arrays.fill(sigmas, input);
+		return kernelOp.compute1(sigmas);
+	}
+
 }

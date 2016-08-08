@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -36,12 +36,11 @@ import java.util.HashMap;
 import java.util.Map;
 
 import net.imagej.ops.AbstractOpTest;
-import net.imagej.ops.Ops.Eval;
 
 import org.junit.Test;
 
 /**
- * Tests {@link Eval}.
+ * Tests {@link net.imagej.ops.Ops.Eval}.
  * 
  * @author Curtis Rueden
  */
@@ -49,17 +48,17 @@ public class EvalTest extends AbstractOpTest {
 
 	@Test
 	public void testMath() {
-		final Map<String, Object> vars = new HashMap<String, Object>();
+		final Map<String, Object> vars = new HashMap<>();
 		vars.put("a", 2);
 		vars.put("b", 3);
 		vars.put("c", 5);
 
-		assertEquals(7, ops.eval("a+c", vars));
-		assertEquals(3, ops.eval("c-a", vars));
-		assertEquals(6, ops.eval("a*b", vars));
-		assertEquals(2, ops.eval("c/a", vars));
-		assertEquals(1, ops.eval("c%a", vars));
-		assertEquals(17, ops.eval("a+b*c", vars));
+		assertEquals(7, ops.run(DefaultEval.class, "a+c", vars));
+		assertEquals(3, ops.run(DefaultEval.class, "c-a", vars));
+		assertEquals(6, ops.run(DefaultEval.class, "a*b", vars));
+		assertEquals(2, ops.run(DefaultEval.class, "c/a", vars));
+		assertEquals(1, ops.run(DefaultEval.class, "c%a", vars));
+		assertEquals(17, ops.run(DefaultEval.class, "a+b*c", vars));
 	}
 
 }

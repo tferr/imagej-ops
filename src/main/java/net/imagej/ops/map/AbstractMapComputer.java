@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,34 +30,38 @@
 
 package net.imagej.ops.map;
 
-import net.imagej.ops.AbstractComputerOp;
-import net.imagej.ops.ComputerOp;
+import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
+import net.imagej.ops.special.computer.UnaryComputerOp;
 
 import org.scijava.plugin.Parameter;
 
 /**
- * Abstract implementation of a {@link MapOp}.
+ * Abstract base class for {@link MapUnaryComputer} implementations.
  * 
  * @author Christian Dietz (University of Konstanz)
- * @param <A> mapped on {@code <B>}
- * @param <B> mapped from {@code <A>}
- * @param <C> provides {@code <A>}s
- * @param <D> provides {@code <B>}s
+ * @param <EI> element type of inputs
+ * @param <EO> element type of outputs
+ * @param <PI> producer of inputs
+ * @param <PO> producer of outputs
  */
-public abstract class AbstractMapComputer<A, B, C, D> extends
-	AbstractComputerOp<C, D> implements MapOp<A, B, ComputerOp<A, B>>
+public abstract class AbstractMapComputer<EI, EO, PI, PO> extends
+	AbstractUnaryComputerOp<PI, PO> implements
+	MapUnaryComputer<EI, EO, UnaryComputerOp<EI, EO>>
 {
 
 	@Parameter
-	private ComputerOp<A, B> op;
+	private UnaryComputerOp<EI, EO> op;
+
+	// -- MapOp methods --
 
 	@Override
-	public ComputerOp<A, B> getOp() {
+	public UnaryComputerOp<EI, EO> getOp() {
 		return op;
 	}
 
 	@Override
-	public void setOp(final ComputerOp<A, B> op) {
+	public void setOp(final UnaryComputerOp<EI, EO> op) {
 		this.op = op;
 	}
+
 }

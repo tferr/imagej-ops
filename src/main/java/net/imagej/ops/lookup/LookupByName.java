@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,9 @@
 package net.imagej.ops.lookup;
 
 import net.imagej.ops.Op;
-import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
+import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 
-import org.scijava.ItemIO;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -43,24 +42,17 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Curtis Rueden
  */
-@Plugin(type = Ops.Lookup.class, name = Ops.Lookup.NAME)
-public class LookupByName implements Ops.Lookup {
-
-	@Parameter
-	private OpService ops;
-
-	@Parameter(type = ItemIO.OUTPUT)
-	private Op op;
-
-	@Parameter
-	private String name;
+@Plugin(type = Ops.Lookup.class)
+public class LookupByName extends AbstractUnaryFunctionOp<String, Op> implements
+	Ops.Lookup
+{
 
 	@Parameter
 	private Object[] args;
 
 	@Override
-	public void run() {
-		op = ops.op(name, args);
+	public Op compute1(final String input) {
+		return ops().op(input, args);
 	}
 
 }

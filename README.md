@@ -1,11 +1,11 @@
-[![](http://jenkins.imagej.net/job/ImageJ-OPS/lastBuild/badge/icon)](http://jenkins.imagej.net/job/ImageJ-OPS/)
+[![](http://jenkins.imagej.net/job/ImageJ-Ops/lastBuild/badge/icon)](http://jenkins.imagej.net/job/ImageJ-Ops/)
 [![Join the chat at https://gitter.im/imagej/imagej-ops](https://badges.gitter.im/Join%20Chat.svg)](https://gitter.im/imagej/imagej-ops?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 
-ImageJ OPS
+ImageJ Ops
 ==========
 
-ImageJ OPS is an extensible Java framework for algorithms, particularly image
-processing algorithms. OPS seeks to be a unifying library for scientific image
+ImageJ Ops is an extensible Java framework for algorithms, particularly image
+processing algorithms. Ops seeks to be a unifying library for scientific image
 processing. See the
 [Motivation](https://github.com/imagej/imagej-ops/wiki/Motivation) page for
 details.
@@ -16,13 +16,13 @@ Getting started
 Each op has a list of typed input and output parameters on which it operates.
 You can think of an op as a (potentially multi-variable) function:
 ```
-c = math.add(a, b)
+sum = math.add(a, b)
 (phase, amplitude) = fft(image)
 ```
 
 In many cases you can also pass a pre-allocated output which will be populated:
 ```
-math.add(c, a, b)
+math.add(sum, a, b)
 ```
 
 Some ops take other ops as inputs, which allows for things like "execute this
@@ -33,8 +33,9 @@ output_image = map(input_image, add_op)
 ```
 
 For more details, see these tutorials:
-* [Using OPS](https://github.com/imagej/imagej-tutorials/tree/master/using-ops)
-* [Create a new OP](https://github.com/imagej/imagej-tutorials/tree/master/create-a-new-op)
+* [Using Ops](https://github.com/imagej/imagej-tutorials/tree/master/using-ops)
+* [Create a new Op](https://github.com/imagej/imagej-tutorials/tree/master/create-a-new-op)
+* [Developing external Op namespaces](http://imagej.net/Adding_new_ops)
 
 Working example
 ---------------

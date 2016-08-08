@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@ package net.imagej.ops;
 import org.scijava.Contextual;
 import org.scijava.Named;
 import org.scijava.plugin.Plugin;
-import org.scijava.plugin.SingletonPlugin;
+import org.scijava.plugin.SciJavaPlugin;
 
 /**
  * A namespace is a collection of ops with related functions.
@@ -45,8 +45,15 @@ import org.scijava.plugin.SingletonPlugin;
  * 
  * @author Curtis Rueden
  */
-public interface Namespace extends Contextual, Named, SingletonPlugin {
+public interface Namespace extends Contextual, Environmental, Named,
+	SciJavaPlugin
+{
 
-	OpService ops();
+	// -- Named methods --
+
+	@Override
+	default void setName(final String name) {
+		throw new UnsupportedOperationException();
+	}
 
 }

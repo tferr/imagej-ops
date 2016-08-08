@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,52 +30,76 @@
 
 package net.imagej.ops;
 
+import java.util.List;
+
+import org.scijava.ValidityProblem;
+import org.scijava.command.CommandInfo;
 import org.scijava.module.Module;
-import org.scijava.module.ModuleInfo;
 import org.scijava.module.ModuleItem;
 
 /**
- * Container class for a possible operation match between an {@link OpRef} and a
- * {@link ModuleInfo}, as computed by the {@link OpMatchingService}.
+ * Container class for a possible operation match between an {@link OpRef} and
+ * an {@link OpInfo}, as computed by the {@link OpMatchingService}.
  * 
  * @author Curtis Rueden
- * @param <OP> The type of {@link Op}.
  * @see OpMatchingService
  */
-public class OpCandidate<OP extends Op> {
+public class OpCandidate {
 
 	public static enum StatusCode {
 		MATCH,
 		INVALID_MODULE,
+		TOO_FEW_OUTPUTS,
+		OUTPUT_TYPES_DO_NOT_MATCH,
 		TOO_MANY_ARGS,
 		TOO_FEW_ARGS,
+		ARG_TYPES_DO_NOT_MATCH,
 		REQUIRED_ARG_IS_NULL,
 		CANNOT_CONVERT,
 		DOES_NOT_CONFORM,
 		OTHER
 	}
 
-	private final OpRef<OP> ref;
-	private final ModuleInfo info;
+	private final OpEnvironment ops;
+	private final OpRef ref;
+	private final OpInfo info;
 
 	private Module module;
 	private StatusCode code;
 	private String message;
 	private ModuleItem<?> item;
+	private Object[] args;
 
-	public OpCandidate(final OpRef<OP> ref, final ModuleInfo info) {
+	public OpCandidate(final OpEnvironment ops, final OpRef ref,
+		final OpInfo info)
+	{
+		this.ops = ops;
 		this.ref = ref;
 		this.info = info;
 	}
 
+	/** Gets the op execution environment of the desired match. */
+	public OpEnvironment ops() {
+		return ops;
+	}
+
 	/** Gets the op reference describing the desired match. */
-	public OpRef<OP> getRef() {
+	public OpRef getRef() {
 		return ref;
 	}
 
-	/** Gets the module info describing the op to match against. */
-	public ModuleInfo getInfo() {
+	/** Gets the {@link OpInfo} metadata describing the op to match against. */
+	public OpInfo opInfo() {
 		return info;
+	}
+
+	/**
+	 * Gets the {@link CommandInfo} metadata describing the op to match against.
+	 * 
+	 * @see OpInfo#cInfo()
+	 */
+	public CommandInfo cInfo() {
+		return info.cInfo();
 	}
 
 	/** Sets the module instance associated with the attempted match. */
@@ -136,13 +160,32 @@ public class OpCandidate<OP extends Op> {
 				sb.append("MATCH");
 				break;
 			case INVALID_MODULE:
-				sb.append("Invalid module: " + info.getDelegateClassName());
+				sb.append("Invalid op: " + info.cInfo().getDelegateClassName());
+				final List<ValidityProblem> problems = info.cInfo().getProblems();
+				final int problemCount = problems.size();
+				if (problemCount > 0) sb.append(" (");
+				int no = 0;
+				for (final ValidityProblem problem : problems) {
+					if (no++ > 0) sb.append("; ");
+					if (problemCount > 1) sb.append(no + ". ");
+					sb.append(problem.getMessage());
+				}
+				if (problemCount > 0) sb.append(")");
+				break;
+			case TOO_FEW_OUTPUTS:
+				sb.append("Too few outputs");
+				break;
+			case OUTPUT_TYPES_DO_NOT_MATCH:
+				sb.append("Output types do not match");
 				break;
 			case TOO_MANY_ARGS:
 				sb.append("Too many arguments");
 				break;
 			case TOO_FEW_ARGS:
 				sb.append("Not enough arguments");
+				break;
+			case ARG_TYPES_DO_NOT_MATCH:
+				sb.append("Argument types do not match");
 				break;
 			case REQUIRED_ARG_IS_NULL:
 				sb.append("Missing required argument");
@@ -161,9 +204,17 @@ public class OpCandidate<OP extends Op> {
 
 		return sb.toString();
 	}
+	
+	public Object[] getArgs() {
+		return args;
+	}
+	
+	public void setArgs(final Object[] args) {
+		this.args = args;
+	}
 
 	@Override
 	public String toString() {
-		return OpUtils.opString(getInfo());
+		return info.toString();
 	}
 }

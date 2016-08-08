@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,12 +32,13 @@ package net.imagej.ops.threshold.maxLikelihood;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.threshold.AbstractComputeThresholdHistogram;
-import net.imagej.ops.threshold.ThresholdUtils;
+import net.imagej.ops.threshold.Thresholds;
 import net.imagej.ops.threshold.minimum.ComputeMinimumThreshold;
 import net.imglib2.histogram.Histogram1d;
 import net.imglib2.type.numeric.RealType;
 
 import org.scijava.ItemIO;
+import org.scijava.Priority;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -46,14 +47,15 @@ import org.scijava.plugin.Plugin;
 // the HistThresh Toolbox (relicensed BSD 2-12-13)
 
 /**
- * Implements a maximum likelihood threshold method by Dempster, Laird, & Rubin
- * and Glasbey.
+ * Implements a maximum likelihood threshold method by Dempster, Laird,
+ * {@literal &} Rubin and Glasbey.
  * 
  * @author Barry DeZonia
  */
-@Plugin(type = Ops.Threshold.MaxLikelihood.class, name = Ops.Threshold.MaxLikelihood.NAME)
+@Plugin(type = Ops.Threshold.MaxLikelihood.class, priority = Priority.HIGH_PRIORITY)
 public class ComputeMaxLikelihoodThreshold<T extends RealType<T>> extends
-		AbstractComputeThresholdHistogram<T> {
+		AbstractComputeThresholdHistogram<T> implements Ops.Threshold.MaxLikelihood
+{
 
 	private static final int MAX_ATTEMPTS = 10000;
 
@@ -97,23 +99,23 @@ public class ComputeMaxLikelihoodThreshold<T extends RealType<T>> extends
 
 		// % The initial estimate for the threshold is found with the MINIMUM
 		// % algorithm.
-		final ComputeMinimumThreshold<T> method = new ComputeMinimumThreshold<T>();
+		final ComputeMinimumThreshold<T> method = new ComputeMinimumThreshold<>();
 		int T = (int) method.computeBin(hist);
 
 		double eps = 0.0000001;
 
 		// % Calculate initial values for the statistics.
-		double mu = ThresholdUtils.B(y, T) / ThresholdUtils.A(y, T);
-		double nu = (ThresholdUtils.B(y, n) - ThresholdUtils.B(y, T))
-				/ (ThresholdUtils.A(y, n) - ThresholdUtils.A(y, T));
-		double p = ThresholdUtils.A(y, T) / ThresholdUtils.A(y, n);
-		double q = (ThresholdUtils.A(y, n) - ThresholdUtils.A(y, T)) / ThresholdUtils.A(y, n);
-		double sigma2 = ThresholdUtils.C(y, T) / ThresholdUtils.A(y, T) - (mu * mu);
-		double tau2 = (ThresholdUtils.C(y, n) - ThresholdUtils.C(y, T))
-				/ (ThresholdUtils.A(y, n) - ThresholdUtils.A(y, T)) - (nu * nu);
+		double mu = Thresholds.B(y, T) / Thresholds.A(y, T);
+		double nu = (Thresholds.B(y, n) - Thresholds.B(y, T))
+				/ (Thresholds.A(y, n) - Thresholds.A(y, T));
+		double p = Thresholds.A(y, T) / Thresholds.A(y, n);
+		double q = (Thresholds.A(y, n) - Thresholds.A(y, T)) / Thresholds.A(y, n);
+		double sigma2 = Thresholds.C(y, T) / Thresholds.A(y, T) - (mu * mu);
+		double tau2 = (Thresholds.C(y, n) - Thresholds.C(y, T))
+				/ (Thresholds.A(y, n) - Thresholds.A(y, T)) - (nu * nu);
 
 		// % Return if sigma2 or tau2 are zero, to avoid division by zero
-		if (sigma2 == 0 | tau2 == 0)
+		if (sigma2 == 0 || tau2 == 0)
 			return -1;
 
 		double mu_prev = Double.NaN;
@@ -161,7 +163,7 @@ public class ComputeMaxLikelihoodThreshold<T extends RealType<T>> extends
 			nu_prev = nu;
 			sigma2_prev = nu;
 			tau2_prev = nu;
-			double Ayn = ThresholdUtils.A(y, n);
+			double Ayn = Thresholds.A(y, n);
 			p = F / Ayn;
 			q = G / Ayn;
 			scale(ind, phi, tmp1);

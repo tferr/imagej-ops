@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2015 Board of Regents of the University of
+ * Copyright (C) 2014 - 2016 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,11 +30,9 @@
 
 package net.imagej.ops.threshold;
 
-import net.imagej.ops.AbstractHybridOp;
-import net.imagej.ops.OpService;
+import net.imagej.ops.special.computer.BinaryComputerOp;
+import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.logic.BitType;
-
-import org.scijava.plugin.Parameter;
 
 /**
  * Abstract superclass of {@link ApplyThresholdIterable} implementations.
@@ -44,16 +42,15 @@ import org.scijava.plugin.Parameter;
  * @author Curtis Rueden
  */
 public abstract class AbstractApplyThresholdIterable<T, I extends Iterable<T>, O extends Iterable<BitType>>
-	extends AbstractHybridOp<I, O> implements
+	extends AbstractUnaryHybridCF<I, O> implements
 	ApplyThresholdIterable<T, I, O>
 {
 
-	@Parameter
-	private OpService ops;
+	protected BinaryComputerOp<I, T, O> applyThresholdComp;
 
 	@Override
-	public void compute(final I input, final O output) {
-		ops.threshold().apply(output, input, getThreshold(input));
+	public void compute1(final I input, final O output) {
+		applyThresholdComp.compute2(input, getThreshold(input), output);
 	}
 
 }
