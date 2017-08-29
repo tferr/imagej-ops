@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ public class IntervalViewTest extends AbstractOpTest {
 		}
 		
 		Cursor<DoubleType> il2 = Views.interval(img, img).localizingCursor();
-		RandomAccess<DoubleType> opr = ops.transform().interval(img, img).randomAccess();
+		RandomAccess<DoubleType> opr = ops.transform().intervalView(img, img).randomAccess();
 
 		
 		while (il2.hasNext()) {
@@ -88,7 +88,7 @@ public class IntervalViewTest extends AbstractOpTest {
 		}
 		
 		Cursor<DoubleType> il2 = Views.interval(img, new long[]{1, 1}, new long[]{8,9}).localizingCursor();
-		RandomAccess<DoubleType> opr = ops.transform().interval(img, new long[]{1, 1}, new long[]{8,9}).randomAccess();
+		RandomAccess<DoubleType> opr = ops.transform().intervalView(img, new long[]{1, 1}, new long[]{8,9}).randomAccess();
 		
 		while (il2.hasNext()) {
 			DoubleType e = il2.next();

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ public class DefaultMinMax<I extends RealType<I>> extends
 {
 
 	@Override
-	public Pair<I, I> compute1(final Iterable<I> input) {
+	public Pair<I, I> calculate(final Iterable<I> input) {
 		double tmpMin = Double.POSITIVE_INFINITY;
 		double tmpMax = Double.NEGATIVE_INFINITY;
 

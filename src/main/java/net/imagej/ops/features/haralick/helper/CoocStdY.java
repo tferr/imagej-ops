@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = CoocStdY.class)
 public class CoocStdY extends AbstractUnaryFunctionOp<double[][], DoubleType> {
@@ -58,17 +59,17 @@ public class CoocStdY extends AbstractUnaryFunctionOp<double[][], DoubleType> {
 	}
 
 	@Override
-	public DoubleType compute1(double[][] input) {
+	public DoubleType calculate(double[][] input) {
 		double res = 0;
 
-		final double meany = coocMeanYFunc.compute1(input).getRealDouble();
-		final double[] py = coocPYFunc.compute1(input);
+		final double meany = coocMeanYFunc.calculate(input).getRealDouble();
+		final double[] py = coocPYFunc.calculate(input);
 
 		for (int i = 0; i < py.length; i++) {
 			res += ((i - meany) * (i - meany)) * py[i];
 		}
 
-		return new DoubleType(res);
+		return new DoubleType(Math.sqrt(res));
 	}
 
 }

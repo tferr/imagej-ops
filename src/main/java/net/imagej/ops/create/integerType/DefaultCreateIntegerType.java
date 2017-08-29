@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -60,7 +60,7 @@ public class DefaultCreateIntegerType extends
 	private long maxValue;
 
 	@Override
-	public IntegerType compute0() {
+	public IntegerType calculate() {
 		if (maxValue <= 0L) return new IntType();
 		if (maxValue <= 1L) return new BitType();
 		if (maxValue <= 0x7fL) return new ByteType();

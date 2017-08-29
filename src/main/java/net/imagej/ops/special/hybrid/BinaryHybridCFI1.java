@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,8 +39,8 @@ import net.imagej.ops.special.inplace.BinaryInplace1Op;
  * {@link BinaryFunctionOp} or {@link BinaryInplace1Op}.
  * <p>
  * To populate a preallocated output object, call
- * {@link BinaryComputerOp#compute2}; to compute a new output object, call
- * {@link BinaryFunctionOp#compute2}; to mutate the first input inplace, call
+ * {@link BinaryComputerOp#compute}; to compute a new output object, call
+ * {@link BinaryFunctionOp#calculate}; to mutate the first input inplace, call
  * {@link BinaryInplace1Op#mutate1}. To do any of these things as appropriate,
  * call {@link #run(Object, Object, Object)}.
  * </p>

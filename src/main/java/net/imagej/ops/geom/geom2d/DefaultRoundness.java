@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,8 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@code geom.roundness}.
  * 
+ * Based on https://imagej.nih.gov/ij/plugins/descriptors.html.
+ * 
  * @author Daniel Seebacher (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.Roundness.class, label = "Geometric (2D): Roundness")
@@ -57,9 +59,9 @@ public class DefaultRoundness extends AbstractUnaryHybridCF<Polygon, DoubleType>
 	}
 
 	@Override
-	public void compute1(final Polygon input, final DoubleType output) {
-		output.set(4 * (areaFunc.compute1(input).getRealDouble()
-				/ (Math.PI * Math.pow(majorAxisFunc.compute1(input).getRealDouble(), 2))));
+	public void compute(final Polygon input, final DoubleType output) {
+		output.set(4 * (areaFunc.calculate(input).getRealDouble()
+				/ (Math.PI * Math.pow(majorAxisFunc.calculate(input).getRealDouble(), 2))));
 	}
 
 	@Override

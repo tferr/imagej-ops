@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ public interface LoopComputer<I> extends UnaryComputerOp<I, I>,
 	// -- UnaryComputerOp methods --
 
 	@Override
-	default void compute1(final I input, final I output) {
+	default void compute(final I input, final I output) {
 		final int n = getLoopCount();
 
 		final ArrayList<UnaryComputerOp<I, I>> ops = new ArrayList<>(n);
@@ -64,7 +64,7 @@ public interface LoopComputer<I> extends UnaryComputerOp<I, I>,
 		joiner.setOps(ops);
 		joiner.setOutputFactory(getOutputFactory());
 
-		joiner.compute1(input, output);
+		joiner.compute(input, output);
 	}
 
 }

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -45,14 +45,14 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
- *
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Haralick.DifferenceEntropy.class, label = "Haralick: Difference Entropy")
 public class DefaultDifferenceEntropy<T extends RealType<T>> extends
 		AbstractHaralickFeature<T> implements Ops.Haralick.DifferenceEntropy {
 
 	// Avoid log 0
-	private static final double EPSILON = 0.00000001f;
+	private static final double EPSILON = Double.MIN_NORMAL;
 
 	private UnaryFunctionOp<double[][], double[]> coocPXMinusYFunc;
 	
@@ -63,14 +63,14 @@ public class DefaultDifferenceEntropy<T extends RealType<T>> extends
 	}
 	
 	@Override
-	public void compute1(final IterableInterval<T> input, final DoubleType output) {
+	public void compute(final IterableInterval<T> input, final DoubleType output) {
 		final double[][] matrix = getCooccurrenceMatrix(input);
 
-		final double[] pxminusy = coocPXMinusYFunc.compute1(matrix);
+		final double[] pxminusy = coocPXMinusYFunc.calculate(matrix);
 		final int nrGrayLevels = matrix.length;
 
 		double res = 0;
-		for (int k = 0; k <= nrGrayLevels - 1; k++) {
+		for (int k = 0; k < nrGrayLevels; k++) {
 			res += pxminusy[k] * Math.log(pxminusy[k] + EPSILON);
 		}
 

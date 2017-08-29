@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -75,8 +75,8 @@ public class SliceRAI2RAI<I, O>
 	}
 
 	@Override
-	public void compute1(final RandomAccessibleInterval<I> input, final RandomAccessibleInterval<O> output) {
-		mapper.compute1(new SlicesII<>(input, axisIndices, dropSingleDimensions),
+	public void compute(final RandomAccessibleInterval<I> input, final RandomAccessibleInterval<O> output) {
+		mapper.compute(new SlicesII<>(input, axisIndices, dropSingleDimensions),
 				new SlicesII<>(output, axisIndices, dropSingleDimensions));
 	}
 

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -49,7 +49,7 @@ public class DefaultASM<T extends RealType<T>> extends
 		AbstractHaralickFeature<T> implements Ops.Haralick.ASM {
 
 	@Override
-	public void compute1(final IterableInterval<T> input, final DoubleType output) {
+	public void compute(final IterableInterval<T> input, final DoubleType output) {
 		final double[][] matrix = getCooccurrenceMatrix(input);
 		final int nrGrayLevels = matrix.length;
 

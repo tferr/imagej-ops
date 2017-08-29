@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -278,7 +278,6 @@ public interface OpEnvironment extends Contextual {
 	 */
 	default Module module(final Op op, final Object... args) {
 		final Module module = info(op).cInfo().createModule(op);
-		getContext().inject(module.getDelegateObject());
 		return matcher().assignInputs(module, args);
 	}
 

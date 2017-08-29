@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ public class IterableVariance<I extends RealType<I>, O extends RealType<O>>
 {
 
 	@Override
-	public void compute1(final Iterable<I> input, final O output) {
+	public void compute(final Iterable<I> input, final O output) {
 		int n = 0;
 		double mean = 0.0;
 		double M2 = 0.0;

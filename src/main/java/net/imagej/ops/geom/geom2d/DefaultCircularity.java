@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,8 @@ import org.scijava.plugin.Plugin;
 /**
  * Generic implementation of {@code geom.circularity}.
  * 
+ * Based on https://imagej.nih.gov/ij/plugins/circularity.html.
+ * 
  * @author Daniel Seebacher (University of Konstanz)
  */
 @Plugin(type = Ops.Geometric.Circularity.class,
@@ -51,18 +53,18 @@ public class DefaultCircularity extends AbstractUnaryHybridCF<Polygon, DoubleTyp
 {
 
 	private UnaryFunctionOp<Polygon, DoubleType> areaFunc;
-	private UnaryFunctionOp<Polygon, DoubleType> perimiterFunc;
+	private UnaryFunctionOp<Polygon, DoubleType> perimeterFunc;
 
 	@Override
 	public void initialize() {
 		areaFunc = RTs.function(ops(), Ops.Geometric.Size.class, in());
-		perimiterFunc = RTs.function(ops(), Ops.Geometric.BoundarySize.class, in());
+		perimeterFunc = RTs.function(ops(), Ops.Geometric.BoundarySize.class, in());
 	}
 	
 	@Override
-	public void compute1(Polygon input, DoubleType output) {
-		output.set(4 * Math.PI * (areaFunc.compute1(input)
-				.getRealDouble() / Math.pow(perimiterFunc.compute1(input).getRealDouble(),
+	public void compute(Polygon input, DoubleType output) {
+		output.set(4 * Math.PI * (areaFunc.calculate(input)
+				.getRealDouble() / Math.pow(perimeterFunc.calculate(input).getRealDouble(),
 						2)));
 	}
 	

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,8 @@
  */
 package net.imagej.ops.topology.eulerCharacteristic;
 
+import java.util.stream.LongStream;
+
 import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
@@ -37,9 +39,8 @@ import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.BooleanType;
 import net.imglib2.type.numeric.real.DoubleType;
 import net.imglib2.view.Views;
-import org.scijava.plugin.Plugin;
 
-import java.util.stream.LongStream;
+import org.scijava.plugin.Plugin;
 
 /**
  * An Op which calculates the correction needed to approximate the contribution of the image to the
@@ -81,7 +82,7 @@ public class EulerCorrection<B extends BooleanType<B>>
 
 
     @Override
-    public void compute1(RandomAccessibleInterval<B> interval, DoubleType output) {
+    public void compute(RandomAccessibleInterval<B> interval, DoubleType output) {
         final Traverser<B> traverser = new Traverser<>(interval);
         final long chiZero = stackCorners(traverser);
         final long e = stackEdges(traverser) + 3 * chiZero;

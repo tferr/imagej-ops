@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -66,10 +66,10 @@ public class DefaultMapNeighborhood<I, O> extends
 	}
 
 	@Override
-	public void compute2(final RandomAccessibleInterval<I> in1, final Shape in2,
+	public void compute(final RandomAccessibleInterval<I> in1, final Shape in2,
 		final IterableInterval<O> out)
 	{
-		map.compute1(in2.neighborhoodsSafe(in1), out);
+		map.compute(in2.neighborhoodsSafe(in1), out);
 	}
 
 }

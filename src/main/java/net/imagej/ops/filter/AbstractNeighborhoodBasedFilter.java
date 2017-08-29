@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -65,10 +65,10 @@ public abstract class AbstractNeighborhoodBasedFilter<I, O> extends
 	}
 
 	@Override
-	public void compute1(RandomAccessibleInterval<I> input,
+	public void compute(RandomAccessibleInterval<I> input,
 		IterableInterval<O> output)
 	{
-		map.compute1(Views.interval(Views.extend(input, outOfBoundsFactory), input),
+		map.compute(Views.interval(Views.extend(input, outOfBoundsFactory), input),
 			output);
 	}
 

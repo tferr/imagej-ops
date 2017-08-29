@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -166,7 +166,7 @@ public class RichardsonLucyF<I extends RealType<I> & NativeType<I>, O extends Re
 			return Computers.binary(ops(), RichardsonLucyC.class, output,
 				raiExtendedInput, raiExtendedKernel, fftImg, fftKernel, true, true,
 				maxIterations, imgConvolutionInterval, accelerator, computeEstimateOp,
-				fg.compute1(raiExtendedInput), list);
+				fg.calculate(raiExtendedInput), list);
 		}
 
 		// return a richardson lucy computer

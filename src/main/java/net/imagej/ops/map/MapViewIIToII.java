@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -36,6 +36,7 @@ import net.imglib2.IterableInterval;
 import net.imglib2.converter.read.ConvertedIterableInterval;
 import net.imglib2.type.Type;
 
+import org.scijava.Priority;
 import org.scijava.plugin.Plugin;
 
 /**
@@ -46,13 +47,13 @@ import org.scijava.plugin.Plugin;
  * @param <EI> element type of inputs
  * @param <EO> element type of outputs
  */
-@Plugin(type = Ops.Map.class)
+@Plugin(type = Ops.Map.class, priority = Priority.HIGH_PRIORITY)
 public class MapViewIIToII<EI, EO extends Type<EO>> extends
 	AbstractMapView<EI, EO, IterableInterval<EI>, IterableInterval<EO>>
 {
 
 	@Override
-	public IterableInterval<EO> compute1(final IterableInterval<EI> input) {
+	public IterableInterval<EO> calculate(final IterableInterval<EI> input) {
 		final ComputerConverter<EI, EO> converter =
 			new ComputerConverter<>(getOp());
 		return new ConvertedIterableInterval<>(input, converter, getType());

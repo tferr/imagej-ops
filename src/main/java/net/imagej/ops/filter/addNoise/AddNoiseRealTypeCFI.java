@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -70,7 +70,7 @@ public class AddNoiseRealTypeCFI<T extends RealType<T>> extends
 	// -- UnaryComputerOp methods --
 
 	@Override
-	public void compute1(final T input, final T output) {
+	public void compute(final T input, final T output) {
 		if (rng == null) rng = new Random(seed);
 		AddNoiseRealType.addNoise(input, output, rangeMin, rangeMax, rangeStdDev,
 			rng);

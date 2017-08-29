@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -50,7 +50,7 @@ import org.scijava.plugin.Plugin;
 public class DefaultPhaseFeature<T extends RealType<T>, O extends RealType<O>> extends AbstractZernikeFeature<T,O>implements Ops.Zernike.Phase {
 
 	@Override
-	public void compute1(IterableInterval<T> input, O output) {
+	public void compute(IterableInterval<T> input, O output) {
 
 		output.setReal(getZernikeMoment(input).getPhase());
 	}

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -42,8 +42,8 @@ import org.scijava.plugin.Plugin;
  * Evaluates an expression.
  * <p>
  * The expression is parsed using
- * <a href="https://github.com/scijava/scijava-expression-parser">SJEP</a>, then
- * evaluated by invoking available ops.
+ * <a href="https://github.com/scijava/parsington">Parsington</a>, the SciJava
+ * expression parsing library, then evaluated by invoking available ops.
  * </p>
  * 
  * @author Curtis Rueden
@@ -66,7 +66,7 @@ public class DefaultEval extends AbstractUnaryFunctionOp<String, Object>
 	}
 
 	@Override
-	public Object compute1(final String input) {
+	public Object calculate(final String input) {
 		return e.evaluate(input);
 	}
 

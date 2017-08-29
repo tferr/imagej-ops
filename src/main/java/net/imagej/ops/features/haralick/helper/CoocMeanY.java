@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -55,10 +55,10 @@ public class CoocMeanY extends AbstractUnaryFunctionOp<double[][], DoubleType> {
 	}
 
 	@Override
-	public DoubleType compute1(double[][] input) {
+	public DoubleType calculate(double[][] input) {
 
 		double res = 0;
-		final double[] py = coocPYFunc.compute1(input);
+		final double[] py = coocPYFunc.calculate(input);
 		for (int i = 0; i < py.length; i++) {
 			res += i * py[i];
 		}

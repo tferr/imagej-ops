@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,7 @@ public class ConvolveNaiveC<I extends RealType<I>, K extends RealType<K>, O exte
 	private RandomAccessibleInterval<K> kernel;
 
 	@Override
-	public void compute1(final RandomAccessible<I> input,
+	public void compute(final RandomAccessible<I> input,
 		final RandomAccessibleInterval<O> output)
 	{
 		// TODO: try a decomposition of the kernel into n 1-dim kernels

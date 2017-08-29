@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,7 @@ import java.io.IOException;
 import net.imagej.ops.eval.OpEvaluator;
 
 import org.scijava.Context;
-import org.scijava.sjep.eval.EvaluatorConsole;
+import org.scijava.parse.eval.EvaluatorConsole;
 
 /**
  * Launches a console-based, Ops-driven expression evaluator.

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -43,7 +43,7 @@ import org.scijava.plugin.Plugin;
 public class CoocPX extends AbstractUnaryFunctionOp<double[][], double[]> {
 
 	@Override
-	public double[] compute1(double[][] input) {
+	public double[] calculate(double[][] input) {
 		final int nrGrayLevels = input.length;
 		final double[] output = new double[nrGrayLevels];
 		for (int i = 0; i < nrGrayLevels; i++) {

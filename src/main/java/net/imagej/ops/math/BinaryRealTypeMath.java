@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ public class BinaryRealTypeMath {
 	{
 
 		@Override
-		public void compute2(final I1 input1, final I2 input2, final O output) {
+		public void compute(final I1 input1, final I2 input2, final O output) {
 			output.setReal(input1.getRealDouble() + input2.getRealDouble());
 		}
 	}
@@ -73,7 +73,7 @@ public class BinaryRealTypeMath {
 	{
 
 		@Override
-		public void compute2(final I1 input1, final I2 input2, final O output) {
+		public void compute(final I1 input1, final I2 input2, final O output) {
 			output.setReal((long) input1.getRealDouble() & (long) input2
 				.getRealDouble());
 		}
@@ -92,7 +92,7 @@ public class BinaryRealTypeMath {
 		private double dbzVal;
 
 		@Override
-		public void compute2(final I1 input1, final I2 input2, final O output) {
+		public void compute(final I1 input1, final I2 input2, final O output) {
 			if (input2.getRealDouble() == 0) {
 				output.setReal(dbzVal);
 			}
@@ -112,7 +112,7 @@ public class BinaryRealTypeMath {
 	{
 
 		@Override
-		public void compute2(final I1 input1, final I2 input2, final O output) {
+		public void compute(final I1 input1, final I2 input2, final O output) {
 			output.setReal(input1.getRealDouble() * input2.getRealDouble());
 		}
 	}
@@ -127,7 +127,7 @@ public class BinaryRealTypeMath {
 	{
 
 		@Override
-		public void compute2(final I1 input1, final I2 input2, final O output) {
+		public void compute(final I1 input1, final I2 input2, final O output) {
 			output.setReal((long) input1.getRealDouble() | (long) input2
 				.getRealDouble());
 		}
@@ -143,7 +143,7 @@ public class BinaryRealTypeMath {
 	{
 
 		@Override
-		public void compute2(final I1 input1, final I2 input2, final O output) {
+		public void compute(final I1 input1, final I2 input2, final O output) {
 			output.setReal(input1.getRealDouble() - input2.getRealDouble());
 		}
 	}
@@ -158,7 +158,7 @@ public class BinaryRealTypeMath {
 	{
 
 		@Override
-		public void compute2(final I1 input1, final I2 input2, final O output) {
+		public void compute(final I1 input1, final I2 input2, final O output) {
 			output.setReal((long) input1.getRealDouble() ^ (long) input2
 				.getRealDouble());
 		}

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -41,11 +41,12 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = CoocHXY.class)
 public class CoocHXY extends AbstractUnaryFunctionOp<double[][], double[]> {
 
-	private static final double EPSILON = 0.00000001f;
+	private static final double EPSILON = Double.MIN_NORMAL;
 
 	private UnaryFunctionOp<double[][], double[]> coocPXFunc;
 	private UnaryFunctionOp<double[][], double[]> coocPYFunc;
@@ -59,7 +60,7 @@ public class CoocHXY extends AbstractUnaryFunctionOp<double[][], double[]> {
 	}
 
 	@Override
-	public double[] compute1(double[][] matrix) {
+	public double[] calculate(double[][] matrix) {
 		double hx = 0.0d;
 		double hy = 0.0d;
 		double hxy1 = 0.0d;
@@ -67,8 +68,8 @@ public class CoocHXY extends AbstractUnaryFunctionOp<double[][], double[]> {
 
 		final int nrGrayLevels = matrix.length;
 
-		final double[] px = coocPXFunc.compute1(matrix);
-		final double[] py = coocPYFunc.compute1(matrix);
+		final double[] px = coocPXFunc.calculate(matrix);
+		final double[] py = coocPYFunc.calculate(matrix);
 
 		for (int i = 0; i < px.length; i++) {
 			hx += px[i] * Math.log(px[i] + EPSILON);

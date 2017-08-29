@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -66,9 +66,9 @@ public class DefaultHuMoment1<I extends RealType<I>, O extends RealType<O>>
 	}
 
 	@Override
-	public void compute1(final IterableInterval<I> input, final O output) {
-		double n20 = normalizedCentralMoment20Func.compute1(input).getRealDouble();
-		double n02 = normalizedCentralMoment02Func.compute1(input).getRealDouble();
+	public void compute(final IterableInterval<I> input, final O output) {
+		double n20 = normalizedCentralMoment20Func.calculate(input).getRealDouble();
+		double n02 = normalizedCentralMoment02Func.calculate(input).getRealDouble();
 
 		output.setReal(n20 + n02);
 	}

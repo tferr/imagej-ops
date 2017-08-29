@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -58,12 +58,12 @@ public class DefaultContrastFeature<I extends RealType<I>, O extends RealType<O>
 	}
 
 	@Override
-	public void compute1(final RandomAccessibleInterval<I> input, final O output) {
+	public void compute(final RandomAccessibleInterval<I> input, final O output) {
 
 		// Get fourth moment about mean
-		double m4 = m4Op.compute1(input).getRealDouble();
-		double var = varOp.compute1(input).getRealDouble();
-		double std = stdOp.compute1(input).getRealDouble();
+		double m4 = m4Op.calculate(input).getRealDouble();
+		double var = varOp.calculate(input).getRealDouble();
+		double std = stdOp.calculate(input).getRealDouble();
 
 		double l4 = m4 / (var * var);
 

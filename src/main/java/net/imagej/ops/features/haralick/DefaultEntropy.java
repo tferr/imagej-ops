@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,20 +39,21 @@ import org.scijava.plugin.Plugin;
 /**
  * 
  * Implementation of Entropy Haralick Feature Definition: -( sum_{i=1}^q
- * sum_{j=1}^q c(i,j) log10(c(i,j)) )
+ * sum_{j=1}^q c(i,j) log(c(i,j)) )
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
- *
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Haralick.Entropy.class, label = "Haralick: Entropy")
 public class DefaultEntropy<T extends RealType<T>> extends
 		AbstractHaralickFeature<T> implements Ops.Haralick.Entropy {
 
-	private static final double EPSILON = 0.00000001f;
-
+	// Avoid log 0
+	private static final double EPSILON = Double.MIN_NORMAL;
+	
 	@Override
-	public void compute1(final IterableInterval<T> input, final DoubleType output) {
+	public void compute(final IterableInterval<T> input, final DoubleType output) {
 		final double[][] matrix = getCooccurrenceMatrix(input);
 		double res = 0;
 
@@ -60,7 +61,7 @@ public class DefaultEntropy<T extends RealType<T>> extends
 
 		for (int i = 0; i < nrGrayLevels; i++) {
 			for (int j = 0; j < nrGrayLevels; j++) {
-				res += matrix[i][j] * Math.log10(matrix[i][j] + EPSILON);
+				res += matrix[i][j] * Math.log(matrix[i][j] + EPSILON);
 			}
 		}
 

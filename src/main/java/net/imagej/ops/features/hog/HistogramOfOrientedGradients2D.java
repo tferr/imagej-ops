@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -34,10 +34,6 @@ import java.util.List;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 
-import org.scijava.plugin.Parameter;
-import org.scijava.plugin.Plugin;
-import org.scijava.thread.ThreadService;
-
 import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
 import net.imagej.ops.create.img.CreateImgFromDimsAndType;
@@ -47,7 +43,6 @@ import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imagej.ops.thread.chunker.CursorBasedChunk;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;
-import net.imglib2.Point;
 import net.imglib2.RandomAccess;
 import net.imglib2.RandomAccessible;
 import net.imglib2.RandomAccessibleInterval;
@@ -62,6 +57,10 @@ import net.imglib2.type.numeric.real.FloatType;
 import net.imglib2.util.Intervals;
 import net.imglib2.view.Views;
 import net.imglib2.view.composite.GenericComposite;
+
+import org.scijava.plugin.Parameter;
+import org.scijava.plugin.Plugin;
+import org.scijava.thread.ThreadService;
 
 /**
  * Calculates a histogram of oriented gradients which is a feature descriptor.
@@ -139,7 +138,7 @@ public class HistogramOfOrientedGradients2D<T extends RealType<T>>
 	@SuppressWarnings("unchecked")
 	@Override
 	public RandomAccessibleInterval<T> createOutput(RandomAccessibleInterval<T> in) {
-		return createOp.compute1(new FinalInterval(in().dimension(0), in().dimension(1), numOrientations));
+		return createOp.calculate(new FinalInterval(in().dimension(0), in().dimension(1), numOrientations));
 	}
 
 	@Override
@@ -149,13 +148,13 @@ public class HistogramOfOrientedGradients2D<T extends RealType<T>>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void compute1(RandomAccessibleInterval<T> in, RandomAccessibleInterval<T> out) {
-		RandomAccessible<FloatType> convertedIn = Converters.convert(Views.extendMirrorDouble(in), converterToFloat,
-				new FloatType());
+	public void compute(RandomAccessibleInterval<T> in, RandomAccessibleInterval<T> out) {
+		final RandomAccessible<FloatType> convertedIn = Converters.convert(Views.extendMirrorDouble(in),
+				converterToFloat, new FloatType());
 
 		// compute partial derivative for each dimension
-		RandomAccessibleInterval<FloatType> derivative0 = createImgOp.compute0();
-		RandomAccessibleInterval<FloatType> derivative1 = createImgOp.compute0();
+		RandomAccessibleInterval<FloatType> derivative0 = createImgOp.calculate();
+		RandomAccessibleInterval<FloatType> derivative1 = createImgOp.calculate();
 
 		// case of grayscale image
 		if (in.numDimensions() == 2) {
@@ -167,8 +166,8 @@ public class HistogramOfOrientedGradients2D<T extends RealType<T>>
 			List<RandomAccessibleInterval<FloatType>> listDerivs0 = new ArrayList<>();
 			List<RandomAccessibleInterval<FloatType>> listDerivs1 = new ArrayList<>();
 			for (int i = 0; i < in.dimension(2); i++) {
-				final RandomAccessibleInterval<FloatType> deriv0 = createImgOp.compute0();
-				final RandomAccessibleInterval<FloatType> deriv1 = createImgOp.compute0();
+				final RandomAccessibleInterval<FloatType> deriv0 = createImgOp.calculate();
+				final RandomAccessibleInterval<FloatType> deriv1 = createImgOp.calculate();
 				PartialDerivative.gradientCentralDifference(
 						Views.interval(convertedIn, new long[] { 0, 0, i }, new long[] { in.max(0), in.max(1), i }),
 						deriv0, 0);
@@ -187,10 +186,10 @@ public class HistogramOfOrientedGradients2D<T extends RealType<T>>
 		final RandomAccessibleInterval<FloatType> finalderivative1 = derivative1;
 
 		// compute angles and magnitudes
-		final RandomAccessibleInterval<FloatType> angles = createImgOp.compute0();
-		final RandomAccessibleInterval<FloatType> magnitudes = createImgOp.compute0();
+		final RandomAccessibleInterval<FloatType> angles = createImgOp.calculate();
+		final RandomAccessibleInterval<FloatType> magnitudes = createImgOp.calculate();
 
-		CursorBasedChunk chunkable = new CursorBasedChunk() {
+		final CursorBasedChunk chunkable = new CursorBasedChunk() {
 
 			@Override
 			public void execute(int startIndex, int stepSize, int numSteps) {
@@ -270,15 +269,13 @@ public class HistogramOfOrientedGradients2D<T extends RealType<T>>
 				// sum up the magnitudes of all bins in a neighborhood
 				raNeighbor.setPosition(new long[] { i, j });
 				final Cursor<FloatType> cursorNeighborHood = raNeighbor.get().cursor();
-				final long[] posNeighbor = new long[cursorNeighborHood.numDimensions()];
 				while (cursorNeighborHood.hasNext()) {
 					cursorNeighborHood.next();
-					cursorNeighborHood.localize(posNeighbor);
-					if (Intervals.contains(interval, new Point(posNeighbor))) {
-						raAngles.setPosition(posNeighbor);
-						raMagnitudes.setPosition(posNeighbor);
-						raOut.setPosition(
-								new long[] { i, j, (int) raAngles.get().getRealFloat() / (360 / numOrientations) });
+					if (Intervals.contains(interval, cursorNeighborHood)) {
+						raAngles.setPosition(cursorNeighborHood);
+						raMagnitudes.setPosition(cursorNeighborHood);
+						raOut.setPosition(new long[] { i, j,
+								(int) (raAngles.get().getRealFloat() / (360 / numOrientations) - 0.5) });
 						raOut.get().add(raMagnitudes.get());
 					}
 				}

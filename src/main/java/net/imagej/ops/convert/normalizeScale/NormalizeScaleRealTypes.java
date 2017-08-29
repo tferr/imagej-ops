@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,7 +30,6 @@
 
 package net.imagej.ops.convert.normalizeScale;
 
-import net.imagej.ops.Contingent;
 import net.imagej.ops.Ops;
 import net.imagej.ops.convert.scale.ScaleRealTypes;
 import net.imagej.ops.special.function.Functions;
@@ -42,14 +41,20 @@ import net.imglib2.util.Pair;
 import org.scijava.plugin.Plugin;
 
 /**
+ * Scales input values to their corresponding value in the output type range
+ * based on the min/max values of an {@link IterableInterval} not the range of
+ * the input type.
+ *
  * @author Martin Horn (University of Konstanz)
  */
 @Plugin(type = Ops.Convert.NormalizeScale.class)
 public class NormalizeScaleRealTypes<I extends RealType<I>, O extends RealType<O>>
-	extends ScaleRealTypes<I, O> implements Ops.Convert.NormalizeScale, Contingent
+	extends ScaleRealTypes<I, O> implements Ops.Convert.NormalizeScale
 {
-	
+
 	private UnaryFunctionOp<IterableInterval<I>, Pair<I, I>> minMaxFunc;
+
+	protected double outMax;
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
@@ -61,25 +66,16 @@ public class NormalizeScaleRealTypes<I extends RealType<I>, O extends RealType<O
 	@Override
 	public void checkInput(final I inType, final O outType) {
 		outMin = outType.getMinValue();
+		outMax = outType.getMaxValue();
 	}
 
 	@Override
 	public void checkInput(final IterableInterval<I> in) {
-		final Pair<I, I> minMax = minMaxFunc.compute1(in);
-		final I inType = in.firstElement().createVariable();
-		factor =
-			1.0 / (minMax.getB().getRealDouble() - minMax.getA().getRealDouble()) *
-				(inType.getMaxValue() - inType.getMinValue());
+		final Pair<I, I> minMax = minMaxFunc.calculate(in);
+		factor = (minMax.getB().getRealDouble() - minMax.getA()
+			.getRealDouble()) / (outMax - outMin);
 
 		inMin = minMax.getA().getRealDouble();
-
-	}
-
-	@Override
-	public boolean conforms() {
-		// only conforms if an input source has been provided and the scale factor
-		// was calculated
-		return factor != 0;
 	}
 
 }

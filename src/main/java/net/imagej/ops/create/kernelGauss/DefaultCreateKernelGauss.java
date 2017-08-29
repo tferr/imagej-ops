@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ public class DefaultCreateKernelGauss<T extends ComplexType<T>> extends
 	}
 
 	@Override
-	public RandomAccessibleInterval<T> compute1(double[] input) {
+	public RandomAccessibleInterval<T> calculate(double[] input) {
 		final double[] sigmaPixels = new double[input.length];
 
 		final long[] dims = new long[input.length];
@@ -88,7 +88,7 @@ public class DefaultCreateKernelGauss<T extends ComplexType<T>> extends
 			kernelArrays[d] = Util.createGaussianKernel1DDouble(sigmaPixels[d], true);
 		}
 
-		final RandomAccessibleInterval<T> out = createOp.compute1(new FinalInterval(
+		final RandomAccessibleInterval<T> out = createOp.calculate(new FinalInterval(
 			dims));
 
 		final Cursor<T> cursor = Views.iterable(out).cursor();

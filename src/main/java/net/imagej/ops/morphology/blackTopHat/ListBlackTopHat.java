@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -91,10 +91,10 @@ public class ListBlackTopHat<T extends RealType<T>> extends
 	}
 
 	@Override
-	public void compute2(final RandomAccessibleInterval<T> in1,
+	public void compute(final RandomAccessibleInterval<T> in1,
 		final List<Shape> in2, final IterableInterval<T> out)
 	{
-		closeComputer.compute2(in1, in2, out);
+		closeComputer.compute(in1, in2, out);
 		subtractor.mutate1(out, in1);
 	}
 }

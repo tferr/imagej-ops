@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ public class RichardsonLucyTVUpdate<T extends RealType<T> & NativeType<T>, I ext
 	 * performs update step of the Richardson Lucy with Total Variation Algorithm
 	 */
 	@Override
-	public void compute1(I correction, I estimate) {
+	public void compute(I correction, I estimate) {
 
 		if (variation == null) {
 			Type<T> type = Util.getTypeFromInterval(correction);

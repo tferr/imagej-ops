@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -38,14 +38,15 @@ import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.type.numeric.real.DoubleType;
 
 /**
- * Generic implementation of
- * {@link net.imagej.ops.Ops.Geometric.Boxivity}.
+ * Generic implementation of {@link net.imagej.ops.Ops.Geometric.Boxivity}.
+ * 
+ * Based on http://www.math.uci.edu/icamp/summer/research_11/park/
+ * shape_descriptors_survey.pdf, where boxivity is called rectangularity.
  * 
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
-public abstract class AbstractBoxivity<I> extends
-	AbstractUnaryHybridCF<I, DoubleType> implements Ops.Geometric.Boxivity
-{
+public abstract class AbstractBoxivity<I> extends AbstractUnaryHybridCF<I, DoubleType>
+		implements Ops.Geometric.Boxivity {
 
 	private UnaryFunctionOp<I, DoubleType> areaFunc;
 
@@ -61,14 +62,14 @@ public abstract class AbstractBoxivity<I> extends
 	public void initialize() {
 		// in() == null :/
 		areaFunc = RTs.function(ops(), Ops.Geometric.Size.class, in());
-		smallestEnclosingRectangleFunc = Functions.unary(ops(), 
-			Ops.Geometric.SmallestEnclosingBoundingBox.class, inType, in());
+		smallestEnclosingRectangleFunc = Functions.unary(ops(), Ops.Geometric.SmallestEnclosingBoundingBox.class,
+				inType, in());
 	}
-	
+
 	@Override
-	public void compute1(I input, DoubleType output) {
-		output.set(areaFunc.compute1(input).getRealDouble() / areaFunc
-			.compute1(smallestEnclosingRectangleFunc.compute1(input)).getRealDouble());
+	public void compute(I input, DoubleType output) {
+		output.set(areaFunc.calculate(input).getRealDouble()
+				/ areaFunc.calculate(smallestEnclosingRectangleFunc.calculate(input)).getRealDouble());
 	}
 
 	@Override

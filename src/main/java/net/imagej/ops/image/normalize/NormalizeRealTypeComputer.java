@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -69,7 +69,7 @@ class NormalizeRealTypeComputer<T extends RealType<T>> extends
 	}
 
 	@Override
-	public void compute1(final T input, final T output) {
+	public void compute(final T input, final T output) {
 
 		final double res = (input.getRealDouble() - sourceMin) * factor + targetMin;
 
@@ -86,6 +86,6 @@ class NormalizeRealTypeComputer<T extends RealType<T>> extends
 
 	@Override
 	public void convert(T input, T output) {
-		compute1(input, output);
+		compute(input, output);
 	}
 }

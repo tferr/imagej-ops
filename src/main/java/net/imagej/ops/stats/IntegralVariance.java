@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ public class IntegralVariance<I extends RealType<I>> extends
 {
 
 	@Override
-	public void compute1(final RectangleNeighborhood<Composite<I>> input,
+	public void compute(final RectangleNeighborhood<Composite<I>> input,
 		final DoubleType output)
 	{
 		// computation according to
@@ -112,6 +112,7 @@ public class IntegralVariance<I extends RealType<I>> extends
 		sum1.div(valueAsDoubleType); // NB
 
 		sum2.sub(sum1);
+		valueAsDoubleType.sub(new DoubleType(1)); // NB
 		sum2.div(valueAsDoubleType); // NB
 
 		output.set(sum2);

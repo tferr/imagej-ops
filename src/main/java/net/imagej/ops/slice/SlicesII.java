@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ package net.imagej.ops.slice;
 
 import java.util.Iterator;
 
-import net.imagej.ops.OpEnvironment;
 import net.imglib2.AbstractInterval;
 import net.imglib2.Cursor;
 import net.imglib2.FinalInterval;

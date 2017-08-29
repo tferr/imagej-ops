@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,7 @@ public class NullaryNumericTypeMath {
 		private T constant;
 
 		@Override
-		public void compute0(final T output) {
+		public void compute(final T output) {
 			output.set(constant);
 		}
 	}
@@ -77,7 +77,7 @@ public class NullaryNumericTypeMath {
 	{
 
 		@Override
-		public void compute0(final T output) {
+		public void compute(final T output) {
 			output.setZero();
 		}
 

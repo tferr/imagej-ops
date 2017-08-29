@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ public class ComputeFFTMethodsSize extends
 	private boolean fast;
 
 	@Override
-	public long[][] compute1(Dimensions inputDimensions) {
+	public long[][] calculate(Dimensions inputDimensions) {
 
 		long[][] size = new long[2][];
 		size[0] = new long[inputDimensions.numDimensions()];

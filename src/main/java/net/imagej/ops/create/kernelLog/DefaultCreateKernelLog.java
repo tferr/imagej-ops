@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -75,7 +75,7 @@ public class DefaultCreateKernelLog<T extends ComplexType<T>> extends
 	}
 
 	@Override
-	public RandomAccessibleInterval<T> compute1(double[] sigmas) {
+	public RandomAccessibleInterval<T> calculate(double[] sigmas) {
 		final double[] sigmaPixels = new double[sigmas.length];
 		for (int i = 0; i < sigmaPixels.length; i++) {
 			// Optimal sigma for LoG approach and dimensionality.
@@ -95,7 +95,7 @@ public class DefaultCreateKernelLog<T extends ComplexType<T>> extends
 			middle[d] = 1 + hksizes;
 		}
 
-		final RandomAccessibleInterval<T> output = createOp.compute1(
+		final RandomAccessibleInterval<T> output = createOp.calculate(
 			new FinalInterval(dims));
 
 		final Cursor<T> c = Views.iterable(output).cursor();

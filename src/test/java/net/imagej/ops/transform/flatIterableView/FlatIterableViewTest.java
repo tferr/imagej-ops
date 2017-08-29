@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ public class FlatIterableViewTest extends AbstractOpTest {
 
 		Cursor<DoubleType> il2 = Views.flatIterable(img).cursor();
 
-		Cursor<DoubleType> opr = ops.transform().flatIterable(img).cursor();
+		Cursor<DoubleType> opr = ops.transform().flatIterableView(img).cursor();
 
 		while (il2.hasNext()) {
 			il2.next();

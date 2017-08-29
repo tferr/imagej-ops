@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -68,8 +68,8 @@ public class CropImgPlus<T extends Type<T>> extends
 	}
 
 	@Override
-	public ImgPlus<T> compute2(final ImgPlus<T> input, final Interval interval) {
-		final ImgPlus<T> out = new ImgPlus<>(ImgView.wrap(cropper.compute2(input, interval),
+	public ImgPlus<T> calculate(final ImgPlus<T> input, final Interval interval) {
+		final ImgPlus<T> out = new ImgPlus<>(ImgView.wrap(cropper.calculate(input, interval),
 			input.factory()));
 
 		// TODO remove metadata-util

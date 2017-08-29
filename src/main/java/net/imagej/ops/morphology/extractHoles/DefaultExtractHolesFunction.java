@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -36,7 +36,8 @@ import net.imagej.ops.special.chain.UFViaUCAllSame;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.algorithm.labeling.ConnectedComponents.StructuringElement;
+import net.imglib2.algorithm.neighborhood.RectangleShape;
+import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.type.BooleanType;
 
 import org.scijava.plugin.Parameter;
@@ -53,10 +54,7 @@ public class DefaultExtractHolesFunction<T extends BooleanType<T>> extends
 {
 
 	@Parameter(required = false)
-	private StructuringElement structElement = StructuringElement.EIGHT_CONNECTED;
-
-	@Parameter(required = false)
-	private boolean background = false;
+	private Shape structElement = new RectangleShape(1, false);
 
 	private UnaryFunctionOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> createFunc;
 
@@ -72,14 +70,14 @@ public class DefaultExtractHolesFunction<T extends BooleanType<T>> extends
 		createWorker(final RandomAccessibleInterval<T> t)
 	{
 		return RAIs.computer(ops(), Ops.Morphology.ExtractHoles.class, t,
-			structElement, background);
+			structElement);
 	}
 
 	@Override
 	public RandomAccessibleInterval<T> createOutput(
 		final RandomAccessibleInterval<T> input)
 	{
-		return createFunc.compute1(input);
+		return createFunc.calculate(input);
 	}
 
 }

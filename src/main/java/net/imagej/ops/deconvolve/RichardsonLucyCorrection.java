@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -94,7 +94,7 @@ public class RichardsonLucyCorrection<I extends RealType<I>, O extends RealType<
 	 * computes the correction factor of the Richardson Lucy Algorithm
 	 */
 	@Override
-	public void compute2(RandomAccessibleInterval<I> observed,
+	public void compute(RandomAccessibleInterval<I> observed,
 		RandomAccessibleInterval<O> reblurred,
 		RandomAccessibleInterval<O> correction)
 	{
@@ -103,7 +103,7 @@ public class RichardsonLucyCorrection<I extends RealType<I>, O extends RealType<
 
 		// correlate with psf to compute the correction factor
 		// Note: FFT of psf is pre-computed and set as an input parameter of the op
-		correlate.compute1(reblurred, correction);
+		correlate.compute(reblurred, correction);
 
 	}
 

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ public class WrappedIntegralImg<I extends RealType<I>> extends
 	private IntegralImg<I, DoubleType> integralImg;
 
 	@Override
-	public RandomAccessibleInterval<DoubleType> compute1(
+	public RandomAccessibleInterval<DoubleType> calculate(
 		final RandomAccessibleInterval<I> input)
 	{
 		// Create IntegralImg from input

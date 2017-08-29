@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,7 @@ public class DefaultCoarsenessFeature<I extends RealType<I>, O extends RealType<
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void compute1(final RandomAccessibleInterval<I> input, final O output) {
+	public void compute(final RandomAccessibleInterval<I> input, final O output) {
 		HashMap<Integer, Img<I>> meanImages = new HashMap<>();
 
 		// get mean images

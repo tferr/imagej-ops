@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,12 @@
 package net.imagej.ops.cached;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 
 import java.util.ArrayList;
 
 import net.imagej.ops.AbstractOpTest;
+import net.imagej.ops.Op;
 import net.imagej.ops.OpInfo;
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.function.Functions;
@@ -48,6 +50,7 @@ import net.imglib2.type.numeric.real.DoubleType;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.scijava.plugin.Parameter;
 
 /**
  * JUnit-Tests for the {@link CachedOpEnvironment}.
@@ -72,6 +75,7 @@ public class CachedOpEnvironmentTest extends AbstractOpTest {
 	public void initCustomOps() {
 		final ArrayList<OpInfo> customOps = new ArrayList<>();
 		customOps.add(new OpInfo(MyMin.class));
+		customOps.add(new OpInfo(MyOptionalParameterOp.class));
 
 		env = new CachedOpEnvironment(ops, customOps);
 
@@ -87,11 +91,11 @@ public class CachedOpEnvironmentTest extends AbstractOpTest {
 		ctr = 0;
 
 		// Calling it twice should result in the same result
-		assertEquals(1.0, func.compute1(imgA).get(), 0.0);
-		assertEquals(1.0, func.compute1(imgA).get(), 0.0);
+		assertEquals(1.0, func.calculate(imgA).get(), 0.0);
+		assertEquals(1.0, func.calculate(imgA).get(), 0.0);
 
 		// Should be increased
-		assertEquals(2.0, func.compute1(imgB).getRealDouble(), 0.0);
+		assertEquals(2.0, func.calculate(imgB).getRealDouble(), 0.0);
 	}
 
 	@Test
@@ -99,11 +103,20 @@ public class CachedOpEnvironmentTest extends AbstractOpTest {
 		ctr = 0;
 
 		// Calling it twice should result in the same result
-		assertEquals(1.0, hybrid.compute1(imgA).get(), 0.0);
-		assertEquals(1.0, hybrid.compute1(imgA).get(), 0.0);
+		assertEquals(1.0, hybrid.calculate(imgA).get(), 0.0);
+		assertEquals(1.0, hybrid.calculate(imgA).get(), 0.0);
 
 		// Should be increased
-		assertEquals(2.0, hybrid.compute1(imgB).getRealDouble(), 0.0);
+		assertEquals(2.0, hybrid.calculate(imgB).getRealDouble(), 0.0);
+	}
+
+	@Test
+	public void testOptionalParameter() {
+		UnaryFunctionOp<DoubleType, Object> f = Functions.unary(env, OptionalParameterOp.class, Object.class, DoubleType.class);
+		Object result = f.calculate(new DoubleType());
+		UnaryFunctionOp<DoubleType, Object> f2 = Functions.unary(env, OptionalParameterOp.class, Object.class, DoubleType.class);
+		Object sameResult = f2.calculate(new DoubleType());
+		assertSame(result, sameResult);
 	}
 
 	// some specialized ops to track number of counts
@@ -117,11 +130,33 @@ public class CachedOpEnvironmentTest extends AbstractOpTest {
 		}
 
 		@Override
-		public void compute1(final Img<ByteType> input, final DoubleType output) {
+		public void compute(final Img<ByteType> input, final DoubleType output) {
 			ctr++;
 			output.set(ctr);
 		}
 
 	}
 
+	private interface OptionalParameterOp extends Op {
+		String name = "optional.parameter.op";
+	}
+	// specialized op returns a new Object for each calculation
+	public static class MyOptionalParameterOp extends AbstractUnaryHybridCF<DoubleType, Object>
+			implements OptionalParameterOp
+	{
+
+		@Parameter(required = false)
+		ByteType optionalParameter;
+
+		@Override
+		public Object createOutput(final DoubleType input) {
+			return new Object();
+		}
+
+		@Override
+		public void compute(final DoubleType input, final Object output) {
+			// ignore
+		}
+
+	}
 }

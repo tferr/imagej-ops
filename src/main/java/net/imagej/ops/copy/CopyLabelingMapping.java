@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -66,11 +66,11 @@ public class CopyLabelingMapping<L> extends
 
 	@Override
 	public LabelingMapping<L> createOutput(final LabelingMapping<L> input) {
-		return outputCreator.compute0();
+		return outputCreator.calculate();
 	}
 
 	@Override
-	public void compute1(final LabelingMapping<L> input,
+	public void compute(final LabelingMapping<L> input,
 			final LabelingMapping<L> output) {
 
 		final LabelingMappingSerializationAccess<L> access = new LabelingMappingSerializationAccess<>(

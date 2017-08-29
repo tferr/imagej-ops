@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -62,9 +62,9 @@ public class DefaultMoment2AboutMean<I extends RealType<I>, O extends RealType<O
 	}
 
 	@Override
-	public void compute1(final Iterable<I> input, final O output) {
-		final double mean = meanFunc.compute1(input).getRealDouble();
-		final double size = sizeFunc.compute1(input).getRealDouble();
+	public void compute(final Iterable<I> input, final O output) {
+		final double mean = meanFunc.calculate(input).getRealDouble();
+		final double size = sizeFunc.calculate(input).getRealDouble();
 
 		double res = 0;
 		for (final I in : input) {

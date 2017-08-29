@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -62,7 +62,7 @@ public class LocalMeanThreshold<T extends RealType<T>> extends
 	private double c;
 
 	@Override
-	protected CenterAwareComputerOp<T, BitType> unaryComputer(
+	protected CenterAwareComputerOp<T, BitType> unaryComputer(final T inClass,
 		final BitType outClass)
 	{
 		final LocalThresholdMethod<T> op = new LocalThresholdMethod<T>() {
@@ -70,7 +70,7 @@ public class LocalMeanThreshold<T extends RealType<T>> extends
 			private UnaryComputerOp<Iterable<T>, DoubleType> meanOp;
 
 			@Override
-			public void compute2(final Iterable<T> neighborhood, final T center, final BitType output) {
+			public void compute(final Iterable<T> neighborhood, final T center, final BitType output) {
 
 				if (meanOp == null) {
 					meanOp = Computers.unary(ops(),	Ops.Stats.Mean.class, DoubleType.class, neighborhood);
@@ -78,7 +78,7 @@ public class LocalMeanThreshold<T extends RealType<T>> extends
 
 				final DoubleType m = new DoubleType();
 
-				meanOp.compute1(neighborhood, m);
+				meanOp.compute(neighborhood, m);
 				output.set(center.getRealDouble() > m.getRealDouble() - c);
 			}
 		};

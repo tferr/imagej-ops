@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@ public class LocalNiblackThreshold<T extends RealType<T>> extends LocalThreshold
 	private double k;
 	
 	@Override
-	protected CenterAwareComputerOp<T, BitType> unaryComputer(
+	protected CenterAwareComputerOp<T, BitType> unaryComputer(final T inClass,
 		final BitType outClass)
 	{
 		final LocalThresholdMethod<T> op = new LocalThresholdMethod<T>() {
@@ -73,7 +73,7 @@ public class LocalNiblackThreshold<T extends RealType<T>> extends LocalThreshold
 			private UnaryComputerOp<Iterable<T>, DoubleType> stdDeviation;
 
 			@Override
-			public void compute2(final Iterable<T> neighborhood, final T center, final BitType output) {
+			public void compute(final Iterable<T> neighborhood, final T center, final BitType output) {
 
 				if (mean == null) {
 					mean = Computers.unary(ops(), Ops.Stats.Mean.class, new DoubleType(),
@@ -86,10 +86,10 @@ public class LocalNiblackThreshold<T extends RealType<T>> extends LocalThreshold
 				}
 
 				final DoubleType m = new DoubleType();
-				mean.compute1(neighborhood, m);
+				mean.compute(neighborhood, m);
 
 				final DoubleType stdDev = new DoubleType();
-				stdDeviation.compute1(neighborhood, stdDev);
+				stdDeviation.compute(neighborhood, stdDev);
 
 				output.set(center.getRealDouble() > m.getRealDouble() + k * stdDev
 					.getRealDouble() - c);

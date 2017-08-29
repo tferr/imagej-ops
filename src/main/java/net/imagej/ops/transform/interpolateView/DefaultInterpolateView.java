@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,6 @@ import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imglib2.EuclideanSpace;
 import net.imglib2.RealRandomAccessible;
 import net.imglib2.interpolation.InterpolatorFactory;
-import net.imglib2.type.Type;
 import net.imglib2.view.Views;
 
 import org.scijava.plugin.Parameter;
@@ -48,14 +47,14 @@ import org.scijava.plugin.Plugin;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Transform.InterpolateView.class)
-public class DefaultInterpolateView<I extends EuclideanSpace, T extends Type<T>>
+public class DefaultInterpolateView<I extends EuclideanSpace, T>
 		extends AbstractUnaryFunctionOp<I, RealRandomAccessible<T>> implements Ops.Transform.InterpolateView {
 
 	@Parameter
 	private InterpolatorFactory<T, I> factory;
 
 	@Override
-	public RealRandomAccessible<T> compute1(I input) {
+	public RealRandomAccessible<T> calculate(I input) {
 		return Views.interpolate(input, factory);
 	}
 

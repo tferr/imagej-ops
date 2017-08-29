@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -59,7 +59,7 @@ public class DefaultQuantile<I extends RealType<I>, O extends RealType<O>>
 	private double quantile;
 	
 	@Override
-	public void compute1(final Iterable<I> input, final O output) {
+	public void compute(final Iterable<I> input, final O output) {
 		final ArrayList<Double> statistics = new ArrayList<>();
 
 		final Iterator<I> it = input.iterator();

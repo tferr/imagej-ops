@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -30,13 +30,14 @@
 
 package net.imagej.ops.morphology;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
-import java.io.IOException;
 
 import net.imagej.ops.AbstractOpTest;
 import net.imglib2.Cursor;
-import net.imglib2.algorithm.labeling.ConnectedComponents.StructuringElement;
+import net.imglib2.RandomAccess;
+import net.imglib2.RandomAccessibleInterval;
+import net.imglib2.algorithm.neighborhood.DiamondShape;
 import net.imglib2.img.Img;
 import net.imglib2.type.logic.BitType;
 import net.imglib2.type.numeric.real.FloatType;
@@ -48,6 +49,7 @@ public class MorphologyOpsTest extends AbstractOpTest {
 
 	private Img<BitType> imgWithoutHoles;
 	private Img<BitType> imgWithHoles;
+	private Img<BitType> invertedImgWithFilledHoles;
 
 	private boolean initialized = false;
 
@@ -60,34 +62,81 @@ public class MorphologyOpsTest extends AbstractOpTest {
 		// create two bittypes images
 		Img<FloatType> inputWithoutHoles = openFloatImg("img_without_holes.png");
 		Img<FloatType> inputWithHoles = openFloatImg("img_with_holes.png");
+		Img<FloatType> invertedInputWithFilledHoles = openFloatImg("inverted_img_with_filled_holes.png");
 
 		Cursor<FloatType> inputWithoutHolesCursor = inputWithoutHoles.cursor();
 		Cursor<FloatType> inputWithHolesCursor = inputWithHoles.cursor();
+		Cursor<FloatType> invertedInputWithFilledHolesCursor = invertedInputWithFilledHoles.cursor();
 
 		imgWithoutHoles = ops.create().img(inputWithoutHoles, new BitType());
 		imgWithHoles = ops.create().img(inputWithHoles, new BitType());
+		invertedImgWithFilledHoles = ops.create().img(invertedInputWithFilledHoles, new BitType());
 
 		Cursor<BitType> imgWithoutHolesCursor = imgWithoutHoles.cursor();
 		Cursor<BitType> imgWithHolesCursor = imgWithHoles.cursor();
+		Cursor<BitType> invertedImgWithFilledHolesCursor = invertedImgWithFilledHoles.cursor();
 
 		while (inputWithoutHolesCursor.hasNext()) {
-			imgWithoutHolesCursor.next().set((inputWithoutHolesCursor.next()
-				.get() > 0) ? false : true);
+			imgWithoutHolesCursor.next().set((inputWithoutHolesCursor.next().get() > 0) ? true : false);
 		}
 
 		while (inputWithHolesCursor.hasNext()) {
-			imgWithHolesCursor.next().set((inputWithHolesCursor.next().get() > 0)
-				? false : true);
+			imgWithHolesCursor.next().set((inputWithHolesCursor.next().get() > 0) ? true : false);
+		}
+
+		while (invertedInputWithFilledHolesCursor.hasNext()) {
+			invertedImgWithFilledHolesCursor.next()
+					.set((invertedInputWithFilledHolesCursor.next().get() > 0) ? true : false);
 		}
 
 		initialized = true;
 	}
 
 	@Test
-	public void testExtractHoles() throws IOException {
-		assertNotNull("Img Without Holes", ops.morphology().extractHoles(
-			imgWithoutHoles, StructuringElement.FOUR_CONNECTED, true));
-		assertNotNull("Img With Holes", ops.morphology().extractHoles(imgWithHoles,
-			StructuringElement.FOUR_CONNECTED, false));
+	public void testExtractHoles() {
+		assertNotNull("Img Without Holes", ops.morphology().extractHoles(imgWithoutHoles, new DiamondShape(1)));
+		assertNotNull("Img With Holes", ops.morphology().extractHoles(imgWithHoles, new DiamondShape(1)));
+	}
+
+	@Test
+	public void testFillHoles() {
+		Img<BitType> result = ops.create().img(imgWithHoles);
+		ops.morphology().fillHoles(result, imgWithHoles, new DiamondShape(1));
+
+		Cursor<BitType> resultC = result.cursor();
+		final BitType one = new BitType(true);
+		while (resultC.hasNext()) {
+			assertEquals(one, resultC.next());
+		}
+	}
+
+	@Test
+	public void testFillHoles1() {
+		Img<BitType> result = ops.create().img(invertedImgWithFilledHoles);
+		Img<BitType> inverted = ops.create().img(invertedImgWithFilledHoles);
+		ops.image().invert(inverted, imgWithHoles);
+		ops.morphology().fillHoles(result, inverted, new DiamondShape(1));
+
+		Cursor<BitType> resultC = result.localizingCursor();
+		RandomAccess<BitType> groundTruthRA = invertedImgWithFilledHoles.randomAccess();
+
+		while (resultC.hasNext()) {
+			boolean r = resultC.next().get();
+			groundTruthRA.setPosition(resultC);
+			assertEquals(groundTruthRA.get().get(), r);
+		}
+	}
+
+	@Test
+	public void testFillHoles2() {
+		RandomAccessibleInterval<BitType> result = ops.morphology().fillHoles(imgWithoutHoles);
+		Cursor<BitType> groundTruthC = imgWithoutHoles.localizingCursor();
+		RandomAccess<BitType> resultRA = result.randomAccess();
+
+		while (groundTruthC.hasNext()) {
+			boolean r = groundTruthC.next().get();
+			resultRA.setPosition(groundTruthC);
+			assertEquals(r, resultRA.get().get());
+		}
 	}
 }

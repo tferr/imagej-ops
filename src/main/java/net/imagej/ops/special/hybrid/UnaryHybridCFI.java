@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,8 +39,8 @@ import net.imagej.ops.special.inplace.UnaryInplaceOp;
  * {@link UnaryFunctionOp} or {@link UnaryInplaceOp}.
  * <p>
  * To populate a preallocated output object, call
- * {@link UnaryComputerOp#compute1}; to compute a new output object, call
- * {@link UnaryFunctionOp#compute1}; to mutate an object inplace, call
+ * {@link UnaryComputerOp#compute}; to compute a new output object, call
+ * {@link UnaryFunctionOp#calculate}; to mutate an object inplace, call
  * {@link UnaryInplaceOp#mutate}. To do any of these things as appropriate, call
  * {@link #run(Object, Object)}.
  * </p>

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -80,7 +80,7 @@ public class DefaultLBP2D<I extends RealType<I>> extends AbstractLBP2DFeature<I>
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void compute1(RandomAccessibleInterval<I> input,
+	public void compute(RandomAccessibleInterval<I> input,
 		ArrayList<LongType> output)
 	{
 		ArrayList<LongType> numberList = new ArrayList<>();
@@ -106,7 +106,7 @@ public class DefaultLBP2D<I extends RealType<I>> extends AbstractLBP2DFeature<I>
 			numberList.add(new LongType(resultBinaryValue));
 		}
 
-		Histogram1d<Integer> hist = histOp.compute1(numberList);
+		Histogram1d<Integer> hist = histOp.calculate(numberList);
 		Iterator<LongType> c = hist.iterator();
 		while (c.hasNext()) {
 			output.add(new LongType(c.next().get()));

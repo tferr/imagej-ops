@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -61,7 +61,6 @@ public class RichardsonLucyUpdate<T extends RealType<T>> extends
 		null;
 
 	@Override
-	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void initialize() {
 
 		// TODO: comment in when problem with initialize is fixed
@@ -75,7 +74,7 @@ public class RichardsonLucyUpdate<T extends RealType<T>> extends
 	 * performs update step of the Richardson Lucy Algorithm
 	 */
 	@Override
-	public void compute1(RandomAccessibleInterval<T> correction,
+	public void compute(RandomAccessibleInterval<T> correction,
 		RandomAccessibleInterval<T> estimate)
 	{
 
@@ -86,7 +85,7 @@ public class RichardsonLucyUpdate<T extends RealType<T>> extends
 				correction, estimate);
 		}
 
-		mul.compute2(estimate, correction, estimate);
+		mul.compute(estimate, correction, estimate);
 	}
 
 }

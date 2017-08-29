@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,6 +31,7 @@
 package net.imagej.ops;
 
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 
 import org.junit.Test;
 import org.scijava.InstantiableException;
@@ -59,4 +60,13 @@ public class OpConformanceTest extends AbstractOpTest {
 		}
 	}
 
+	/** Tests that all ops are valid modules. */
+	@Test
+	public void testValidModules() {
+		for (final OpInfo info : ops.infos()) {
+			if (info.cInfo().isValid()) continue;
+			fail("Invalid op\n\n" + info + //
+				"\n\nproblems: " + info.cInfo().getProblems());
+		}
+	}
 }

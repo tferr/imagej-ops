@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@ import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
 import net.imglib2.RandomAccessibleInterval;
 import net.imglib2.type.BooleanType;
 import net.imglib2.type.numeric.real.DoubleType;
+
 import org.scijava.plugin.Plugin;
 
 /**
@@ -220,7 +221,7 @@ public class EulerCharacteristic26NFloating
     }
 
     @Override
-    public void compute1(RandomAccessibleInterval<B> interval, DoubleType output) {
+    public void compute(RandomAccessibleInterval<B> interval, DoubleType output) {
         final Octant<B> octant = new Octant<>(interval);
         int sumDeltaEuler = 0;
 

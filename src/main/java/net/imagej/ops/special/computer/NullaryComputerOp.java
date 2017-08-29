@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -52,14 +52,14 @@ public interface NullaryComputerOp<O> extends NullaryOp<O>, OutputMutable<O> {
 	 * @param output Object where the computation's result will be stored, which
 	 * <em>must be non-null</em>
 	 */
-	void compute0(O output);
+	void compute(O output);
 
 	// -- NullaryOp methods --
 
 	@Override
 	default O run(final O output) {
 		if (output == null) throw new NullPointerException("output is null");
-		compute0(output);
+		compute(output);
 		return output;
 	}
 

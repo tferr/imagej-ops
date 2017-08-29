@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -41,10 +41,12 @@ import net.imglib2.type.numeric.real.DoubleType;
 import org.scijava.plugin.Plugin;
 
 /**
- * Implementation of Sum Variance Haralick Feature
+ * Implementation of Sum Variance Haralick Feature according to
+ * http://murphylab.web.cmu.edu/publications/boland/boland_node26.html .
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Haralick.SumVariance.class, label = "Haralick: Sum Variance")
 public class DefaultSumVariance<T extends RealType<T>> extends
@@ -53,30 +55,30 @@ public class DefaultSumVariance<T extends RealType<T>> extends
 
 	private UnaryFunctionOp<double[][], double[]> coocPXPlusYFunc;
 	@SuppressWarnings("rawtypes")
-	private UnaryFunctionOp<IterableInterval<T>, RealType> sumAverageFunc;
+	private UnaryFunctionOp<IterableInterval<T>, RealType> sumEntropyFunc;
 
 	@Override
 	public void initialize() {
 		super.initialize();
 		coocPXPlusYFunc = Functions.unary(ops(), CoocPXPlusY.class, double[].class,
 			double[][].class);
-		sumAverageFunc = Functions.unary(ops(), Ops.Haralick.SumAverage.class, RealType.class, in(),
+		sumEntropyFunc = Functions.unary(ops(), Ops.Haralick.SumEntropy.class, RealType.class, in(),
 			numGreyLevels, distance, orientation);
 	}
 
 	@Override
-	public void compute1(final IterableInterval<T> input,
+	public void compute(final IterableInterval<T> input,
 		final DoubleType output)
 	{
 		final double[][] matrix = getCooccurrenceMatrix(input);
 
-		final double[] pxplusy = coocPXPlusYFunc.compute1(matrix);
+		final double[] pxplusy = coocPXPlusYFunc.calculate(matrix);
 		final int nrGrayLevels = matrix.length;
-		final double average = sumAverageFunc.compute1(input).getRealDouble();
+		final double sumEntropy = sumEntropyFunc.calculate(input).getRealDouble();
 
 		double res = 0;
 		for (int i = 2; i <= 2 * nrGrayLevels; i++) {
-			res += (i - average) * (i - average) * pxplusy[i];
+			res += (i - sumEntropy) * (i - sumEntropy) * pxplusy[i];
 		}
 
 		output.set(res);

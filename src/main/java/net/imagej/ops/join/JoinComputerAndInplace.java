@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -45,8 +45,8 @@ public interface JoinComputerAndInplace<A, BI, BO extends BI> extends
 	// -- UnaryComputerOp methods --
 
 	@Override
-	default void compute1(final A input, final BO output) {
-		getFirst().compute1(input, output);
+	default void compute(final A input, final BO output) {
+		getFirst().compute(input, output);
 		getSecond().mutate(output);
 	}
 

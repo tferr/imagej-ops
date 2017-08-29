@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -70,7 +70,7 @@ public class AddPoissonNoiseRealType<I extends RealType<I>, O extends RealType<O
 	}
 	
 	@Override
-	public void compute1(final I input, final O output) {
+	public void compute(final I input, final O output) {
 		if (rng == null) rng = new Random(seed);
 		double l = Math.exp(-(input.getRealDouble()));
 		int k = 0;

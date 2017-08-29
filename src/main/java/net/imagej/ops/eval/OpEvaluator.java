@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,19 +35,20 @@ import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import net.imagej.ops.Op;
 import net.imagej.ops.OpEnvironment;
 import net.imagej.ops.Ops;
 
-import org.scijava.sjep.Operator;
-import org.scijava.sjep.Operators;
-import org.scijava.sjep.Variable;
-import org.scijava.sjep.eval.AbstractStandardStackEvaluator;
-import org.scijava.sjep.eval.Evaluator;
+import org.scijava.parse.Operator;
+import org.scijava.parse.Operators;
+import org.scijava.parse.Variable;
+import org.scijava.parse.eval.AbstractStandardStackEvaluator;
+import org.scijava.parse.eval.Evaluator;
 
 /**
- * An SJEP {@link Evaluator} using available {@link Op}s.
+ * A Parsington {@link Evaluator} using available {@link Op}s.
  * 
  * @author Curtis Rueden
  */
@@ -55,14 +56,14 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 
 	private final OpEnvironment ops;
 
-	/** Map of SJEP {@link Operator}s to Ops operation names. */
+	/** Map of Parsington {@link Operator}s to Ops operation names. */
 	private final HashMap<Operator, String> opMap;
 
 	public OpEvaluator(final OpEnvironment ops) {
 		this.ops = ops;
 		opMap = new HashMap<>();
 
-		// Map each standard SJEP operator to its associated op name.
+		// Map each standard Parsington operator to its associated op name.
 		// TODO: Consider creating a plugin extension point for defining these.
 
 		// -- dot --
@@ -150,6 +151,16 @@ public class OpEvaluator extends AbstractStandardStackEvaluator {
 	/** Gets the op name associated with the given {@link Operator}. */
 	public String getOpName(final Operator op) {
 		return opMap.containsKey(op) ? opMap.get(op) : op.getToken();
+	}
+
+	/**
+	 * Gets the map of {@link Operator} to op names backing this evaluator.
+	 * <p>
+	 * Changes to this map will affect evaluation accordingly.
+	 * </p>
+	 */
+	public Map<Operator, String> getOpMap() {
+		return opMap;
 	}
 
 	// -- StandardEvaluator methods --

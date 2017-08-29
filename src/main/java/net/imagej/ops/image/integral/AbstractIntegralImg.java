@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -61,22 +61,19 @@ public abstract class AbstractIntegralImg<I extends RealType<I>> extends
 	implements Contingent
 {
 
-	private AbstractUnaryHybridCI<IterableInterval<RealType<?>>, IterableInterval<RealType<?>>> integralAdd;
 	private UnaryComputerOp[] slicewiseOps;
 	private UnaryFunctionOp<Dimensions, RandomAccessibleInterval> createLongRAI;
 	private UnaryFunctionOp<Dimensions, RandomAccessibleInterval> createDoubleRAI;
 
 	@Override
 	public void initialize() {
-		integralAdd = getComputer();
-
 		if (in() != null) {
 			slicewiseOps = new UnaryComputerOp[in().numDimensions()];
 
 			for (int i = 0; i < in().numDimensions(); ++i) {
 				slicewiseOps[i] = Computers.unary(ops(), Slice.class,
 					RandomAccessibleInterval.class, RandomAccessibleInterval.class,
-					integralAdd, i);
+					getComputer(i), i);
 			}
 		}
 
@@ -88,16 +85,17 @@ public abstract class AbstractIntegralImg<I extends RealType<I>> extends
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void compute1(final RandomAccessibleInterval<I> input,
+	public void compute(final RandomAccessibleInterval<I> input,
 		final RandomAccessibleInterval<RealType<?>> output)
 	{
+		// TODO Should become obsolete (duplication of initialize())
 		if (slicewiseOps == null) {
 			slicewiseOps = new UnaryComputerOp[in().numDimensions()];
 
 			for (int i = 0; i < in().numDimensions(); ++i) {
 				slicewiseOps[i] = Computers.unary(ops(), Slice.class,
 					RandomAccessibleInterval.class, RandomAccessibleInterval.class,
-					integralAdd, i);
+					getComputer(i), i);
 			}
 		}
 
@@ -107,7 +105,7 @@ public abstract class AbstractIntegralImg<I extends RealType<I>> extends
 		// Create integral image
 		for (int i = 0; i < input.numDimensions(); ++i) {
 			// Slicewise integral addition in one direction
-			slicewiseOps[i].compute1(generalizedInput, output);
+			slicewiseOps[i].compute(generalizedInput, output);
 			generalizedInput = output;
 		}
 	}
@@ -119,10 +117,10 @@ public abstract class AbstractIntegralImg<I extends RealType<I>> extends
 	{
 		// Create integral image
 		if (Util.getTypeFromInterval(input) instanceof IntegerType) {
-			return createLongRAI.compute1(input);
+			return createLongRAI.calculate(input);
 		}
 
-		return createDoubleRAI.compute1(input);
+		return createDoubleRAI.calculate(input);
 	}
 
 	@Override
@@ -136,7 +134,7 @@ public abstract class AbstractIntegralImg<I extends RealType<I>> extends
 	 * images.
 	 */
 	public abstract
-		AbstractUnaryHybridCI<IterableInterval<RealType<?>>, IterableInterval<RealType<?>>>
-		getComputer();
+		AbstractUnaryHybridCI<IterableInterval<I>, IterableInterval<I>> getComputer(
+			int dimension);
 
 }

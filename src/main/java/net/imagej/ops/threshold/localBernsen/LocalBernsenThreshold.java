@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -59,13 +59,13 @@ public class LocalBernsenThreshold<T extends RealType<T>> extends
 {
 
 	@Parameter
-	private double constrastThreshold;
+	private double contrastThreshold;
 
 	@Parameter
 	private double halfMaxValue;
 
 	@Override
-	protected CenterAwareComputerOp<T, BitType> unaryComputer(
+	protected CenterAwareComputerOp<T, BitType> unaryComputer(final T inClass,
 		final BitType outClass)
 	{
 		final LocalThresholdMethod<T> op = new LocalThresholdMethod<T>() {
@@ -74,20 +74,20 @@ public class LocalBernsenThreshold<T extends RealType<T>> extends
 
 			@SuppressWarnings({ "unchecked", "rawtypes" })
 			@Override
-			public void compute2(final Iterable<T> neighborhood, final T center,
+			public void compute(final Iterable<T> neighborhood, final T center,
 				final BitType output)
 			{
 
 				if (minMaxFunc == null) {
 					minMaxFunc = (UnaryFunctionOp) Functions.unary(ops(), Ops.Stats.MinMax.class, Pair.class, neighborhood);
 				}
-				
-				final Pair<T, T> outputs = minMaxFunc.compute1(neighborhood);
+
+				final Pair<T, T> outputs = minMaxFunc.calculate(neighborhood);
 				final double minValue = outputs.getA().getRealDouble();
 				final double maxValue = outputs.getB().getRealDouble();
 				final double midGrey = (maxValue + minValue) / 2.0;
 
-				if ((maxValue - minValue) < constrastThreshold) {
+				if ((maxValue - minValue) < contrastThreshold) {
 					output.set(midGrey >= halfMaxValue);
 				}
 				else {

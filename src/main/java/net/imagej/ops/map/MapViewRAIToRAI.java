@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -53,7 +53,7 @@ public class MapViewRAIToRAI<EI, EO extends Type<EO>>
 {
 
 	@Override
-	public RandomAccessibleInterval<EO> compute1(
+	public RandomAccessibleInterval<EO> calculate(
 		final RandomAccessibleInterval<EI> input)
 	{
 		final ComputerConverter<EI, EO> converter =

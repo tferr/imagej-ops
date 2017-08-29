@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -100,6 +100,16 @@ public class OpCandidate {
 	 */
 	public CommandInfo cInfo() {
 		return info.cInfo();
+	}
+
+	/** Gets the op's input parameters. */
+	public List<ModuleItem<?>> inputs() {
+		return opInfo().inputs();
+	}
+
+	/** Gets the op's output parameters. */
+	public List<ModuleItem<?>> outputs() {
+		return opInfo().outputs();
 	}
 
 	/** Sets the module instance associated with the attempted match. */

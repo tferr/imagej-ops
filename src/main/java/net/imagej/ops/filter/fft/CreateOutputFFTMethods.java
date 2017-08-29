@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -68,12 +68,12 @@ public class CreateOutputFFTMethods<T> extends
 	}
 
 	@Override
-	public Img<T> compute2(Dimensions paddedDimensions, T outType) {
+	public Img<T> calculate(Dimensions paddedDimensions, T outType) {
 
 		Dimensions paddedFFTMethodsFFTDimensions = FFTMethodsUtility
 			.getFFTDimensionsRealToComplex(fast, paddedDimensions);
 
-		return create.compute2(paddedFFTMethodsFFTDimensions, outType);
+		return create.calculate(paddedFFTMethodsFFTDimensions, outType);
 	}
 
 }

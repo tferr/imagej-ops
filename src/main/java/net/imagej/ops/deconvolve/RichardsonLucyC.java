@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,6 @@ import net.imglib2.view.IntervalView;
 import net.imglib2.view.Views;
 
 import org.scijava.Priority;
-import org.scijava.app.StatusService;
 import org.scijava.plugin.Parameter;
 import org.scijava.plugin.Plugin;
 
@@ -78,9 +77,6 @@ public class RichardsonLucyC<I extends RealType<I>, O extends RealType<O>, K ext
 	extends AbstractIterativeFFTFilterC<I, O, K, C> implements
 	Ops.Deconvolve.RichardsonLucy
 {
-
-	@Parameter(required = false)
-	private StatusService status;
 
 	/**
 	 * Op that computes Richardson Lucy update, can be overridden to implement
@@ -157,23 +153,23 @@ public class RichardsonLucyC<I extends RealType<I>, O extends RealType<O>, K ext
 	}
 
 	@Override
-	public void compute2(RandomAccessibleInterval<I> in,
+	public void compute(RandomAccessibleInterval<I> in,
 		RandomAccessibleInterval<K> kernel, RandomAccessibleInterval<O> out)
 	{
 		// if a starting point for the estimate was not passed in then create
 		// estimate Img and use the input as the starting point
 		if (raiExtendedEstimate == null) {
 
-			raiExtendedEstimate = create.compute1(getImgConvolutionInterval());
+			raiExtendedEstimate = create.calculate(getImgConvolutionInterval());
 
-			copy.compute1(in, raiExtendedEstimate);
+			copy.compute(in, raiExtendedEstimate);
 		}
 
 		// create image for the reblurred
-		raiExtendedReblurred = create.compute1(getImgConvolutionInterval());
+		raiExtendedReblurred = create.calculate(getImgConvolutionInterval());
 
 		// perform fft of psf
-		fftKernel.compute1(kernel, getFFTKernel());
+		fftKernel.compute(kernel, getFFTKernel());
 
 		// -- perform iterations --
 
@@ -186,14 +182,14 @@ public class RichardsonLucyC<I extends RealType<I>, O extends RealType<O>, K ext
 			// create reblurred by convolving kernel with estimate
 			// NOTE: the FFT of the PSF of the kernel has been passed in as a
 			// parameter. when the op was set up, and computed above, so we can use
-			// compute1
-			convolver.compute1(raiExtendedEstimate, this.raiExtendedReblurred);
+			// compute
+			convolver.compute(raiExtendedEstimate, this.raiExtendedReblurred);
 
 			// compute correction factor
-			rlCorrection.compute2(in, raiExtendedReblurred, raiExtendedReblurred);
+			rlCorrection.compute(in, raiExtendedReblurred, raiExtendedReblurred);
 
 			// perform update to calculate new estimate
-			update.compute1(raiExtendedReblurred, raiExtendedEstimate);
+			update.compute(raiExtendedReblurred, raiExtendedEstimate);
 
 			// apply post processing
 			if (iterativePostProcessing != null) {
@@ -218,7 +214,7 @@ public class RichardsonLucyC<I extends RealType<I>, O extends RealType<O>, K ext
 			end[d] = start[d] + out.dimension(d) - 1;
 		}
 
-		copy2.compute1(Views.interval(raiExtendedEstimate, new FinalInterval(start,
+		copy2.compute(Views.interval(raiExtendedEstimate, new FinalInterval(start,
 			end)), out);
 	}
 

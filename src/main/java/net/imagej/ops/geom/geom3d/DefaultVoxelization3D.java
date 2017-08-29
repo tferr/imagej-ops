@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -29,6 +29,8 @@
  */
 package net.imagej.ops.geom.geom3d;
 
+import java.util.Set;
+
 import net.imagej.ops.OpService;
 import net.imagej.ops.Ops;
 import net.imagej.ops.geom.geom3d.mesh.DefaultMesh;
@@ -43,7 +45,6 @@ import net.imglib2.RealLocalizable;
 import net.imglib2.RealPoint;
 import net.imglib2.img.Img;
 import net.imglib2.type.logic.BitType;
-import java.util.Set;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.scijava.ItemIO;
@@ -79,7 +80,7 @@ public class DefaultVoxelization3D extends AbstractUnaryFunctionOp<Mesh, RandomA
 	private OpService ops;
 
 	@Override
-	public RandomAccessibleInterval<BitType> compute1(Mesh input) {
+	public RandomAccessibleInterval<BitType> calculate(Mesh input) {
 
 		Img<BitType> outImg = ops.create().img(new FinalInterval(width, height, depth), new BitType());
 

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,9 @@ package net.imagej.ops.cached;
 
 import java.lang.reflect.Type;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Objects;
 
 import net.imagej.ops.AbstractOp;
 import net.imagej.ops.CustomOpEnvironment;
@@ -170,7 +172,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 		}
 
 		@Override
-		public O compute1(final I input) {
+		public O calculate(final I input) {
 
 			final Hash hash = new Hash(input, delegate, args);
 
@@ -178,7 +180,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 			O output = (O) cache.get(hash);
 
 			if (output == null) {
-				output = delegate.compute1(input);
+				output = delegate.calculate(input);
 				cache.put(hash, output);
 			}
 			return output;
@@ -245,7 +247,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 		}
 
 		@Override
-		public O compute1(final I input) {
+		public O calculate(final I input) {
 			final Hash hash = new Hash(input, delegate, args);
 
 			@SuppressWarnings("unchecked")
@@ -253,7 +255,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 
 			if (output == null) {
 				output = createOutput(input);
-				compute1(input, output);
+				compute(input, output);
 				cache.put(hash, output);
 			}
 			return output;
@@ -265,8 +267,8 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 		}
 
 		@Override
-		public void compute1(final I input, final O output) {
-			delegate.compute1(input, output);
+		public void compute(final I input, final O output) {
+			delegate.compute(input, output);
 		}
 
 		@Override
@@ -289,13 +291,7 @@ public class CachedOpEnvironment extends CustomOpEnvironment {
 		private final int hash;
 
 		public Hash(final Object o1, final Object o2, final Object[] args) {
-			long h = o1.hashCode() ^ o2.getClass().getSimpleName().hashCode();
-
-			for (final Object o : args) {
-				h ^= o.hashCode();
-			}
-
-			hash = (int) h;
+			hash = Objects.hash(o1, o2.getClass(), Arrays.hashCode(args));
 		}
 
 		@Override

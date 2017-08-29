@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -161,14 +161,14 @@ public class CopyRAITest extends AbstractOpTest {
 			size2), new UnsignedByteType());
 
 		// copy view to output and assert that is equal to the mean of the view
-		copy.compute1(view, out);
+		copy.compute(view, out);
 		assertEquals(ops.stats().mean(out).getRealDouble(), 100.0, delta);
 
 		// also try with a planar image
 		final Img<UnsignedByteType> outFromPlanar = ops.create().img(
 			new FinalDimensions(size2), new UnsignedByteType());
 
-		copy.compute1(viewPlanar, outFromPlanar);
+		copy.compute(viewPlanar, outFromPlanar);
 		assertEquals(ops.stats().mean(outFromPlanar).getRealDouble(), 100.0, delta);
 
 	}

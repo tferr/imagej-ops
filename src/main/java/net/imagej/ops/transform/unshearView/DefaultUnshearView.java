@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -55,7 +55,7 @@ public class DefaultUnshearView<T> extends AbstractUnaryFunctionOp<RandomAccessi
 	private int referenceDimension;
 
 	@Override
-	public TransformView<T> compute1(RandomAccessible<T> input) {
+	public TransformView<T> calculate(RandomAccessible<T> input) {
 		return Views.unshear(input, shearDimension, referenceDimension);
 	}
 

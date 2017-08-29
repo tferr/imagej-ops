@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -124,7 +124,7 @@ public class FFTMethodsOpF<T extends RealType<T>, C extends ComplexType<C>>
 	}
 
 	@Override
-	public RandomAccessibleInterval<C> compute1(
+	public RandomAccessibleInterval<C> calculate(
 		final RandomAccessibleInterval<T> input)
 	{
 		// calculate the padded size
@@ -141,14 +141,14 @@ public class FFTMethodsOpF<T extends RealType<T>, C extends ComplexType<C>>
 		Dimensions paddedDimensions = new FinalDimensions(paddedSize);
 
 		// create the complex output
-		RandomAccessibleInterval<C> output = createOp.compute1(paddedDimensions);
+		RandomAccessibleInterval<C> output = createOp.calculate(paddedDimensions);
 
 		// pad the input
-		RandomAccessibleInterval<T> paddedInput = padOp.compute2(input,
+		RandomAccessibleInterval<T> paddedInput = padOp.calculate(input,
 			paddedDimensions);
 
 		// compute and return fft
-		fftMethodsOp.compute1(paddedInput, output);
+		fftMethodsOp.compute(paddedInput, output);
 
 		return output;
 

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -54,7 +54,7 @@ public class DefaultConvexHull2D extends AbstractUnaryFunctionOp<Polygon, Polygo
 {
 
 	@Override
-	public Polygon compute1(final Polygon input) {
+	public Polygon calculate(final Polygon input) {
 		// create a copy of points because se will get resorted, etc.
 		List<? extends RealLocalizable> RealPoints = new ArrayList<RealLocalizable>(input.getVertices());
 

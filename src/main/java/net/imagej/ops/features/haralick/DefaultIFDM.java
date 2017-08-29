@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -37,17 +37,19 @@ import net.imglib2.type.numeric.real.DoubleType;
 import org.scijava.plugin.Plugin;
 
 /**
- * Implementation of Inverse Difference Moment Haralick Feature
+ * Implementation of Inverse Difference Moment Haralick Feature based on
+ * http://www.uio.no/studier/emner/matnat/ifi/INF4300/h08/undervisningsmateriale/glcm.pdf .
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Haralick.IFDM.class, label = "Haralick: Inverse Difference Moment")
 public class DefaultIFDM<T extends RealType<T>> extends AbstractHaralickFeature<T>
 		implements Ops.Haralick.IFDM {
 
 	@Override
-	public void compute1(final IterableInterval<T> input, final DoubleType output) {
+	public void compute(final IterableInterval<T> input, final DoubleType output) {
 		final double[][] matrix = getCooccurrenceMatrix(input);
 
 		double res = 0;
@@ -56,9 +58,7 @@ public class DefaultIFDM<T extends RealType<T>> extends AbstractHaralickFeature<
 
 		for (int i = 0; i < nrGrayLevels; i++) {
 			for (int j = 0; j < nrGrayLevels; j++) {
-				if (i != j) {
-					res += matrix[i][j] / (Math.abs(i - j));
-				}
+					res += matrix[i][j] / (1 + ((i - j) * (i - j)));
 			}
 		}
 

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -121,13 +121,13 @@ public class DefaultDilate<T extends RealType<T>> extends
 		if (isFull) {
 			final long[] dims = MorphologyUtils.computeTargetImageDimensionsAndOffset(
 				in1, in2)[0];
-			return imgCreator.compute1(new FinalInterval(dims));
+			return imgCreator.calculate(new FinalInterval(dims));
 		}
-		return imgCreator.compute1(in1);
+		return imgCreator.calculate(in1);
 	}
 
 	@Override
-	public void compute2(final RandomAccessibleInterval<T> in1, final Shape in2,
+	public void compute(final RandomAccessibleInterval<T> in1, final Shape in2,
 		final IterableInterval<T> output)
 	{
 		final RandomAccessibleInterval<T> extended = RAIs.extend(in1, f);
@@ -140,7 +140,7 @@ public class DefaultDilate<T extends RealType<T>> extends
 		else {
 			shifted = extended;
 		}
-		mapper.compute2(Views.interval(shifted, output), in2, output);
+		mapper.compute(Views.interval(shifted, output), in2, output);
 	}
 
 	/**
@@ -151,7 +151,7 @@ public class DefaultDilate<T extends RealType<T>> extends
 	{
 
 		@Override
-		public void compute1(final Iterable<BitType> input, final BitType output) {
+		public void compute(final Iterable<BitType> input, final BitType output) {
 			for (final BitType e : input)
 				if (e.get()) {
 					output.set(true);

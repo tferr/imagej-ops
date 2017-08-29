@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -120,7 +120,7 @@ public class LoopTest extends AbstractOpTest {
 	class AddOneFunctional extends AbstractUnaryComputerOp<ByteType, ByteType> {
 
 		@Override
-		public void compute1(final ByteType input, final ByteType output) {
+		public void compute(final ByteType input, final ByteType output) {
 			output.set(input);
 			output.inc();
 		}

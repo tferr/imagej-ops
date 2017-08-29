@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -65,14 +65,14 @@ public class DefaultICM2<T extends RealType<T>> extends
 	}
 
 	@Override
-	public void compute1(final IterableInterval<T> input,
+	public void compute(final IterableInterval<T> input,
 		final DoubleType output)
 	{
 		final double[][] matrix = getCooccurrenceMatrix(input);
 
 		double res = 0;
-		final double[] coochxy = coocHXYFunc.compute1(matrix);
-		res = Math.sqrt(1 - Math.exp(-2 * (coochxy[3] - entropy.compute1(input)
+		final double[] coochxy = coocHXYFunc.calculate(matrix);
+		res = Math.sqrt(1 - Math.exp(-2 * (coochxy[3] - entropy.calculate(input)
 			.get())));
 
 		// if NaN

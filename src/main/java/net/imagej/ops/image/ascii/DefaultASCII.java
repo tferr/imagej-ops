@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ public class DefaultASCII<T extends RealType<T>> extends
 	Ops.Image.ASCII
 {
 
-	private static final String CHARS = " .,-+o*O#";
+	private static final String CHARS = "#O*o+-,. ";
 
 	@Parameter(required = false)
 	private T min;
@@ -74,9 +74,9 @@ public class DefaultASCII<T extends RealType<T>> extends
 	}
 
 	@Override
-	public String compute1(final IterableInterval<T> input) {
+	public String calculate(final IterableInterval<T> input) {
 		if (min == null || max == null) {
-			final Pair<T, T> minMax = minMaxFunc.compute1(input);
+			final Pair<T, T> minMax = minMaxFunc.calculate(input);
 			if (min == null) min = minMax.getA();
 			if (max == null) max = minMax.getB();
 		}
@@ -116,10 +116,10 @@ public class DefaultASCII<T extends RealType<T>> extends
 			// normalized = (value - min) / (max - min)
 			tmp.set(cursor.get());
 			tmp.sub(min);
-			tmp.div(span);
+			final double normalized = tmp.getRealDouble() / span.getRealDouble();
 
 			final int charLen = CHARS.length();
-			final int charIndex = (int) (charLen * tmp.getRealDouble());
+			final int charIndex = (int) (charLen * normalized);
 			c[index] = CHARS.charAt(charIndex < charLen ? charIndex : charLen - 1);
 		}
 

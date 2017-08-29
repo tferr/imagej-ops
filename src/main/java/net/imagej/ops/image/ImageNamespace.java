@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -119,6 +119,30 @@ public class ImageNamespace extends AbstractNamespace {
 		@SuppressWarnings("unchecked")
 		final RandomAccessibleInterval<T> result = (RandomAccessibleInterval<T>) ops()
 				.run(Ops.Image.DistanceTransform.class, in);
+		return result;
+	}
+
+	/** Executes the "distancetransform" operation on the given arguments. */
+	@OpMethod(ops = { net.imagej.ops.image.distancetransform.DefaultDistanceTransformCalibration.class,
+			net.imagej.ops.image.distancetransform.DistanceTransform2DCalibration.class,
+			net.imagej.ops.image.distancetransform.DistanceTransform3DCalibration.class })
+	public <B extends BooleanType<B>, T extends RealType<T>> RandomAccessibleInterval<T> distancetransform(
+			final RandomAccessibleInterval<T> out, final RandomAccessibleInterval<B> in, final double... calibration) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<T> result = (RandomAccessibleInterval<T>) ops()
+				.run(Ops.Image.DistanceTransform.class, out, in, calibration);
+		return result;
+	}
+
+	/** Executes the "distancetransform" operation on the given arguments. */
+	@OpMethod(ops = { net.imagej.ops.image.distancetransform.DefaultDistanceTransformCalibration.class,
+			net.imagej.ops.image.distancetransform.DistanceTransform2DCalibration.class,
+			net.imagej.ops.image.distancetransform.DistanceTransform3DCalibration.class })
+	public <B extends BooleanType<B>, T extends RealType<T>> RandomAccessibleInterval<T> distancetransform(
+			final RandomAccessibleInterval<B> in, final double... calibration) {
+		@SuppressWarnings("unchecked")
+		final RandomAccessibleInterval<T> result = (RandomAccessibleInterval<T>) ops()
+				.run(Ops.Image.DistanceTransform.class, in, calibration);
 		return result;
 	}
 
@@ -397,6 +421,8 @@ public class ImageNamespace extends AbstractNamespace {
 				in, sourceMin, sourceMax, targetMin, targetMax, isLazy);
 		return result;
 	}
+
+	// -- Named methods --
 
 	@Override
 	public String getName() {

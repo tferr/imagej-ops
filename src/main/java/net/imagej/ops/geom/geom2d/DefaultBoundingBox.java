@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ public class DefaultBoundingBox extends AbstractUnaryFunctionOp<Polygon, Polygon
 {
 
 	@Override
-	public Polygon compute1(final Polygon input) {
+	public Polygon calculate(final Polygon input) {
 		double min_x = Double.POSITIVE_INFINITY;
 		double max_x = Double.NEGATIVE_INFINITY;
 		double min_y = Double.POSITIVE_INFINITY;

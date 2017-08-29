@@ -3,18 +3,30 @@
 	<modelVersion>4.0.0</modelVersion>
 
 	<parent>
-		<groupId>net.imagej</groupId>
-		<artifactId>pom-imagej</artifactId>
-		<version>16.0.0</version>
+		<groupId>org.scijava</groupId>
+		<artifactId>pom-scijava</artifactId>
+		<version>16.2.0</version>
 		<relativePath />
 	</parent>
 
+	<groupId>net.imagej</groupId>
 	<artifactId>imagej-ops</artifactId>
-	<version>0.32.0-SNAPSHOT</version>
+	<version>0.38.1-SNAPSHOT</version>
 
 	<name>ImageJ Ops</name>
 	<description>ImageJ Operations: a framework for reusable algorithms.</description>
+	<url>http://imagej.net/ImageJ_Ops</url>
 	<inceptionYear>2014</inceptionYear>
+	<organization>
+		<name>ImageJ</name>
+		<url>http://imagej.net/</url>
+	</organization>
+	<licenses>
+		<license>
+			<name>Simplified BSD License</name>
+			<distribution>repo</distribution>
+		</license>
+	</licenses>
 
 	<developers>
 		<developer>
@@ -70,14 +82,6 @@
 			<roles>
 				<role>developer</role>
 				<role>support</role>
-			</roles>
-		</developer>
-		<developer>
-			<id>LeonYang5114</id>
-			<name>Leon Yang</name>
-			<url>http://imagej.net/User:Leon</url>
-			<roles>
-				<role>developer</role>
 			</roles>
 		</developer>
 	</developers>
@@ -149,10 +153,22 @@
 			<properties><id>awalter17</id></properties>
 		</contributor>
 		<contributor>
+			<name>Leon Yang</name>
+			<url>http://imagej.net/User:Leon</url>
+			<properties><id>lnyng</id></properties>
+		</contributor>
+		<contributor>
 			<name>Michael Zinsmaier</name>
 			<properties><id>MichaelZinsmaier</id></properties>
 		</contributor>
 	</contributors>
+
+	<mailingLists>
+		<mailingList>
+			<name>ImageJ Forum</name>
+			<archive>http://forum.imagej.net/</archive>
+		</mailingList>
+	</mailingLists>
 
 	<scm>
 		<connection>scm:git:git://github.com/imagej/imagej-ops</connection>
@@ -165,19 +181,25 @@
 		<url>https://github.com/imagej/imagej-ops/issues</url>
 	</issueManagement>
 	<ciManagement>
-		<system>Jenkins</system>
-		<url>http://jenkins.imagej.net/job/ImageJ-Ops/</url>
+		<system>Travis CI</system>
+		<url>https://travis-ci.org/imagej/imagej-ops</url>
 	</ciManagement>
 
 	<properties>
+		<package-name>net.imagej.ops</package-name>
 		<main-class>net.imagej.ops.Main</main-class>
-		<scijava.jvm.version>1.8</scijava.jvm.version>
+		<license.licenseName>bsd_2</license.licenseName>
+		<license.copyrightOwners>Board of Regents of the University of
+Wisconsin-Madison, University of Konstanz and Brian Northan.</license.copyrightOwners>
+		<license.projectName>ImageJ software for multidimensional image processing and analysis.</license.projectName>
+		<imglib2.version>4.2.1</imglib2.version>
+		<scifio.version>0.32.0</scifio.version>
 	</properties>
 
 	<repositories>
 		<repository>
 			<id>imagej.public</id>
-			<url>http://maven.imagej.net/content/groups/public</url>
+			<url>https://maven.imagej.net/content/groups/public</url>
 		</repository>
 	</repositories>
 
@@ -205,17 +227,22 @@
 			<groupId>net.imglib2</groupId>
 			<artifactId>imglib2-realtransform</artifactId>
 		</dependency>
+		<dependency>
+			<groupId>net.imglib2</groupId>
+			<artifactId>imglib2-roi</artifactId>
+		</dependency>
 
 		<!-- SciJava dependencies -->
+		<dependency>
+			<groupId>org.scijava</groupId>
+			<artifactId>parsington</artifactId>
+		</dependency>
 		<dependency>
 			<groupId>org.scijava</groupId>
 			<artifactId>scijava-common</artifactId>
 		</dependency>
 		<dependency>
-			<groupId>org.scijava</groupId>
-			<artifactId>scijava-expression-parser</artifactId>
-		</dependency>
-		<dependency>
+			<!-- Do not remove - Maven incorrectly identifies it as an unused dependency!  -->
 			<groupId>org.scijava</groupId>
 			<artifactId>scripting-javascript</artifactId>
 		</dependency>
@@ -243,150 +270,15 @@
 			<scope>test</scope>
 		</dependency>
 		<dependency>
+			<!-- Do not remove - Maven incorrectly identifies it as an unused dependency!  -->
 			<groupId>org.scijava</groupId>
 			<artifactId>scripting-jython</artifactId>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>net.imagej</groupId>
+			<artifactId>ij</artifactId>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
-
-	<build>
-		<pluginManagement>
-			<plugins>
-				<plugin>
-					<!--
-					NB: Make Eclipse generate code in a full build; see:
-					http://wiki.eclipse.org/M2E_plugin_execution_not_covered
-					-->
-					<groupId>org.eclipse.m2e</groupId>
-					<artifactId>lifecycle-mapping</artifactId>
-					<version>1.0.0</version>
-					<configuration>
-						<lifecycleMappingMetadata>
-							<pluginExecutions>
-								<pluginExecution>
-									<pluginExecutionFilter>
-										<groupId>org.codehaus.mojo</groupId>
-										<artifactId>groovy-maven-plugin</artifactId>
-										<versionRange>1.5</versionRange>
-										<goals>
-											<goal>execute</goal>
-										</goals>
-									</pluginExecutionFilter>
-									<action>
-										<execute>
-											<runOnConfiguration>true</runOnConfiguration>
-											<runOnIncremental>false</runOnIncremental>
-										</execute>
-									</action>
-								</pluginExecution>
-							</pluginExecutions>
-						</lifecycleMappingMetadata>
-					</configuration>
-				</plugin>
-			</plugins>
-		</pluginManagement>
-		<plugins>
-			<!--  Workaround for a bug in maven-compiler-plugin.
-			See https://issues.apache.org/jira/browse/MCOMPILER-209 -->
-			<plugin>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<configuration>
-					<useIncrementalCompilation>false</useIncrementalCompilation>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>groovy-maven-plugin</artifactId>
-				<version>1.5</version>
-				<dependencies>
-					<dependency>
-						<groupId>org.apache.velocity</groupId>
-						<artifactId>velocity</artifactId>
-						<version>1.7</version>
-					</dependency>
-				</dependencies>
-				<executions>
-					<execution>
-						<id>generate-sources</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<properties>
-								<templateDirectory>${basedir}/src/main/templates</templateDirectory>
-								<outputDirectory>${project.build.directory}/generated-sources/from-template</outputDirectory>
-							</properties>
-							<source>${basedir}/src/main/groovy/generate.groovy</source>
-						</configuration>
-					</execution>
-					<execution>
-						<id>generate-test-sources</id>
-						<phase>generate-test-sources</phase>
-						<goals>
-							<goal>execute</goal>
-						</goals>
-						<configuration>
-							<properties>
-								<templateDirectory>${basedir}/src/test/templates</templateDirectory>
-								<outputDirectory>${project.build.directory}/generated-test-sources/from-template</outputDirectory>
-							</properties>
-							<source>${basedir}/src/main/groovy/generate.groovy</source>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>build-helper-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>add-source</id>
-						<phase>generate-sources</phase>
-						<goals>
-							<goal>add-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${project.build.directory}/generated-sources/from-template/</source>
-							</sources>
-						</configuration>
-					</execution>
-					<execution>
-						<id>add-test-source</id>
-						<phase>generate-test-sources</phase>
-						<goals>
-							<goal>add-test-source</goal>
-						</goals>
-						<configuration>
-							<sources>
-								<source>${project.build.directory}/generated-test-sources/from-template/</source>
-							</sources>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
-
-			<plugin>
-				<artifactId>maven-jar-plugin</artifactId>
-				<configuration>
-					<archive>
-						<manifest>
-							<packageName>net.imagej.ops</packageName>
-						</manifest>
-					</archive>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<configuration>
-					<organizationName>Board of Regents of the University of
-Wisconsin-Madison, University of Konstanz and Brian Northan.</organizationName>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-
 </project>

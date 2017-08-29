@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -84,14 +84,14 @@ public class PadInput<T extends ComplexType<T>, I extends RandomAccessibleInterv
 
 	@Override
 	@SuppressWarnings("unchecked")
-	public O compute1(final I input) {
+	public O calculate(final I input) {
 
 		if (obf == null) {
 			obf = new OutOfBoundsConstantValueFactory<>(
 				Util.getTypeFromInterval(input).createVariable());
 		}
 
-		Interval inputInterval = paddingIntervalCentered.compute2(input,
+		Interval inputInterval = paddingIntervalCentered.calculate(input,
 			paddedDimensions);
 
 		return (O) Views.interval(Views.extend(input, obf), inputInterval);

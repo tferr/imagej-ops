@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -83,7 +83,7 @@ public class DefaultDirectionalityFeature<I extends RealType<I>, O extends RealT
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void compute1(final RandomAccessibleInterval<I> input,
+	public void compute(final RandomAccessibleInterval<I> input,
 		final O output)
 	{
 
@@ -95,8 +95,8 @@ public class DefaultDirectionalityFeature<I extends RealType<I>, O extends RealT
 		input.dimensions(dims);
 
 		// create image for derivations in x and y direction
-		Img<I> derX = imgCreator.compute1(input);
-		Img<I> derY = imgCreator.compute1(input);
+		Img<I> derX = imgCreator.calculate(input);
+		Img<I> derY = imgCreator.calculate(input);
 
 		// calculate derivations in x and y direction
 		PartialDerivative.gradientCentralDifference2(Views.extendMirrorSingle(
@@ -134,8 +134,8 @@ public class DefaultDirectionalityFeature<I extends RealType<I>, O extends RealT
 		// Otherwise compute histogram over all occuring directions
 		// and calculate inverse second moment on it as output
 		else {
-			Histogram1d<Integer> hist = histOp.compute1(dirList);
-			double std = stdOp.compute1(hist).getRealDouble();
+			Histogram1d<Integer> hist = histOp.calculate(dirList);
+			double std = stdOp.calculate(hist).getRealDouble();
 			output.setReal(1 / std);
 		}
 	}

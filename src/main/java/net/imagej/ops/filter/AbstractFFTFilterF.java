@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -190,7 +190,7 @@ public abstract class AbstractFFTFilterF<I extends RealType<I>, O extends RealTy
 	 * compute output by extending the input(s) and running the filter
 	 */
 	@Override
-	public RandomAccessibleInterval<O> compute2(
+	public RandomAccessibleInterval<O> calculate(
 		final RandomAccessibleInterval<I> input,
 		final RandomAccessibleInterval<K> kernel)
 	{
@@ -220,16 +220,16 @@ public abstract class AbstractFFTFilterF<I extends RealType<I>, O extends RealTy
 			}
 		}
 
-		RandomAccessibleInterval<I> paddedInput = padOp.compute2(input,
+		RandomAccessibleInterval<I> paddedInput = padOp.calculate(input,
 			new FinalDimensions(paddedSize));
 
-		RandomAccessibleInterval<K> paddedKernel = padKernelOp.compute2(kernel,
+		RandomAccessibleInterval<K> paddedKernel = padKernelOp.calculate(kernel,
 			new FinalDimensions(paddedSize));
 
-		RandomAccessibleInterval<C> fftImage = createOp.compute1(
+		RandomAccessibleInterval<C> fftImage = createOp.calculate(
 			new FinalDimensions(paddedSize));
 
-		RandomAccessibleInterval<C> fftKernel = createOp.compute1(
+		RandomAccessibleInterval<C> fftKernel = createOp.calculate(
 			new FinalDimensions(paddedSize));
 
 		// TODO: in this case it is difficult to match the filter op in the
@@ -238,7 +238,7 @@ public abstract class AbstractFFTFilterF<I extends RealType<I>, O extends RealTy
 		filter = createFilterComputer(paddedInput, paddedKernel, fftImage,
 			fftKernel, output, paddedInput);
 
-		filter.compute2(paddedInput, paddedKernel, output);
+		filter.compute(paddedInput, paddedKernel, output);
 
 		return output;
 

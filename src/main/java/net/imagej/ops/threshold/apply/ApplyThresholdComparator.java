@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -57,7 +57,7 @@ public class ApplyThresholdComparator<T> extends
 	private Comparator<? super T> comparator;
 
 	@Override
-	public void compute2(final T input1, final T input2, final BitType output) {
+	public void compute(final T input1, final T input2, final BitType output) {
 		output.set(comparator.compare(input1, input2) > 0);
 	}
 

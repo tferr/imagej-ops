@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -68,7 +68,7 @@ public class RasterViewTest extends AbstractOpTest {
 		RealRandomAccessible<DoubleType> realImg = Views.interpolate(img, new FloorInterpolatorFactory<DoubleType>());
 		
 		RandomAccessibleOnRealRandomAccessible<DoubleType> il2 = Views.raster(realImg);
-		RandomAccessibleOnRealRandomAccessible<DoubleType> opr = ops.transform().raster(realImg);
+		RandomAccessibleOnRealRandomAccessible<DoubleType> opr = ops.transform().rasterView(realImg);
 		
 		Cursor<DoubleType> il2C = Views.interval(il2, img).localizingCursor();
 		RandomAccess<DoubleType> oprRA = Views.interval(opr, img).randomAccess();

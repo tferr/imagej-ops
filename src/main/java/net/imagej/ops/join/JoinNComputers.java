@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -48,13 +48,13 @@ public interface JoinNComputers<A> extends UnaryComputerOp<A, A>,
 	// -- UnaryComputerOp methods --
 
 	@Override
-	default void compute1(final A input, final A output) {
+	default void compute(final A input, final A output) {
 		final List<? extends UnaryComputerOp<A, A>> ops = getOps();
 		final Iterator<? extends UnaryComputerOp<A, A>> it = ops.iterator();
 		final UnaryComputerOp<A, A> first = it.next();
 
 		if (ops.size() == 1) {
-			first.compute1(input, output);
+			first.compute(input, output);
 			return;
 		}
 
@@ -69,13 +69,13 @@ public interface JoinNComputers<A> extends UnaryComputerOp<A, A>,
 			tmpInput = output;
 		}
 
-		first.compute1(input, tmpOutput);
+		first.compute(input, tmpOutput);
 
 		while (it.hasNext()) {
 			tmp = tmpInput;
 			tmpInput = tmpOutput;
 			tmpOutput = tmp;
-			it.next().compute1(tmpInput, tmpOutput);
+			it.next().compute(tmpInput, tmpOutput);
 		}
 	}
 

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -74,9 +74,9 @@ public abstract class UFViaUC<I extends DI, O extends DO, DI, DO> extends
 	// -- UnaryFunctionOp methods --
 
 	@Override
-	public O compute1(final I input) {
+	public O calculate(final I input) {
 		final O output = createOutput(input);
-		worker.compute1(input, output);
+		worker.compute(input, output);
 		return output;
 	}
 

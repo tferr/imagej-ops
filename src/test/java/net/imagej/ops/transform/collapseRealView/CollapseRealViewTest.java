@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -65,14 +65,14 @@ public class CollapseRealViewTest extends AbstractOpTest {
 		CompositeIntervalView<DoubleType, RealComposite<DoubleType>> il2 = Views
 				.collapseReal((RandomAccessibleInterval<DoubleType>) img);
 		CompositeIntervalView<DoubleType, RealComposite<DoubleType>> opr = ops.transform()
-				.collapseReal((RandomAccessibleInterval<DoubleType>) img);
+				.collapseRealView((RandomAccessibleInterval<DoubleType>) img);
 
 		assertEquals(il2.numDimensions(), opr.numDimensions());
 
 		CompositeView<DoubleType, RealComposite<DoubleType>> il2_2 = Views
 				.collapseReal((RandomAccessible<DoubleType>) img, 1);
 		CompositeView<DoubleType, RealComposite<DoubleType>> opr_2 = ops.transform()
-				.collapseReal((RandomAccessible<DoubleType>) img, 1);
+				.collapseRealView((RandomAccessible<DoubleType>) img, 1);
 
 		assertEquals(il2_2.numDimensions(), opr_2.numDimensions());
 	}

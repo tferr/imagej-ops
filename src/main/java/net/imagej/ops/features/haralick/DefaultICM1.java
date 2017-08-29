@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -45,6 +45,7 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Haralick.ICM1.class,
 	label = "Haralick: Information Measure of Correlation 1")
@@ -65,16 +66,14 @@ public class DefaultICM1<T extends RealType<T>> extends
 	}
 
 	@Override
-	public void compute1(final IterableInterval<T> input,
+	public void compute(final IterableInterval<T> input,
 		final DoubleType output)
 	{
 		final double[][] matrix = getCooccurrenceMatrix(input);
 
-		double res = 0;
+		final double[] coochxy = coocHXYFunc.calculate(matrix);
 
-		final double[] coochxy = coocHXYFunc.compute1(matrix);
-
-		res = (entropy.compute1(input).get() - coochxy[2]) / (coochxy[0] > coochxy[1]
+		final double res = (entropy.calculate(input).get() - coochxy[2]) / (coochxy[0] > coochxy[1]
 			? coochxy[0] : coochxy[1]);
 
 		output.set(res);

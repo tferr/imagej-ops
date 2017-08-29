@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -98,17 +98,21 @@ public class NonCirculantFirstGuess<I extends RealType<I>, O extends RealType<O>
 	}
 
 	@Override
-	public RandomAccessibleInterval<O> compute1(RandomAccessibleInterval<I> in) {
+	public RandomAccessibleInterval<O> calculate(RandomAccessibleInterval<I> in) {
 
-		final Img<O> firstGuess = create.compute1(imgConvolutionInterval);
+		final Img<O> firstGuess = create.calculate(imgConvolutionInterval);
 
 		// set first guess to be a constant = to the average value
 
 		// so first compute the sum...
-		final O s = sum.compute1(in);
+		final O s = sum.calculate(in);
 
 		// then the number of pixels
-		final long numPixels = k.dimension(0) * k.dimension(1) * k.dimension(2);
+		long numPixels = 1;
+
+		for (int d = 0; d < k.numDimensions(); d++) {
+			numPixels = numPixels * k.dimension(d);
+		}
 
 		// then the average value...
 		final double average = s.getRealDouble() / (numPixels);

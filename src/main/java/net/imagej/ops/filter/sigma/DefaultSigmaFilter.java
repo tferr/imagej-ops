@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -63,7 +63,9 @@ public class DefaultSigmaFilter<T extends RealType<T>, V extends RealType<V>>
 	private Double minPixelFraction;
 
 	@Override
-	protected CenterAwareComputerOp<T, V> unaryComputer(final V outType) {
+	protected CenterAwareComputerOp<T, V> unaryComputer(final T inType,
+		final V outType)
+	{
 
 		final AbstractCenterAwareComputerOp<T, V> op =
 			new AbstractCenterAwareComputerOp<T, V>()
@@ -72,14 +74,14 @@ public class DefaultSigmaFilter<T extends RealType<T>, V extends RealType<V>>
 				private UnaryComputerOp<Iterable<T>, DoubleType> variance;
 
 				@Override
-				public void compute2(final Iterable<T> neighborhood, final T center, final V output) {
+				public void compute(final Iterable<T> neighborhood, final T center, final V output) {
 					if (variance == null) {
 						variance = Computers.unary(ops(), Ops.Stats.Variance.class,
 							DoubleType.class, neighborhood);
 					}
 
 					DoubleType varianceResult = new DoubleType();
-					variance.compute1(neighborhood, varianceResult);
+					variance.compute(neighborhood, varianceResult);
 					double varianceValue = varianceResult.getRealDouble() * range;
 
 					final double centerValue = center.getRealDouble();

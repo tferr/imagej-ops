@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -65,6 +65,6 @@ public class MapIIAndIIInplace<EA> extends
 	public void mutate2(final IterableInterval<EA> in,
 		final IterableInterval<EA> arg)
 	{
-		Maps.inplace(arg, in, getOp());
+		Maps.inplace(in, arg, getOp());
 	}
 }

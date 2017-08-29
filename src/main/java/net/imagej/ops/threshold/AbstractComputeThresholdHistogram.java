@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ public abstract class AbstractComputeThresholdHistogram<T extends RealType<T>>
 	// -- UnaryComputerOp methods --
 
 	@Override
-	public void compute1(final Histogram1d<T> input, final T output) {
+	public void compute(final Histogram1d<T> input, final T output) {
 		final long binPos = computeBin(input);
 
 		// convert bin number to corresponding gray level

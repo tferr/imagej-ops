@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -58,8 +58,8 @@ public abstract class BCViaBC<I1 extends DI1, I2 extends DI2, O extends DO, DI1,
 	}
 
 	@Override
-	public void compute2(final I1 input1, final I2 input2, final O output) {
-		worker.compute2(input1, input2, output);
+	public void compute(final I1 input1, final I2 input2, final O output) {
+		worker.compute(input1, input2, output);
 	}
 
 }

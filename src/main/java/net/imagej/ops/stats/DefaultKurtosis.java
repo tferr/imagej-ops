@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -63,12 +63,12 @@ public class DefaultKurtosis<I extends RealType<I>, O extends RealType<O>>
 	}
 	
 	@Override
-	public void compute1(final Iterable<I> input, final O output) {
+	public void compute(final Iterable<I> input, final O output) {
 		output.setReal(Double.NaN);
 
-		final double std = stdDevFunc.compute1(input).getRealDouble();
+		final double std = stdDevFunc.calculate(input).getRealDouble();
 		final double moment4 =
-				moment4AboutMeanFunc.compute1(input).getRealDouble();
+				moment4AboutMeanFunc.calculate(input).getRealDouble();
 
 		if (std != 0) {
 			output.setReal((moment4) / (std * std * std * std));

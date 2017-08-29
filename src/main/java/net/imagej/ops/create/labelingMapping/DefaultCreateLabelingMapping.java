@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -65,8 +65,8 @@ public class DefaultCreateLabelingMapping<L> extends
 	}
 
 	@Override
-	public LabelingMapping<L> compute0() {
-		return new LabelingMapping<>(indexTypeCreator.compute0());
+	public LabelingMapping<L> calculate() {
+		return new LabelingMapping<>(indexTypeCreator.calculate());
 	}
 
 }

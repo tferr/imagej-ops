@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,7 +31,7 @@
 package net.imagej.ops.geom.geom2d;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.Ops.Geometric.SecondMultiVariate;
+import net.imagej.ops.Ops.Geometric.SecondMoment;
 import net.imagej.ops.special.function.Functions;
 import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imagej.ops.special.hybrid.AbstractUnaryHybridCF;
@@ -46,28 +46,23 @@ import org.scijava.plugin.Plugin;
  * 
  * @author Daniel Seebacher (University of Konstanz)
  */
-@Plugin(type = Ops.Geometric.MajorAxis.class,
-	label = "Geometric (2D): Major Axis")
-public class DefaultMajorAxis extends AbstractUnaryHybridCF<Polygon, DoubleType>
-	implements Ops.Geometric.MajorAxis
-{
+@Plugin(type = Ops.Geometric.MajorAxis.class, label = "Geometric (2D): Major Axis")
+public class DefaultMajorAxis extends AbstractUnaryHybridCF<Polygon, DoubleType> implements Ops.Geometric.MajorAxis {
 
 	@SuppressWarnings("rawtypes")
 	private UnaryFunctionOp<Polygon, Pair> minorMajorAxisFunc;
 
 	@Override
 	public void initialize() {
-		minorMajorAxisFunc = Functions.unary(ops(), SecondMultiVariate.class, Pair.class,
-			in());
+		minorMajorAxisFunc = Functions.unary(ops(), SecondMoment.class, Pair.class, in());
 	}
 
 	@SuppressWarnings("unchecked")
 	@Override
-	public void compute1(final Polygon input, final DoubleType output) {
-		final Pair<DoubleType, DoubleType> compute = minorMajorAxisFunc.compute1(input);
-		output.set(compute.getB());
+	public void compute(final Polygon input, final DoubleType output) {
+		output.set(((Pair<DoubleType, DoubleType>)minorMajorAxisFunc.calculate(input)).getB());
 	}
-	
+
 	@Override
 	public DoubleType createOutput(Polygon input) {
 		return new DoubleType();

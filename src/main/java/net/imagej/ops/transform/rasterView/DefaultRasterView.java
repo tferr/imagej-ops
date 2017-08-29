@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,6 @@ package net.imagej.ops.transform.rasterView;
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.function.AbstractUnaryFunctionOp;
 import net.imglib2.RealRandomAccessible;
-import net.imglib2.type.Type;
 import net.imglib2.view.RandomAccessibleOnRealRandomAccessible;
 import net.imglib2.view.Views;
 
@@ -45,12 +44,12 @@ import org.scijava.plugin.Plugin;
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Transform.RasterView.class)
-public class DefaultRasterView<T extends Type<T>>
+public class DefaultRasterView<T>
 		extends AbstractUnaryFunctionOp<RealRandomAccessible<T>, RandomAccessibleOnRealRandomAccessible<T>>
 		implements Ops.Transform.RasterView {
 
 	@Override
-	public RandomAccessibleOnRealRandomAccessible<T> compute1(RealRandomAccessible<T> input) {
+	public RandomAccessibleOnRealRandomAccessible<T> calculate(RealRandomAccessible<T> input) {
 		return Views.raster(input);
 	}
 

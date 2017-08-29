@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,8 @@ import net.imglib2.type.numeric.real.DoubleType;
 /**
  * Generic implementation of {@link net.imagej.ops.Ops.Geometric.Convexity}.
  * 
+ * Based on http://www.math.uci.edu/icamp/summer/research_11/park/shape_descriptors_survey.pdf.
+ * 
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 public abstract class AbstractConvexity<I> extends
@@ -57,9 +59,9 @@ public abstract class AbstractConvexity<I> extends
 	}
 
 	@Override
-	public void compute1(final I input, final DoubleType output) {
-		output.set(boundarySizeConvexHull.compute1(input).get() /
-			boundarySize.compute1(input).get());
+	public void compute(final I input, final DoubleType output) {
+		output.set(boundarySizeConvexHull.calculate(input).get() /
+			boundarySize.calculate(input).get());
 	}
 	
 	@Override

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -64,7 +64,7 @@ public class ExtendViewTest extends AbstractOpTest {
 				.randomAccess();
 
 		OutOfBounds<DoubleType> opr = ops.transform()
-				.extend(img, new OutOfBoundsBorderFactory<DoubleType, RandomAccessibleInterval<DoubleType>>())
+				.extendView(img, new OutOfBoundsBorderFactory<DoubleType, RandomAccessibleInterval<DoubleType>>())
 				.randomAccess();
 
 		il2.setPosition(new int[] { -1, -1 });

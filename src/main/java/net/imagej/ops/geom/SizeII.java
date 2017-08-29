@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -51,7 +51,7 @@ public class SizeII extends
 {
 
 	@Override
-	public DoubleType compute1(IterableInterval<?> input) {
+	public DoubleType calculate(IterableInterval<?> input) {
 		return new DoubleType(input.size());
 	}
 

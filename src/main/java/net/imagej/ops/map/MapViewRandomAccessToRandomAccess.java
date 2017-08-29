@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -52,7 +52,7 @@ public class MapViewRandomAccessToRandomAccess<EI, EO extends Type<EO>> extends
 {
 
 	@Override
-	public RandomAccessible<EO> compute1(final RandomAccessible<EI> input) {
+	public RandomAccessible<EO> calculate(final RandomAccessible<EI> input) {
 		final ComputerConverter<EI, EO> converter =
 			new ComputerConverter<>(getOp());
 		return new ConvertedRandomAccessible<>(input, converter, getType());

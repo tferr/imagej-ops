@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -180,16 +180,16 @@ public class ConvolveTest extends AbstractOpTest {
 			paddedSize[d] = (int) in.dimension(d) + (int) kernel.dimension(d) - 1;
 		}
 
-		RandomAccessibleInterval<FloatType> paddedInput = padOp.compute2(in,
+		RandomAccessibleInterval<FloatType> paddedInput = padOp.calculate(in,
 			new FinalDimensions(paddedSize));
 
-		RandomAccessibleInterval<FloatType> paddedKernel = padKernelOp.compute2(
+		RandomAccessibleInterval<FloatType> paddedKernel = padKernelOp.calculate(
 			kernel, new FinalDimensions(paddedSize));
 
-		RandomAccessibleInterval<ComplexFloatType> fftImage = createOp.compute1(
+		RandomAccessibleInterval<ComplexFloatType> fftImage = createOp.calculate(
 			new FinalDimensions(paddedSize));
 
-		RandomAccessibleInterval<ComplexFloatType> fftKernel = createOp.compute1(
+		RandomAccessibleInterval<ComplexFloatType> fftKernel = createOp.calculate(
 			new FinalDimensions(paddedSize));
 
 		// run convolve using the rai version with the memory created above

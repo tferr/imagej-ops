@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -76,7 +76,7 @@ public class LocalSauvolaThreshold<T extends RealType<T>> extends LocalThreshold
 	private double r = 0.5d;
 
 	@Override
-	protected CenterAwareComputerOp<T, BitType> unaryComputer(
+	protected CenterAwareComputerOp<T, BitType> unaryComputer(final T inClass,
 		final BitType outClass)
 	{
 		final LocalThresholdMethod<T> op = new LocalThresholdMethod<T>() {
@@ -85,7 +85,7 @@ public class LocalSauvolaThreshold<T extends RealType<T>> extends LocalThreshold
 			private UnaryComputerOp<Iterable<T>, DoubleType> stdDeviation;
 
 			@Override
-			public void compute2(final Iterable<T> neighborhood, final T center, final BitType output) {
+			public void compute(final Iterable<T> neighborhood, final T center, final BitType output) {
 
 				if (mean == null) {
 					mean = Computers.unary(ops(), Ops.Stats.Mean.class, new DoubleType(),
@@ -98,10 +98,10 @@ public class LocalSauvolaThreshold<T extends RealType<T>> extends LocalThreshold
 				}
 
 				final DoubleType meanValue = new DoubleType();
-				mean.compute1(neighborhood, meanValue);
+				mean.compute(neighborhood, meanValue);
 
 				final DoubleType stdDevValue = new DoubleType();
-				stdDeviation.compute1(neighborhood, stdDevValue);
+				stdDeviation.compute(neighborhood, stdDevValue);
 
 				double threshold = meanValue.get() * (1.0d + k * ((Math.sqrt(stdDevValue
 					.get()) / r) - 1.0));

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -99,7 +99,7 @@ public abstract class LocalThresholdIntegral<I extends RealType<I>> extends
 
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	@Override
-	public void compute1(final RandomAccessibleInterval<I> input,
+	public void compute(final RandomAccessibleInterval<I> input,
 		final IterableInterval<BitType> output)
 	{
 
@@ -127,7 +127,7 @@ public abstract class LocalThresholdIntegral<I extends RealType<I>> extends
 				filterOp);
 		}
 
-		map.compute2(input, neighborhoods, output);
+		map.compute(input, neighborhoods, output);
 	}
 
 	/**
@@ -150,10 +150,10 @@ public abstract class LocalThresholdIntegral<I extends RealType<I>> extends
 		RandomAccessibleInterval<RealType> img = null;
 		switch (order) {
 			case 1:
-				img = (RandomAccessibleInterval) integralImgOp.compute1(offsetInterval2);
+				img = (RandomAccessibleInterval) integralImgOp.calculate(offsetInterval2);
 				break;
 			case 2:
-				img = (RandomAccessibleInterval) squareIntegralImgOp.compute1(offsetInterval2);
+				img = (RandomAccessibleInterval) squareIntegralImgOp.calculate(offsetInterval2);
 				break;
 		}
 

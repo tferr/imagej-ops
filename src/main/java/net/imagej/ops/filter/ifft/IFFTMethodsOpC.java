@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ public class IFFTMethodsOpC<C extends ComplexType<C>, T extends RealType<T>>
 	 * Compute an ND inverse FFT
 	 */
 	@Override
-	public void compute1(final RandomAccessibleInterval<C> input,
+	public void compute(final RandomAccessibleInterval<C> input,
 		final RandomAccessibleInterval<T> output)
 	{
 		for (int d = input.numDimensions() - 1; d > 0; d--)

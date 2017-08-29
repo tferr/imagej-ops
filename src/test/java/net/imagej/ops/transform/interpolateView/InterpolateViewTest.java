@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,7 @@ public class InterpolateViewTest extends AbstractOpTest {
 		}
 		
 		RealRandomAccess<DoubleType> il2 = Views.interpolate(img, new FloorInterpolatorFactory<DoubleType>()).realRandomAccess();
-		RealRandomAccess<DoubleType> opr = ops.transform().interpolate(img, new FloorInterpolatorFactory<DoubleType>()).realRandomAccess();
+		RealRandomAccess<DoubleType> opr = ops.transform().interpolateView(img, new FloorInterpolatorFactory<DoubleType>()).realRandomAccess();
 		
 		il2.setPosition(new double[]{1.75, 5.34});
 		opr.setPosition(new double[]{1.75, 5.34});

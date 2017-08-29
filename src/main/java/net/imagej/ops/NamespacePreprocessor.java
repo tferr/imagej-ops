@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ public class NamespacePreprocessor extends AbstractPreprocessorPlugin {
 
 	@Override
 	public void process(final Module module) {
-		if (nsService == null || ops == null) return;
+		if (nsService == null) return;
 
 		for (final ModuleItem<?> input : module.getInfo().inputs()) {
 			assignNamespace(module, input);
@@ -69,15 +69,22 @@ public class NamespacePreprocessor extends AbstractPreprocessorPlugin {
 	private <T> void assignNamespace(final Module module,
 		final ModuleItem<T> item)
 	{
-		if (module.isResolved(item.getName())) return;
+		if (module.isInputResolved(item.getName())) return;
+
+		// if possible, extract the OpEnvironment from the delegate object
+		final Object delegate = module.getDelegateObject();
+		final OpEnvironment env = delegate instanceof Environmental ? //
+			((Environmental) delegate).ops() : ops;
+		if (env == null) return;
+
 		T defaultValue = null;
-		
 		if (Namespace.class.isAssignableFrom(item.getType())) {
-			defaultValue = (T) nsService.create((Class<? extends Namespace>)item.getType(), ops);
+			defaultValue = (T) nsService.create(//
+				(Class<? extends Namespace>) item.getType(), env);
 		}
 		if (defaultValue == null) return;
 
 		item.setValue(module, defaultValue);
-		module.setResolved(item.getName(), true);
+		module.resolveInput(item.getName());
 	}
 }

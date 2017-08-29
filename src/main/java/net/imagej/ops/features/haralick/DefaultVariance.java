@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -31,10 +31,6 @@
 package net.imagej.ops.features.haralick;
 
 import net.imagej.ops.Ops;
-import net.imagej.ops.features.haralick.helper.CoocMeanX;
-import net.imagej.ops.features.haralick.helper.CoocMeanY;
-import net.imagej.ops.special.function.Functions;
-import net.imagej.ops.special.function.UnaryFunctionOp;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.real.DoubleType;
@@ -42,49 +38,44 @@ import net.imglib2.type.numeric.real.DoubleType;
 import org.scijava.plugin.Plugin;
 
 /**
- * Implementation of Variance Haralick Feature
+ * Implementation of Variance Haralick Feature based on
+ * http://murphylab.web.cmu.edu/publications/boland/boland_node26.html
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Haralick.Variance.class, label = "Haralick: Variance")
 public class DefaultVariance<T extends RealType<T>> extends
 	AbstractHaralickFeature<T>implements Ops.Haralick.Variance
 {
 
-	private UnaryFunctionOp<double[][], DoubleType> coocMeanXFunc;
-	private UnaryFunctionOp<double[][], DoubleType> coocMeanYFunc;
-
 	@Override
-	public void initialize() {
-		super.initialize();
-		coocMeanXFunc = Functions.unary(ops(), CoocMeanX.class, DoubleType.class,
-			double[][].class);
-		coocMeanYFunc = Functions.unary(ops(), CoocMeanY.class, DoubleType.class,
-			double[][].class);
-	}
-
-	@Override
-	public void compute1(final IterableInterval<T> input,
+	public void compute(final IterableInterval<T> input,
 		final DoubleType output)
 	{
 		final double[][] matrix = getCooccurrenceMatrix(input);
 
-		final double mux = coocMeanXFunc.compute1(matrix).getRealDouble();
-
-		final double muy = coocMeanYFunc.compute1(matrix).getRealDouble();
 
 		final int nrGreyLevel = matrix.length;
 
+
+		double mean =  0.0;
+		for (int i = 0; i < nrGreyLevel; i++) {
+			for (int j = 0; j < nrGreyLevel; j++) {
+				mean += matrix[i][j];
+			}
+		}
+		mean /= nrGreyLevel*nrGreyLevel;
+		
 		double result = 0.0;
 		for (int i = 0; i < nrGreyLevel; i++) {
 			for (int j = 0; j < nrGreyLevel; j++) {
-				result += (((i - mux) * (i - mux)) * matrix[i][j] + ((j - muy) * (j -
-					muy)) * matrix[i][j]);
+				result += (i - mean) * (i - mean) * matrix[i][j];
 			}
 		}
 
-		output.set(result / 2);
+		output.set(result);
 	}
 
 }

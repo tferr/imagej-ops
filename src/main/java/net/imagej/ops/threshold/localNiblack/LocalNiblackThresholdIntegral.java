@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -109,7 +109,7 @@ public class LocalNiblackThresholdIntegral<T extends RealType<T>> extends
 		}
 
 		@Override
-		public void compute2(final I center,
+		public void compute(final I center,
 			final RectangleNeighborhood<Composite<DoubleType>> neighborhood,
 			final BitType output)
 		{
@@ -117,12 +117,12 @@ public class LocalNiblackThresholdIntegral<T extends RealType<T>> extends
 			final DoubleType threshold = new DoubleType(0.0d);
 
 			final DoubleType mean = new DoubleType();
-			integralMean.compute1(neighborhood, mean);
+			integralMean.compute(neighborhood, mean);
 
 			threshold.add(mean);
 
 			final DoubleType variance = new DoubleType();
-			integralVariance.compute1(neighborhood, variance);
+			integralVariance.compute(neighborhood, variance);
 
 			final DoubleType stdDev = new DoubleType(Math.sqrt(variance.get()));
 			stdDev.mul(k);

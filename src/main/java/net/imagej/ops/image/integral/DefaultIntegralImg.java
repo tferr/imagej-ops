@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -32,7 +32,6 @@ package net.imagej.ops.image.integral;
 
 import net.imagej.ops.Ops;
 import net.imagej.ops.special.hybrid.AbstractUnaryHybridCI;
-import net.imglib2.Cursor;
 import net.imglib2.IterableInterval;
 import net.imglib2.type.numeric.RealType;
 import net.imglib2.type.numeric.integer.LongType;
@@ -57,43 +56,10 @@ public class DefaultIntegralImg<I extends RealType<I>> extends
 {
 
 	@Override
-	public
-		AbstractUnaryHybridCI<IterableInterval<RealType<?>>, IterableInterval<RealType<?>>>
-		getComputer()
+	public AbstractUnaryHybridCI<IterableInterval<I>, IterableInterval<I>>
+		getComputer(final int dimension)
 	{
-		return new IntegralAddComputer();
-	}
-
-	/**
-	 * Implements the row-wise addition required for computations of integral
-	 * images of order=1.
-	 *
-	 * @author Stefan Helfrich (University of Konstanz)
-	 */
-	private class IntegralAddComputer extends
-		AbstractUnaryHybridCI<IterableInterval<RealType<?>>, IterableInterval<RealType<?>>>
-	{
-
-		@Override
-		public void compute1(final IterableInterval<RealType<?>> input,
-			final IterableInterval<RealType<?>> output)
-		{
-
-			final Cursor<RealType<?>> inputCursor = input.cursor();
-			final Cursor<RealType<?>> outputCursor = output.cursor();
-
-			double tmp = 0.0d;
-			while (outputCursor.hasNext()) {
-
-				final RealType<?> inputValue = inputCursor.next();
-				final RealType<?> outputValue = outputCursor.next();
-
-				tmp += inputValue.getRealDouble();
-
-				outputValue.setReal(tmp);
-			}
-		}
-
+		return new IntegralAdd<>();
 	}
 
 }

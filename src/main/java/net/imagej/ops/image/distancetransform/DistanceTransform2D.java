@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -52,6 +52,9 @@ import org.scijava.plugin.Plugin;
 import org.scijava.thread.ThreadService;
 
 /**
+ * Computes a distance transform, i.e. for every foreground pixel its distance
+ * to the nearest background pixel.
+ * 
  * @author Simon Schmid (University of Konstanz)
  */
 @Plugin(type = Ops.Image.DistanceTransform.class)
@@ -70,7 +73,7 @@ public class DistanceTransform2D<B extends BooleanType<B>, T extends RealType<T>
 	@Override
 	public boolean conforms() {
 		if (in().numDimensions() == 2) {
-			long max_dist = in().dimension(0) * in().dimension(0) + in().dimension(1) * in().dimension(1);
+			final long max_dist = in().dimension(0) * in().dimension(0) + in().dimension(1) * in().dimension(1);
 			return ((in().numDimensions() == 2) && (max_dist <= Integer.MAX_VALUE));
 		}
 		return false;
@@ -86,7 +89,7 @@ public class DistanceTransform2D<B extends BooleanType<B>, T extends RealType<T>
 	@SuppressWarnings("unchecked")
 	@Override
 	public RandomAccessibleInterval<T> createOutput(final RandomAccessibleInterval<B> in) {
-		return createOp.compute1(new FinalInterval(in));
+		return createOp.calculate(new FinalInterval(in));
 	}
 
 	/*
@@ -94,7 +97,7 @@ public class DistanceTransform2D<B extends BooleanType<B>, T extends RealType<T>
 	 * http://fab.cba.mit.edu/classes/S62.12/docs/Meijster_distance.pdf
 	 */
 	@Override
-	public void compute1(final RandomAccessibleInterval<B> in, final RandomAccessibleInterval<T> out) {
+	public void compute(final RandomAccessibleInterval<B> in, final RandomAccessibleInterval<T> out) {
 
 		// tempValues stores the integer values of the first phase, i.e. the
 		// first two scans

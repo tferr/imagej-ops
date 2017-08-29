@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -56,7 +56,7 @@ public class CropRAI<T>
 	private boolean dropSingleDimensions = true;
 
 	@Override
-	public RandomAccessibleInterval<T> compute2(final RandomAccessibleInterval<T> input, final Interval interval) {
+	public RandomAccessibleInterval<T> calculate(final RandomAccessibleInterval<T> input, final Interval interval) {
 		boolean oneSizedDims = false;
 
 		if (dropSingleDimensions) {

@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -35,7 +35,8 @@ import net.imagej.ops.special.chain.RAIs;
 import net.imagej.ops.special.computer.AbstractUnaryComputerOp;
 import net.imagej.ops.special.computer.UnaryComputerOp;
 import net.imglib2.RandomAccessibleInterval;
-import net.imglib2.algorithm.labeling.ConnectedComponents.StructuringElement;
+import net.imglib2.algorithm.neighborhood.RectangleShape;
+import net.imglib2.algorithm.neighborhood.Shape;
 import net.imglib2.type.BooleanType;
 
 import org.scijava.plugin.Parameter;
@@ -54,10 +55,7 @@ public class DefaultExtractHolesComputer<T extends BooleanType<T>> extends
 {
 
 	@Parameter(required=false)
-	private StructuringElement structElement = StructuringElement.EIGHT_CONNECTED;
-
-	@Parameter(required=false)
-	private boolean background = false;
+	private Shape structElement = new RectangleShape(1, false);
 
 	private UnaryComputerOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> xorMapOp;
 
@@ -65,27 +63,26 @@ public class DefaultExtractHolesComputer<T extends BooleanType<T>> extends
 
 	@Override
 	public void initialize() {
-		fillHolesComp = RAIs.computer(ops(), Ops.Morphology.FillHoles.class, in(), structElement,
-			background);
+		fillHolesComp = RAIs.computer(ops(), Ops.Morphology.FillHoles.class, in(), structElement);
 		xorMapOp = RAIs.computer(ops(), Ops.Map.class, in(),
 			new AbstractUnaryComputerOp<T, T>()
 		{
 
 				@Override
-				public void compute1(T input, T output) {
-					output.set((input.get() != background) ^ (output
-						.get() != background));
+				public void compute(T input, T output) {
+					output.set((input.get()) ^ (output
+						.get()));
 				}
 			});
 
 	}
 
 	@Override
-	public void compute1(final RandomAccessibleInterval<T> input,
+	public void compute(final RandomAccessibleInterval<T> input,
 		final RandomAccessibleInterval<T> output)
 	{
-		fillHolesComp.compute1(input, output);
-		xorMapOp.compute1(input, output);
+		fillHolesComp.compute(input, output);
+		xorMapOp.compute(input, output);
 	}
 
 }

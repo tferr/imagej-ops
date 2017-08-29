@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -38,7 +38,7 @@ import net.imagej.ops.special.inplace.BinaryInplaceOp;
  * {@link BinaryInplaceOp}.
  * <p>
  * To populate a preallocated output object, call
- * {@link BinaryComputerOp#compute1}; to compute inplace, call
+ * {@link BinaryComputerOp#compute}; to compute inplace, call
  * {@link BinaryInplaceOp#mutate1} or {@link BinaryInplaceOp#mutate2}. To do any
  * of these things as appropriate, call {@link #run(Object, Object, Object)}.
  * </p>
@@ -52,7 +52,7 @@ public interface BinaryHybridCI<I, O extends I> extends
 	BinaryHybridCI1<I, I, O>, BinaryInplaceOp<I, O>
 {
 
-	// -- UnaryOp methods --
+	// -- BinaryOp methods --
 
 	@Override
 	default O run(final I input1, final I input2, final O output) {
@@ -64,7 +64,7 @@ public interface BinaryHybridCI<I, O extends I> extends
 			mutate2(input1, output);
 		else
 			// run as computer
-			compute2(input1, input2, output);
+			compute(input1, input2, output);
 		return output;
 	}
 

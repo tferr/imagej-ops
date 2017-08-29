@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -73,26 +73,15 @@ public class DefaultDoG<T extends NumericType<T> & NativeType<T>> extends
 	@Parameter
 	private UnaryFunctionOp<RandomAccessibleInterval<T>, RandomAccessibleInterval<T>> tmpCreator;
 
-	@Parameter(required = false)
-	private OutOfBoundsFactory<T, RandomAccessibleInterval<T>> fac;
-
 	@Override
 	public RandomAccessibleInterval<T> createOutput(
 		final RandomAccessibleInterval<T> input)
 	{
-		return outputCreator.compute1(input);
+		return outputCreator.calculate(input);
 	}
 
 	@Override
-	public void initialize() {
-		if (fac == null) {
-			fac = new OutOfBoundsMirrorFactory<>(
-				Boundary.SINGLE);
-		}
-	}
-
-	@Override
-	public void compute1(final RandomAccessibleInterval<T> input,
+	public void compute(final RandomAccessibleInterval<T> input,
 		final RandomAccessibleInterval<T> output)
 	{
 		// input may potentially be translated
@@ -100,10 +89,10 @@ public class DefaultDoG<T extends NumericType<T> & NativeType<T>> extends
 		input.min(translation);
 
 		final IntervalView<T> tmpInterval = Views.interval(Views.translate(
-			(RandomAccessible<T>) tmpCreator.compute1(input), translation), output);
+			(RandomAccessible<T>) tmpCreator.calculate(input), translation), output);
 
-		gauss1.compute1(input, tmpInterval);
-		gauss2.compute1(input, output);
+		gauss1.compute(input, tmpInterval);
+		gauss2.compute(input, output);
 
 		// TODO: Match the Subtract Op in initialize() once we have BinaryOp
 		ops().run(Ops.Math.Subtract.class, output, output, tmpInterval);

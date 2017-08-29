@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -475,7 +475,7 @@ public class DeconvolveNamespace extends AbstractNamespace {
 			(RandomAccessibleInterval<O>) ops().run(
 				net.imagej.ops.deconvolve.RichardsonLucyTVF.class, in, kernel,
 				borderSize, obfInput, obfKernel, outType, fftType, maxIterations,
-				regularizationFactor, nonCirculant);
+				nonCirculant, regularizationFactor);
 		return result;
 	}
 
@@ -602,6 +602,7 @@ public class DeconvolveNamespace extends AbstractNamespace {
 			final Interval imgConvolutionInterval, final Type<O> outType,
 			final Dimensions k)
 	{
+		@SuppressWarnings("unchecked")
 		final RandomAccessibleInterval<O> result =
 			(RandomAccessibleInterval<O>) ops().run(
 				net.imagej.ops.deconvolve.NonCirculantFirstGuess.class, in,

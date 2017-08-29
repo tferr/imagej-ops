@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -58,7 +58,7 @@ public class DefaultCreateImgFactory<T extends NativeType<T>> extends
 	private Dimensions dims;
 
 	@Override
-	public ImgFactory<T> compute0() {
+	public ImgFactory<T> calculate() {
 		return (dims == null || Intervals.numElements(dims) <= Integer.MAX_VALUE)
 			? new ArrayImgFactory<>() : new CellImgFactory<>();
 	}

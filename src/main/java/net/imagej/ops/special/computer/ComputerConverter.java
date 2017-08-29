@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -47,7 +47,7 @@ public class ComputerConverter<A, B> implements Converter<A, B> {
 
 	@Override
 	public void convert(final A input, final B output) {
-		op.compute1(input, output);
+		op.compute(input, output);
 	}
 
 }

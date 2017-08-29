@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -44,11 +44,12 @@ import org.scijava.plugin.Plugin;
 
 /**
  * 
- * Implementation of texture correlation haralick feature.
+ * Implementation of texture correlation haralick feature based on
+ * http://earlglynn.github.io/RNotes/package/EBImage/Haralick-Textural-Features.html .
  * 
  * @author Andreas Graumann (University of Konstanz)
  * @author Christian Dietz (University of Konstanz)
- *
+ * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 @Plugin(type = Ops.Haralick.Correlation.class, label = "Haralick: Correlation")
 public class DefaultCorrelation<T extends RealType<T>> extends
@@ -70,30 +71,25 @@ public class DefaultCorrelation<T extends RealType<T>> extends
 	}
 	
 	@Override
-	public void compute1(final IterableInterval<T> input, final DoubleType output) {
+	public void compute(final IterableInterval<T> input, final DoubleType output) {
 		final double[][] matrix = getCooccurrenceMatrix(input);
 
 		final int nrGrayLevels = matrix.length;
 
-		final double meanx = coocMeanXFunc.compute1(matrix).get();
-		final double meany = coocMeanYFunc.compute1(matrix).get();
-		final double stdx = coocStdXFunc.compute1(matrix).get();
-		final double stdy = coocStdYFunc.compute1(matrix).get();
+		final double meanx = coocMeanXFunc.calculate(matrix).get();
+		final double meany = coocMeanYFunc.calculate(matrix).get();
+		final double stdx = coocStdXFunc.calculate(matrix).get();
+		final double stdy = coocStdYFunc.calculate(matrix).get();
 
-		double res = 0;
+		double sum = 0;
 		for (int i = 0; i < nrGrayLevels; i++) {
 			for (int j = 0; j < nrGrayLevels; j++) {
-				res += ((i - meanx) * (j - meany))
-						* (matrix[i][j] / (stdx * stdy));
+				sum += i*j*matrix[i][j];
 			}
 		}
+		
+		output.set((sum - (meanx*meany))/(stdx*stdy));
 
-		// if NaN
-		if (Double.isNaN(res)) {
-			output.set(0);
-		} else {
-			output.set(res);
-		}
 	}
 
 }

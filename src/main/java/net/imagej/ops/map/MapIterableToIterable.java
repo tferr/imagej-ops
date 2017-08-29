@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -51,12 +51,12 @@ public class MapIterableToIterable<EI, EO> extends
 {
 
 	@Override
-	public void compute1(final Iterable<EI> input, final Iterable<EO> output) {
+	public void compute(final Iterable<EI> input, final Iterable<EO> output) {
 		final Iterator<EI> inCursor = input.iterator();
 		final Iterator<EO> outCursor = output.iterator();
 
 		while (inCursor.hasNext()) {
-			getOp().compute1(inCursor.next(), outCursor.next());
+			getOp().compute(inCursor.next(), outCursor.next());
 		}
 	}
 }

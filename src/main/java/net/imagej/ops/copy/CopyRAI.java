@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -66,7 +66,7 @@ public class CopyRAI<T> extends
 	public RandomAccessibleInterval<T> createOutput(
 		final RandomAccessibleInterval<T> input)
 	{
-		return createFunc.compute1(input);
+		return createFunc.calculate(input);
 	}
 
 	@Override
@@ -85,10 +85,10 @@ public class CopyRAI<T> extends
 	}
 
 	@Override
-	public void compute1(final RandomAccessibleInterval<T> input,
+	public void compute(final RandomAccessibleInterval<T> input,
 		final RandomAccessibleInterval<T> output)
 	{
-		mapComputer.compute1(input, output);
+		mapComputer.compute(input, output);
 	}
 
 	@Override

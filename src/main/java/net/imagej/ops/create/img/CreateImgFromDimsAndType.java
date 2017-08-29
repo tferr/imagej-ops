@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -65,7 +65,7 @@ public class CreateImgFromDimsAndType<T extends NativeType<T>> extends
 	}
 
 	@Override
-	public Img<T> compute2(final Dimensions input1, final T input2) {
+	public Img<T> calculate(final Dimensions input1, final T input2) {
 		return Imgs.create(factory, input1, input2);
 	}
 

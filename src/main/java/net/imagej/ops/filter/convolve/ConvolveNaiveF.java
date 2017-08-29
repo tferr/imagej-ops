@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -115,7 +115,7 @@ public class ConvolveNaiveF<I extends RealType<I>, O extends RealType<O> & Nativ
 	}
 
 	@Override
-	public RandomAccessibleInterval<O> compute2(
+	public RandomAccessibleInterval<O> calculate(
 		final RandomAccessibleInterval<I> img,
 		final RandomAccessibleInterval<K> kernel)
 	{
@@ -140,7 +140,7 @@ public class ConvolveNaiveF<I extends RealType<I>, O extends RealType<O> & Nativ
 			obfOutput), out);
 
 		// ops().filter().convolve(extendedOut, extendedIn, kernel);
-		convolver.compute1(extendedIn, extendedOut);
+		convolver.compute(extendedIn, extendedOut);
 
 		return out;
 	}

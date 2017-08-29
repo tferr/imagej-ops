@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -39,6 +39,8 @@ import net.imglib2.type.numeric.real.DoubleType;
 /**
  * Generic implementation of {@link net.imagej.ops.Ops.Geometric.Solidity}.
  * 
+ * Based on https://de.mathworks.com/help/images/ref/regionprops.html.
+ * 
  * @author Tim-Oliver Buchholz (University of Konstanz)
  */
 public abstract class AbstractSolidity<I> extends AbstractUnaryHybridCF<I, DoubleType>
@@ -55,8 +57,8 @@ public abstract class AbstractSolidity<I> extends AbstractUnaryHybridCF<I, Doubl
 	}
 
 	@Override
-	public void compute1(final I input, final DoubleType output) {
-		output.set(volume.compute1(input).get() / convexHullVolume.compute1(input).get());
+	public void compute(final I input, final DoubleType output) {
+		output.set(volume.calculate(input).get() / convexHullVolume.calculate(input).get());
 	}
 
 	@Override

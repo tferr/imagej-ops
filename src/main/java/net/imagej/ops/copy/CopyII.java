@@ -2,7 +2,7 @@
  * #%L
  * ImageJ software for multidimensional image processing and analysis.
  * %%
- * Copyright (C) 2014 - 2016 Board of Regents of the University of
+ * Copyright (C) 2014 - 2017 Board of Regents of the University of
  * Wisconsin-Madison, University of Konstanz and Brian Northan.
  * %%
  * Redistribution and use in source and binary forms, with or without
@@ -71,13 +71,13 @@ public class CopyII<T> extends
 	public IterableInterval<T> createOutput(final IterableInterval<T> input) {
 		// FIXME: Assumption here: Create an Img. I would rather like: Create
 		// what ever is best given the input.
-		return imgCreator.compute1(input);
+		return imgCreator.calculate(input);
 	}
 
 	@Override
-	public void compute1(final IterableInterval<T> input,
+	public void compute(final IterableInterval<T> input,
 			final IterableInterval<T> output) {
-		map.compute1(input, output);
+		map.compute(input, output);
 	}
 
 	@Override
